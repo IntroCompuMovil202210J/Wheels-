@@ -23,6 +23,7 @@
             android:layout_marginTop="100dp"/>
 
        <Button
+           android:id="@+id/botonTipoConductor"
            style="@style/Widget.Material3.Button.OutlinedButton"
            android:layout_width="300dp"
            android:layout_height="65dp"
@@ -35,6 +36,7 @@
            android:textColor="@color/black"  />
 
         <Button
+            android:id="@+id/botonTipoPasajero"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="300dp"
             android:layout_height="65dp"
@@ -53,7 +55,7 @@
             android:layout_marginTop="180dp">
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textAnteriorPantalla"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginStart="30dp"
@@ -61,9 +63,11 @@
                 android:text="Volver"
                 android:theme="@style/textoSeleccionTipoUsuario"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:textColor="@color/rojoWheels"/>
 
             <TextView
+                android:id="@+id/textContinuarPantalla"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
@@ -71,7 +75,8 @@
                 android:text="Continuar"
                 android:theme="@style/textoSeleccionTipoUsuario"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
