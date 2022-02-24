@@ -10,6 +10,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Wheels">
         <activity
+            android:name=".PantallaMainConductorActivity"
+            android:exported="false" />
+        <activity
             android:name=".RegisterVehiculoActivity"
             android:exported="false" />
         <activity
