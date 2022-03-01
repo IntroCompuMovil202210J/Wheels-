@@ -39,16 +39,22 @@
             app:boxCornerRadiusBottomStart="20dp"
             app:boxCornerRadiusTopEnd="20dp"
             app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+            android:background="@color/white"
+            app:boxStrokeErrorColor="@color/rojoWheels"
+            >
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textViewLoginCorreo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:theme="@style/formatoInput"
                 android:hint="Correo Electronico"
-                android:inputType="textEmailAddress" />
-
+                android:inputType="textEmailAddress"
+                app:errorEnabled="true"
+                app:boxStrokeErrorColor="@color/rojoWheels"
+                android:textColor="@color/black"
+                />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -62,17 +68,23 @@
             app:boxCornerRadiusTopEnd="20dp"
             app:boxCornerRadiusTopStart="20dp"
             android:background="@color/white"
-            app:endIconMode="password_toggle">
+            app:endIconMode="password_toggle"
+            >
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textViewLoginContra"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
                 android:theme="@style/formatoInput"
                 android:hint="Contraseña"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                app:errorEnabled="true"
+                app:boxStrokeErrorColor="@color/rojoWheels"
+                android:textColor="@color/black"/>
 
         </com.google.android.material.textfield.TextInputLayout>
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -139,6 +151,7 @@
             android:layout_marginTop="30dp" />
 
         <Button
+            android:id="@+id/buttonLoginEntrar"
             android:layout_width="250dp"
             android:layout_height="60dp"
             android:layout_marginTop="30dp"

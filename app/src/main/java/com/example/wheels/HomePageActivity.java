@@ -1,7 +1,6 @@
 package com.example.wheels;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class HomePageActivity extends AppCompatActivity {
+
+    TextView textoInicioWheels;
+    ImageView logoInicio;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,8 +26,8 @@ public class HomePageActivity extends AppCompatActivity {
         Animation animacion2 = AnimationUtils.loadAnimation(this, R.anim.desplazamiento_arriba);
 
         //objetos
-        TextView textoInicioWheels = findViewById(R.id.textoInicioWheels);
-        ImageView logoInicio = findViewById(R.id.logoInicio);
+        textoInicioWheels = findViewById(R.id.textoInicioWheels);
+        logoInicio = findViewById(R.id.logoInicio);
 
         //Asignar animacion
         logoInicio.setAnimation(animacion1);
@@ -41,9 +43,5 @@ public class HomePageActivity extends AppCompatActivity {
                 finish();
             }
         }, 4000);
-
-
-
-
     }
 }

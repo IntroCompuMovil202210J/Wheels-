@@ -42,4 +42,18 @@
         <item name="android:textAlignment">center</item>
     </style>
 
+    <style name="botonesMainPasajero">
+        <item name="android:backgroundTint">#00C33322</item>
+    </style>
+
+    <style name="textField" parent="Theme.MaterialComponents">
+        <item name="boxStrokeColor">@color/grisClaro</item>
+        <item name="hintTextColor">@color/grisClaro</item>
+
+
+
+
+
+    </style>
+
 </resources>
