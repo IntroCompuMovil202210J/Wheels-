@@ -148,6 +148,7 @@
             app:strokeWidth="2dp"
             android:text="Añadir otro vehiculo"
             android:textSize="18sp"
+            android:alpha="0.7"
             android:textColor="@color/black"
             android:fontFamily="serif"
             android:textStyle="bold" />

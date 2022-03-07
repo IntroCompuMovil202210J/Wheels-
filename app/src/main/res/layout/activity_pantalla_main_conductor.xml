@@ -4,6 +4,99 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PantallaMainConductorActivity">
+    tools:context=".PantallaMainConductorActivity"
+    android:background="@drawable/fondo">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonCrearGrupoC"
+        android:layout_width="370dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:backgroundTint="@color/white"
+        app:strokeColor="@color/rojoWheels"
+        app:strokeWidth="2dp"
+        app:cornerRadius="20dp"
+        android:text="Crear Grupo"
+        android:textColor="@color/black"
+        android:textAlignment="viewStart"
+        app:icon="@drawable/crear"
+        app:iconTint="@color/black"
+        app:iconGravity="end"
+        />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutInfoConductor"
+        android:layout_width="370dp"
+        android:layout_height="200dp"
+        android:layout_marginTop="35dp"
+        android:background="@color/grisClaro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCrearGrupoC"
+        android:orientation="vertical"></LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayoutViajesPendientes"
+        android:layout_width="370dp"
+        android:layout_height="250dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.512"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutInfoConductor"
+        android:orientation="vertical"
+        android:background="@color/grisClaro">
+
+
+    </LinearLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="85dp"
+        android:layout_marginTop="32dp"
+        android:alpha="0.95"
+        android:background="@drawable/color_borde_layout"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutViajesPendientes">
+
+        <ImageButton
+            android:id="@+id/imageGruposC"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/grupo"
+            android:theme="@style/botonesMainPasajero"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/buttonIniciarViajeC"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:textAlignment="center"
+            app:layout_constraintEnd_toStartOf="@+id/imagePerfilC"
+            app:layout_constraintStart_toEndOf="@+id/imageGruposC"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/boton_de_play"
+            android:backgroundTint="#00A6A6A6"/>
+
+        <ImageButton
+            android:id="@+id/imagePerfilC"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/perfil"
+            android:theme="@style/botonesMainPasajero"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

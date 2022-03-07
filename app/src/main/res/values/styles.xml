@@ -49,11 +49,17 @@
     <style name="textField" parent="Theme.MaterialComponents">
         <item name="boxStrokeColor">@color/grisClaro</item>
         <item name="hintTextColor">@color/grisClaro</item>
+    </style>
 
-
-
-
-
+    <style name="botonPerfilP" parent="Theme.MaterialComponents">
+        <item name="android:textAlignment">viewStart</item>
+        <item name="android:fontFamily">serif</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:backgroundTint">@color/white</item>
+        <item name="iconTint">@color/black</item>
+        <item name="iconSize">25dp</item>
+        <item name="iconPadding">15dp</item>
+        <item name="cornerRadius">0dp</item>
     </style>
 
 </resources>
