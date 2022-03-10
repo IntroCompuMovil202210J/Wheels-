@@ -13,20 +13,23 @@
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/drawable/image_circle.xml" value="0.296" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_buscar_grupo_pactivity.xml" value="0.3625" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_crear_grupo.xml" value="0.3484375" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_grupos.xml" value="0.2975630611372381" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_grupos_pasajero.xml" value="0.3625" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_iniciar_viaje.xml" value="0.3625" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_login.xml" value="0.33" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_iniciar_viaje.xml" value="0.5" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_login.xml" value="0.25" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_main.xml" value="0.3625" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_maps.xml" value="0.25815217391304346" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_pantalla_main.xml" value="0.3484375" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_pantalla_main_conductor.xml" value="0.358695652173913" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_pantalla_main_pasajero.xml" value="0.358695652173913" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_perfil_conductor.xml" value="0.3625" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_pantalla_main_conductor.xml" value="0.33" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_pantalla_main_pasajero.xml" value="0.33" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_perfil_conductor.xml" value="0.33" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_perfil_pasajero.xml" value="0.33" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register.xml" value="0.33" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register_datos_personales.xml" value="0.358695652173913" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register_vehiculo.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register.xml" value="0.22" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register_datos_personales.xml" value="0.25" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_register_vehiculo.xml" value="0.22" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_registerb.xml" value="0.33" />
-        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/homepage_activity.xml" value="0.31846153846153846" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/activity_viaje_en_curso.xml" value="0.2975630611372381" />
+        <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/homepage_activity.xml" value="0.33" />
         <entry key="..\:/Users/Fabian/Desktop/Wheels/app/src/main/res/layout/login_activity.xml" value="0.358695652173913" />
       </map>
     </option>

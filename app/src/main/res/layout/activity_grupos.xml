@@ -4,22 +4,70 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GruposActivity">
+    tools:context=".GruposActivity"
+    android:background="@drawable/fondo">
 
     <LinearLayout
+        android:id="@+id/linearLayout9"
         android:layout_width="match_parent"
         android:layout_height="80dp"
+        android:background="@drawable/color_borde_layout_inv"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:background="@drawable/color_borde_layout_inv">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:gravity="center"
             android:text="Tus grupos"
-            android:theme="@style/textoTitulosInicio"
             android:textColor="@color/white"
-            android:gravity="center"/>
+            android:theme="@style/textoTitulosInicio" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="380dp"
+        android:layout_height="600dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/color_borde_input"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="80dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout9" >
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="370dp"
+            android:layout_gravity="center"
+            android:layout_height="70dp"
+            android:layout_marginTop="10dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="@color/gris"
+            android:text="Grupo Centor 10AM"
+            android:textColor="@color/black"
+            app:icon="@drawable/grupo"
+            app:iconTint="@color/black"
+            android:textAlignment="center"
+            />
+
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="370dp"
+            android:layout_gravity="center"
+            android:layout_height="70dp"
+            android:backgroundTint="@color/white"
+            app:strokeColor="@color/gris"
+            android:text="Grupo Centor 10AM"
+            android:textColor="@color/black"
+            app:icon="@drawable/grupo"
+            app:iconTint="@color/black"
+            android:textAlignment="center"
+            />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
 
     </LinearLayout>
 

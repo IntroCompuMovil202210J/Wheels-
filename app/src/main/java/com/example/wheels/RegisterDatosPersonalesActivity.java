@@ -5,18 +5,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RegisterDatosPersonalesActivity extends AppCompatActivity {
 
@@ -25,14 +17,13 @@ public class RegisterDatosPersonalesActivity extends AppCompatActivity {
     TextView textViewDatosPersonalesTelefono;
     TextView textViewDatosPersonalesCorreo;
     TextView textViewDatosPersonalesContra;
-    FirebaseAuth fAuth;
-    FirebaseFirestore fFirestore;
     int tipoUsuario;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register_datos_personales);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         //Variables
         botonDatosPersonales = findViewById(R.id.botonDatosPersonales);
@@ -40,8 +31,6 @@ public class RegisterDatosPersonalesActivity extends AppCompatActivity {
         textViewDatosPersonalesTelefono = findViewById(R.id.textViewDatosPersonalesTelefono);;
         textViewDatosPersonalesCorreo = findViewById(R.id.textViewDatosPersonalesCorreo);;
         textViewDatosPersonalesContra = findViewById(R.id.textViewDatosPersonalesContra);;
-        fAuth = FirebaseAuth.getInstance();
-        fFirestore = FirebaseFirestore.getInstance();
 
 
         tipoUsuario = getIntent().getIntExtra("tipoUsuario", 2);
@@ -58,7 +47,16 @@ public class RegisterDatosPersonalesActivity extends AppCompatActivity {
                                 if(!textViewDatosPersonalesContra.getText().toString().isEmpty()){
                                     if(textViewDatosPersonalesContra.getText().toString().length() >= 6) {
 
-                                        createUser(textViewDatosPersonalesCorreo.getText().toString(), textViewDatosPersonalesContra.getText().toString(), String.valueOf(tipoUsuario), textViewDatosPersonalesTelefono.getText().toString());
+                                        //createUser(textViewDatosPersonalesCorreo.getText().toString(), textViewDatosPersonalesContra.getText().toString(), String.valueOf(tipoUsuario), textViewDatosPersonalesTelefono.getText().toString());
+                                        if(tipoUsuario == 1){
+                                            startActivity(new Intent(RegisterDatosPersonalesActivity.this, RegisterVehiculoActivity.class));
+                                            finish();
+                                        }
+
+                                        else if(tipoUsuario == 2){
+                                            startActivity(new Intent(RegisterDatosPersonalesActivity.this, PantallaMainPasajeroActivity.class));
+                                            finish();
+                                        }
 
                                     } else textViewDatosPersonalesContra.setError("Ingrese una contraseña mas larga");
                                 }else textViewDatosPersonalesContra.setError("Ingrese su contraseña");
@@ -68,7 +66,7 @@ public class RegisterDatosPersonalesActivity extends AppCompatActivity {
                 }
             });
     }
-
+/*
     private void createUser(String email, String password, String tipoUsuario, String telefono){
         fAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
             @Override
@@ -111,5 +109,5 @@ public class RegisterDatosPersonalesActivity extends AppCompatActivity {
             }
         });
 
-        }
+        }*/
 }

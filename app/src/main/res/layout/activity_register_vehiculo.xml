@@ -6,164 +6,192 @@
     android:layout_height="match_parent"
     android:background="@drawable/fondo">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:text="INGRESA LOS DATOS DE TU VEHICULO"
+        android:textAlignment="center"
+        android:textSize="25sp"
+        android:theme="@style/textoTitulosInicio"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.225"
+        app:layout_constraintStart_toStartOf="@+id/textInputLayout11"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:layout_width="350dp"
-            android:layout_height="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout11"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:layout_marginTop="80dp"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView6">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textViewRegistrarVehiculoPlaca"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:layout_marginTop="70dp"
-            android:text="INGRESA LOS DATOS DE TU VEHICULO"
-            android:textAlignment="center"
-            android:theme="@style/textoTitulosInicio"
-            android:textSize="25sp"/>
+            android:hint="Placa"
+            android:inputType="text"
+            android:theme="@style/formatoInput" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="360dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="40dp"
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout13"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout11">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textViewRegistrarVehiculoCapacidad"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+            android:hint="Capacidad"
+            android:inputType="number"
+            android:theme="@style/formatoInput" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textViewRegistrarVehiculoPlaca"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:theme="@style/formatoInput"
-                android:hint="Placa"
-                android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="360dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="15dp"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout14"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        android:layout_marginTop="10dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout13">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textViewRegistrarVehiculoColor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+            android:hint="Color"
+            android:inputType="text"
+            android:theme="@style/formatoInput" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textViewRegistrarVehiculoCapacidad"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:theme="@style/formatoInput"
-                android:hint="Capacidad"
-                android:inputType="number" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayout15"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:background="@color/white"
+        android:layout_marginTop="10dp"
+        app:boxCornerRadiusBottomEnd="20dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout14">
 
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="360dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="15dp"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textViewRegistrarVehiculoMarca"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+            android:hint="Marca"
+            android:inputType="text"
+            android:theme="@style/formatoInput" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textViewRegistrarVehiculoColor"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:theme="@style/formatoInput"
-                android:hint="Color"
-                android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="360dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:background="@color/white"
+        app:boxCornerRadiusBottomEnd="20dp"
+        android:layout_marginBottom="50dp"
+        app:boxCornerRadiusBottomStart="20dp"
+        app:boxCornerRadiusTopEnd="20dp"
+        app:boxCornerRadiusTopStart="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRegistrarAñadirOtro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textInputLayout15"
+        app:layout_constraintVertical_bias="0.0">
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="360dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="10dp"
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/textViewRegistrarVehiculoModelo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+            android:hint="Modelo"
+            android:inputType="number"
+            android:theme="@style/formatoInput" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textViewRegistrarVehiculoMarca"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:theme="@style/formatoInput"
-                android:hint="Marca"
-                android:inputType="text" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <Button
+        android:id="@+id/buttonRegistrarAñadirOtro"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:alpha="0.7"
+        android:fontFamily="serif"
+        android:text="Añadir otro vehiculo"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="15dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/botonContinuarVehiculo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/rojoWheels"
+        app:strokeWidth="2dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="360dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="10dp"
-            android:layout_gravity="center"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            android:background="@color/white" >
+    <Button
+        android:id="@+id/botonContinuarVehiculo"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp"
+        android:text="CONTINUAR"
+        android:theme="@style/botonEstilo"
+        app:cornerRadius="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/textViewRegistrarVehiculoModelo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:theme="@style/formatoInput"
-                android:hint="Modelo"
-                android:inputType="number" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <Button
-            android:id="@+id/buttonRegistrarAñadirOtro"
-            android:layout_width="250dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="35dp"
-            android:layout_gravity="center"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            app:strokeColor="@color/rojoWheels"
-            app:strokeWidth="2dp"
-            android:text="Añadir otro vehiculo"
-            android:textSize="18sp"
-            android:alpha="0.7"
-            android:textColor="@color/black"
-            android:fontFamily="serif"
-            android:textStyle="bold" />
-
-        <Button
-            android:id="@+id/botonContinuarVehiculo"
-            android:layout_width="250dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="25dp"
-            android:layout_gravity="center"
-            android:text="CONTINUAR"
-            style="@style/Widget.MaterialComponents.Button"
-            app:cornerRadius="25dp"
-            android:theme="@style/botonEstilo" />
-
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

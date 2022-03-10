@@ -12,39 +12,41 @@
         android:layout_height="320dp"
         android:background="@drawable/color_borde_layout_inv"
         android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/imagePerfilPasajero"
             android:layout_width="230dp"
             android:layout_height="230dp"
             android:layout_gravity="center"
             android:layout_marginTop="25dp"
-            android:background="@drawable/image_circle" />
+            android:background="@drawable/image_circle"
+            />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:layout_marginTop="5dp"
+            android:fontFamily="serif"
             android:gravity="center"
-            android:text="Patricia Estrella"
+            android:text="Pepe Usuario"
             android:textColor="@color/white"
-            android:textSize="25sp"
-            android:fontFamily="serif"/>
+            android:textSize="25sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="420dp"
+        android:layout_height="564dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/fondo"
         android:orientation="vertical"
-        android:layout_marginTop="5dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.068"
-        android:background="@drawable/fondo"
-        >
+        app:layout_constraintVertical_bias="0.0">
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
@@ -53,8 +55,7 @@
             android:text="Configuración"
             android:textColor="@color/black"
             android:theme="@style/botonPerfilP"
-            app:icon="@drawable/configuracion"
-            />
+            app:icon="@drawable/configuracion" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
@@ -62,8 +63,7 @@
             android:text="Mis viajes"
             android:textColor="@color/black"
             android:theme="@style/botonPerfilP"
-            app:icon="@drawable/historial"
-            />
+            app:icon="@drawable/historial" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
@@ -71,8 +71,7 @@
             android:text="Mis metodos de pago"
             android:textColor="@color/black"
             android:theme="@style/botonPerfilP"
-            app:icon="@drawable/metodospago"
-            />
+            app:icon="@drawable/metodospago" />
 
         <com.google.android.material.button.MaterialButton
             android:layout_width="match_parent"
@@ -80,8 +79,7 @@
             android:text="Modo Conductor"
             android:textColor="@color/black"
             android:theme="@style/botonPerfilP"
-            app:icon="@drawable/volante"
-            />
+            app:icon="@drawable/volante" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
