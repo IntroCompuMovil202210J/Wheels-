@@ -94,7 +94,7 @@
             app:startIconDrawable="@drawable/ic_baseline_search_24">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/if_viaje"
+                android:id="@+id/editViaje"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -112,7 +112,7 @@
             app:cardElevation="12dp">
 
             <org.osmdroid.views.MapView
-                android:id="@+id/mapView"
+                android:id="@+id/homeMap"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom" />

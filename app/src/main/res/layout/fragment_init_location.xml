@@ -9,82 +9,112 @@
 
     <!-- TODO: Update blank fragment layout -->
     <org.osmdroid.views.MapView
-        android:id="@+id/mapView2"
+        android:id="@+id/initLocationMap"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="7"
-        android:layout_gravity="bottom" />
+        android:layout_weight="8">
 
+    </org.osmdroid.views.MapView>
 
-    <androidx.cardview.widget.CardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="12dp">
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/group_border_rounded"
+        android:padding="10dp">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout3"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="Modificar origen"
+            android:textColorHint="#989898"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:startIconDrawable="@drawable/ic_outline_trip_origin_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editOrigin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout4"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:hint="Modificar destino"
+            android:textColorHint="#989898"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
+            app:startIconDrawable="@drawable/ic_outline_gps_fixed_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editDestination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginLeft="20dp"
-                android:background="@null"
-                android:hint="Modificar origen"
-                app:startIconDrawable="@drawable/ic_outline_map_24">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonCancel"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="0.5"
+                android:backgroundTint="@color/azul_cool"
+                android:fontFamily="@font/roboto_medium"
+                android:text="Cancelar"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:cornerRadius="16dp" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/if_viaje"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/roboto_regular"
-                    android:imeOptions="actionDone"
-                    android:inputType="text" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="20dp"
-                android:orientation="horizontal">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/logIn"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginRight="10dp"
-                    app:cornerRadius="16dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:backgroundTint="@color/azul_cool"
-                    android:text="Cancelar" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/register"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginLeft="10dp"
-                    app:cornerRadius="16dp"
-                    android:fontFamily="@font/roboto_medium"
-                    android:textColor="@color/black"
-                    android:textSize="14sp"
-                    android:backgroundTint="@color/azul_cool"
-                    android:text="Confirmar" />
-            </LinearLayout>
-
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/buttonConfirm"
+                android:layout_width="0dp"
+                android:layout_height="55dp"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="0.5"
+                android:backgroundTint="@color/azul_cool"
+                android:fontFamily="@font/roboto_medium"
+                android:text="Confirmar"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:cornerRadius="16dp" />
         </LinearLayout>
 
-    </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 </LinearLayout>

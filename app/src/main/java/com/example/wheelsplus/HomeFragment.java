@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -62,22 +63,30 @@ import java.util.List;
  */
 public class HomeFragment extends Fragment {
 
+    /**
+     * View
+     */
     View root;
 
-    MapView map;
-    TextInputEditText if_viaje;
-
+    /**
+     * Map/Location
+     */
+    FusedLocationProviderClient mFusedLocationClient;
     boolean settingsOK = false;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
     double latitude, longitude;
     GeoPoint startPoint = null;
-    GeoPoint otherPoint = null;
     Geocoder geocoder;
-
+    public static final double EARTH_RADIUS = 6371;
+    MapView map;
+    Marker other = null;
     IMapController mapController;
 
-    FusedLocationProviderClient mFusedLocationClient;
+    /**
+     * Screen elements (to inflate)
+     */
+    TextInputEditText if_viaje;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
@@ -165,7 +174,7 @@ public class HomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if_viaje = root.findViewById(R.id.if_viaje);
+        if_viaje = root.findViewById(R.id.editViaje);
 
 
         if_viaje.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -179,14 +188,10 @@ public class HomeFragment extends Fragment {
                             if (addresses != null && !addresses.isEmpty()) {
                                 Address addressResult = addresses.get(0);
                                 GeoPoint position = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
-                                InitLocationFragment nextFrag = new InitLocationFragment();
                                 Bundle bundle = new Bundle();
-
-
-                                getActivity().getSupportFragmentManager().beginTransaction()
-                                        .replace(R.id.nav_host_fragment, nextFrag, "findThisFragment")
-                                        .addToBackStack(null)
-                                        .commit();
+                                bundle.putParcelable("initDestination", position);
+                                bundle.putParcelable("initOrigin", startPoint);
+                                Navigation.findNavController(getView()).navigate(R.id.initLocationFragment, bundle);
                             } else {
                                 if_viaje.setError("Dirección no encontrada");
                             }
@@ -220,7 +225,7 @@ public class HomeFragment extends Fragment {
     }
 
     private void initMap(){
-        map = (MapView) root.findViewById(R.id.mapView);
+        map = (MapView) root.findViewById(R.id.homeMap);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.getZoomController().activate();
@@ -270,27 +275,23 @@ public class HomeFragment extends Fragment {
                 try {
                     if (lastLocation != null) {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
+                        if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) >= 0.03){
+                           Toast.makeText(getActivity(), "LOCALIZACION ACTUALIZADA", Toast.LENGTH_LONG).show();
+                        }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();
-
-                        if (startPoint == null) {
-                            mapController.setZoom(15.0);
-                            mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
-                        }
+                        mapController.setZoom(15.0);
+                        mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
                         startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
-                        map.removeAllViews();
-
-                        if (otherPoint != null) {
-                            Marker other = createMarker(otherPoint, geocoder.getFromLocation(otherPoint.getLatitude(), otherPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.ic_outline_home_24);
-                            map.getOverlays().add(other);
+                        if(other != null){
+                            map.getOverlays().remove(other);
                         }
-
-                        Marker other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.ic_outline_home_24);
+                        other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
                         map.getOverlays().add(other);
                     }
 
                 } catch (Exception e) {
-
+                    Log.e("Callback", e.toString());
                 }
             }
         };
@@ -319,6 +320,17 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        double latDistance = Math.toRadians(lat1 - lat2);
+        double lngDistance = Math.toRadians(long1 - long2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double result = EARTH_RADIUS * c;
+        return Math.round(result*100.0)/100.0;
     }
 
 }

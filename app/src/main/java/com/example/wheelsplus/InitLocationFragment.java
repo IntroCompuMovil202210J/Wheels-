@@ -1,22 +1,45 @@
 package com.example.wheelsplus;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.material.textfield.TextInputEditText;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,10 +48,29 @@ import org.osmdroid.views.overlay.Marker;
  */
 public class InitLocationFragment extends Fragment {
 
+    /**
+     * View
+     */
     View root;
+
+    /**
+     * Map/Location
+     */
     MapView map;
+    IMapController mapController;
     GeoPoint startPoint;
+    GeoPoint destinationPoint;
     Geocoder geocoder;
+    Marker origin, destination;
+    RoadManager roadManager;
+    Polyline roadOverlay;
+
+    /**
+     * Screen elements (to inflate)
+     */
+    TextInputEditText editModOrigin;
+    TextInputEditText editModDestination;
+    Button buttonCancel, buttonConfirm;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -80,23 +122,134 @@ public class InitLocationFragment extends Fragment {
         Context ctx = getActivity().getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
+        startPoint = getArguments().getParcelable("initOrigin");
+        destinationPoint = getArguments().getParcelable("initDestination");
+
         geocoder = new Geocoder(getActivity().getBaseContext());
 
         initMap();
 
+        roadManager = new OSRMRoadManager(getActivity(), "ANDROID");
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        editModOrigin = root.findViewById(R.id.editOrigin);
+        editModDestination = root.findViewById(R.id.editDestination);
+
+        buttonConfirm = root.findViewById(R.id.buttonCancel);
+        buttonConfirm = root.findViewById(R.id.buttonConfirm);
+
         return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        drawRoute(startPoint, destinationPoint);
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Navigation.findNavController(getView()).navigate(R.id.homeFragment);
+            }
+        });
+
+        editModOrigin.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if(i ==  EditorInfo.IME_ACTION_DONE){
+                    String address = editModOrigin.getText().toString();
+                    if(!address.isEmpty()){
+                        try {
+                            List<Address> addresses = geocoder.getFromLocationName(address, 2);
+                            if (addresses != null && !addresses.isEmpty()) {
+                                Address addressResult = addresses.get(0);
+                                startPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
+                                map.getOverlays().remove(origin);
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                                map.getOverlays().add(origin);
+                                editPolilyne(startPoint, destinationPoint);
+                            } else {
+                                editModOrigin.setError("Dirección no encontrada");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "La dirección esta vacía", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
+            }
+        });
+
+        editModDestination.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if(i ==  EditorInfo.IME_ACTION_DONE){
+                    String address = editModDestination.getText().toString();
+                    if(!address.isEmpty()){
+                        try {
+                            List<Address> addresses = geocoder.getFromLocationName(address, 2);
+                            if (addresses != null && !addresses.isEmpty()) {
+                                Address addressResult = addresses.get(0);
+                                destinationPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
+                                map.getOverlays().remove(destination);
+                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                                map.getOverlays().add(destination);
+                                editPolilyne(startPoint, destinationPoint);
+                            } else {
+                                editModDestination.setError("Dirección no encontrada");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), "La dirección esta vacía", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
+            }
+        });
+
     }
 
     private void initMap(){
         try {
-            map = (MapView) root.findViewById(R.id.mapView2);
+            map = (MapView) root.findViewById(R.id.initLocationMap);
             map.setTileSource(TileSourceFactory.MAPNIK);
             map.setMultiTouchControls(true);
-            Marker other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.ic_outline_home_24);
-            map.getOverlays().add(other);
+            map.getZoomController().activate();
+            mapController = map.getController();
+            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+            map.getOverlays().add(origin);
+            map.getOverlays().add(destination);
+            mapController.setZoom(15.0);
+            centerToPolyline(startPoint, destinationPoint);
         }catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    private void editPolilyne(GeoPoint startPoint, GeoPoint destinationPoint){
+        map.getOverlays().remove(roadOverlay);
+        drawRoute(startPoint, destinationPoint);
+        centerToPolyline(startPoint, destinationPoint);
+    }
+
+    private void centerToPolyline(GeoPoint startPoint, GeoPoint destinationPoint){
+        double centerLat = (startPoint.getLatitude() + destinationPoint.getLatitude()) / 2;
+        double centerLong = (startPoint.getLongitude() + destinationPoint.getLongitude()) / 2;
+        mapController.setCenter(new GeoPoint(centerLat, centerLong));
     }
 
     private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
@@ -114,4 +267,23 @@ public class InitLocationFragment extends Fragment {
         }
         return marker;
     }
+
+    private void drawRoute(GeoPoint start, GeoPoint finish){
+        ArrayList<GeoPoint> routePoints = new ArrayList<>();
+        routePoints.add(start);
+        routePoints.add(finish);
+        Road road = roadManager.getRoad(routePoints);
+        Log.i("RUTA", "Route length: "+road.mLength+" klm");
+        Log.i("RUTA", "Duration: "+road.mDuration/60+" min");
+        if(map!=null){
+            if(roadOverlay!=null){
+                map.getOverlays().remove(roadOverlay);
+            }
+            roadOverlay = RoadManager.buildRoadOverlay(road);
+            roadOverlay.getOutlinePaint().setColor(Color.rgb(39, 97, 198));
+            roadOverlay.getOutlinePaint().setStrokeWidth(5);
+            map.getOverlays().add(roadOverlay);
+        }
+    }
+
 }

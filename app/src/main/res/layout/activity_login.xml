@@ -59,6 +59,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textView2">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editEmailLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -82,6 +83,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editPsswdLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -102,7 +104,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/materialButton"
+            android:id="@+id/buttonSignIn"
             android:layout_width="300dp"
             android:layout_height="70dp"
             android:layout_marginTop="70dp"
@@ -124,7 +126,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.703"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
-            app:layout_constraintTop_toBottomOf="@+id/materialButton"
+            app:layout_constraintTop_toBottomOf="@+id/buttonSignIn"
             app:layout_constraintVertical_bias="0.827" />
 
         <ImageView
@@ -135,7 +137,7 @@
             android:src="@drawable/google"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialButton"
+            app:layout_constraintTop_toBottomOf="@+id/buttonSignIn"
             app:layout_constraintVertical_bias="0.827" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
