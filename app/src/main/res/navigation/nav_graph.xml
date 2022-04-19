@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/initialFragment2">
+    app:startDestination="@id/initialFragment">
 
     <fragment
-        android:id="@+id/initialFragment2"
-        android:name="com.example.navtest.InitialFragment"
-        android:label="fragment_initial"
-        tools:layout="@layout/fragment_initial" >
+        android:id="@+id/initialFragment"
+        android:name="com.example.wheelsplus.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_initialFragment2_to_groupFragment"
             app:destination="@id/groupFragment" />
         <action
             android:id="@+id/action_initialFragment2_to_mapFragment"
-            app:destination="@id/mapFragment" />
+            app:destination="@id/initLocationFragment" />
     </fragment>
     <fragment
         android:id="@+id/groupFragment"
@@ -24,11 +24,11 @@
         tools:layout="@layout/fragment_group" >
         <action
             android:id="@+id/action_groupFragment_to_initialFragment2"
-            app:destination="@id/initialFragment2" />
+            app:destination="@id/initialFragment" />
     </fragment>
     <fragment
-        android:id="@+id/mapFragment"
-        android:name="com.example.navtest.MapFragment"
-        android:label="fragment_map"
-        tools:layout="@layout/fragment_map" />
+        android:id="@+id/initLocationFragment"
+        android:name="com.example.wheelsplus.InitLocationFragment"
+        android:label="fragment_init_location"
+        tools:layout="@layout/fragment_init_location" />
 </navigation>
