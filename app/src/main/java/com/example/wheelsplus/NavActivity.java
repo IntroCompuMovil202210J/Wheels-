@@ -28,14 +28,18 @@ public class NavActivity extends AppCompatActivity {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
         NavController navController = navHostFragment.getNavController();
 
+
         navController.navigate(R.id.homeFragment);
+
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.home:
+                        
                         navController.navigate(R.id.homeFragment);
+
                         break;
                     case R.id.group:
                         navController.navigate(R.id.groupFragment);
