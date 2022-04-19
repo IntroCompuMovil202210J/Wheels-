@@ -2,7 +2,6 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="10dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/azul_cool"
@@ -79,14 +78,19 @@
         app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.Dense"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_gravity="top"
-            android:background="@null"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusTopStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusBottomEnd="20dp"
             android:hint="Buscar Viaje"
+            android:textColorHint="#989898"
             app:startIconDrawable="@drawable/ic_baseline_search_24">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -95,7 +99,8 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:imeOptions="actionDone"
-                android:inputType="text" />
+                android:inputType="text"
+                />
 
         </com.google.android.material.textfield.TextInputLayout>
 

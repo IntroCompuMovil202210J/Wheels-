@@ -188,7 +188,7 @@ public class HomeFragment extends Fragment {
                                         .addToBackStack(null)
                                         .commit();
                             } else {
-                                Toast.makeText(getActivity(), "Dirección no encontrada", Toast.LENGTH_SHORT).show();
+                                if_viaje.setError("Dirección no encontrada");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();

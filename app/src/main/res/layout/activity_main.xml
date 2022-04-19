@@ -1,54 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/homeLayout"
     android:layout_width="match_parent"
-    android:background="@drawable/back3"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_group_gradient_anim"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginTop="-200dp"
+        android:layout_marginBottom="300dp"
+        android:src="@drawable/logo_wheels"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:fontFamily="@font/roboto_regular"
-        android:text="Wheels+"
-        android:textSize="20sp" />
-
-    <LinearLayout
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimationView"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_gravity="bottom"
-        android:layout_margin="15dp"
-        android:orientation="vertical">
+        android:layout_height="250dp"
+        android:layout_marginTop="-150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.515"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/animacion"
+        app:lottie_renderMode="automatic" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logIn"
-            android:layout_width="250dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.5"
-            android:layout_margin="20dp"
-            android:layout_gravity="center"
-            app:cornerRadius="16dp"
-            android:fontFamily="@font/roboto_medium"
-            android:textSize="14sp"
-            android:backgroundTint="@color/teal_700"
-            android:text="Iniciar sesión" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/register"
-            android:layout_width="250dp"
-            android:layout_height="0dp"
-            android:layout_weight="0.5"
-            android:layout_margin="20dp"
-            android:layout_gravity="center"
-            app:cornerRadius="16dp"
-            android:fontFamily="@font/roboto_medium"
-            android:textSize="14sp"
-            android:backgroundTint="@color/azul_raro"
-            android:text="Registro" />
-    </LinearLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonIniciarSesión"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_weight="0.5"
+        android:backgroundTint="#0D324D"
+        android:text="Iniciar sesión"
+        android:theme="@style/textoFuenteBoton"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/buttonRegistro"
+        app:layout_constraintEnd_toEndOf="@+id/buttonRegistro"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/buttonRegistro"
+        app:layout_constraintTop_toBottomOf="@+id/lottieAnimationView"
+        app:layout_constraintVertical_bias="0.315" />
 
-</FrameLayout>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonRegistro"
+        android:layout_width="300dp"
+        android:layout_height="70dp"
+        android:layout_marginBottom="50dp"
+        android:layout_weight="0.5"
+        android:backgroundTint="#2661C6"
+        android:text="Crear Cuenta"
+        android:theme="@style/textoFuenteBoton"
+        app:cornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

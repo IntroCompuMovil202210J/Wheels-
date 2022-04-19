@@ -11,4 +11,10 @@
     <color name="verde_raro">#3CDA83</color>
     <color name="android">#3DDC84</color>
     <color name="azul_cool">#E4E4F2</color>
+
+    <color name="startHomeGradient">#E4E4F2</color>
+    <color name="midHomeGradient">#D5D6E1</color>
+    <color name="endHomeGradient">#FFFFFF</color>
+    <color name="transparente">#00FFFFFF</color>
+    <color name="azulStroke">#8693ab</color>
 </resources>
