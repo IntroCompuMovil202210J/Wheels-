@@ -1,4 +1,4 @@
-package com.example.navtest;
+package com.example.wheelsplus;
 
 import android.Manifest;
 import android.content.Context;
@@ -179,7 +179,7 @@ public class HomeFragment extends Fragment {
                             if (addresses != null && !addresses.isEmpty()) {
                                 Address addressResult = addresses.get(0);
                                 GeoPoint position = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
-                                MapFragment nextFrag = new MapFragment();
+                                InitLocationFragment nextFrag = new InitLocationFragment();
                                 Bundle bundle = new Bundle();
 
 
