@@ -275,9 +275,6 @@ public class HomeFragment extends Fragment {
                 try {
                     if (lastLocation != null) {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
-                        if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) >= 0.03){
-                           Toast.makeText(getActivity(), "LOCALIZACION ACTUALIZADA", Toast.LENGTH_LONG).show();
-                        }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();
                         mapController.setZoom(15.0);

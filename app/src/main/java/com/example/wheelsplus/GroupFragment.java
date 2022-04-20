@@ -1,12 +1,21 @@
 package com.example.wheelsplus;
 
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.TimePicker;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +23,17 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class GroupFragment extends Fragment {
+
+    /**
+     * View
+     */
+    View root;
+
+    /**
+     * Screen elements (to inflate)
+     */
+    Button buttonTime, buttonSearchGroup;
+    TextView tvSelectedTime;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +79,45 @@ public class GroupFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group, container, false);
+
+        root = inflater.inflate(R.layout.fragment_group, container, false);
+
+        buttonTime = root.findViewById(R.id.buttonTime);
+        buttonSearchGroup = root.findViewById(R.id.buttonSearchGroup);
+        tvSelectedTime = root.findViewById(R.id.tvSelectedTime);
+
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        buttonTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Calendar calendar = Calendar.getInstance();
+                TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), android.R.style.Theme_Holo_Light_Dialog_NoActionBar, new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                        String AM_PM;
+                        if(hour < 12) {
+                            AM_PM = "AM";
+                        } else {
+                            AM_PM = "PM";
+                        }
+                        tvSelectedTime.setText("Hora de salida: " + hour + " : " + minute + " " + AM_PM);
+                    }
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
+                timePickerDialog.show();
+            }
+        });
+
+        buttonSearchGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
     }
 }
