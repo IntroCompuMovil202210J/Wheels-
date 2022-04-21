@@ -10,6 +10,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.Navigation;
 
 import android.os.StrictMode;
@@ -136,7 +138,7 @@ public class InitLocationFragment extends Fragment {
         editModOrigin = root.findViewById(R.id.editOrigin);
         editModDestination = root.findViewById(R.id.editDestination);
 
-        buttonConfirm = root.findViewById(R.id.buttonCancel);
+        buttonCancel = root.findViewById(R.id.buttonCancel);
         buttonConfirm = root.findViewById(R.id.buttonConfirm);
 
         return root;
@@ -158,7 +160,8 @@ public class InitLocationFragment extends Fragment {
         buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Navigation.findNavController(getView()).navigate(R.id.homeFragment);
+                HomeFragment homeFragment = new HomeFragment();
+                replaceFragment(homeFragment);
             }
         });
 
@@ -220,6 +223,13 @@ public class InitLocationFragment extends Fragment {
             }
         });
 
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     private void initMap(){

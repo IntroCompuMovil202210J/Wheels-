@@ -2,6 +2,9 @@ package com.example.wheelsplus;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -16,6 +19,11 @@ public class NavActivity extends AppCompatActivity {
 
     BottomNavigationView bottomNavigationView;
 
+    HomeFragment homeFragment = new HomeFragment();
+    GroupFragment groupFragment = new GroupFragment();
+    ChatFragment chatFragment = new ChatFragment();
+    SettingsFragment settingsFragment = new SettingsFragment();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,26 +31,32 @@ public class NavActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_nav);
 
+        replaceFragment(homeFragment);
+
         bottomNavigationView = findViewById(R.id.bottom_nav);
 
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment);
-        NavController navController = navHostFragment.getNavController();
-        navController.navigate(R.id.homeFragment);
+        if(savedInstanceState != null){
+            homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
+            groupFragment = (GroupFragment) getSupportFragmentManager().getFragment(savedInstanceState, "groupFragment");
+            chatFragment = (ChatFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatFragment");
+            settingsFragment = (SettingsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "settingsFragment");
+        }
 
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch(item.getItemId()){
                     case R.id.home:
-                        navController.navigate(R.id.homeFragment);
+                        replaceFragment(homeFragment);
                         break;
                     case R.id.group:
-                        navController.navigate(R.id.groupFragment);
+                        replaceFragment(groupFragment);
                         break;
                     case R.id.chat:
-                        navController.navigate(R.id.chatFragment);
+                        replaceFragment(chatFragment);
                         break;
                     case R.id.settings:
+                        replaceFragment(settingsFragment);
                         break;
                 }
                 return true;
@@ -50,4 +64,21 @@ public class NavActivity extends AppCompatActivity {
         });
 
     }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
+        getSupportFragmentManager().putFragment(outState, "groupFragment", groupFragment);
+        getSupportFragmentManager().putFragment(outState, "chatFragment", chatFragment);
+        getSupportFragmentManager().putFragment(outState, "settingsFragment", settingsFragment);
+    }
+
 }

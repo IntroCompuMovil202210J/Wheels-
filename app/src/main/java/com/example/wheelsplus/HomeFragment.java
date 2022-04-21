@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.Navigation;
 
 import android.preference.PreferenceManager;
@@ -191,7 +193,9 @@ public class HomeFragment extends Fragment {
                                 Bundle bundle = new Bundle();
                                 bundle.putParcelable("initDestination", position);
                                 bundle.putParcelable("initOrigin", startPoint);
-                                Navigation.findNavController(getView()).navigate(R.id.initLocationFragment, bundle);
+                                InitLocationFragment initLocationFragment = new InitLocationFragment();
+                                initLocationFragment.setArguments(bundle);
+                                replaceFragment(initLocationFragment);
                             } else {
                                 if_viaje.setError("Dirección no encontrada");
                             }
@@ -205,6 +209,13 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     @Override
