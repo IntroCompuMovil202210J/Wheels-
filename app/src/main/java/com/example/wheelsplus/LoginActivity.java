@@ -5,14 +5,20 @@ import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,6 +33,8 @@ public class LoginActivity extends AppCompatActivity {
     TextInputEditText editMailLogin, editPsswdLogin;
 
     ConstraintLayout layout;
+
+    FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,11 +53,14 @@ public class LoginActivity extends AppCompatActivity {
         editMailLogin = findViewById(R.id.editEmailLogin);
         editPsswdLogin = findViewById(R.id.editPsswdLogin);
 
+        auth = FirebaseAuth.getInstance();
+
         //Pruebita
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(view.getContext(), NavActivity.class));
+                //startActivity(new Intent(view.getContext(), NavActivity.class));
+                authenticateWithFB();
             }
         });
 
@@ -101,6 +112,14 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(auth.getCurrentUser() != null){
+            updateUI();
+        }
+    }
+
     private boolean validateEmail(String email){
         Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(email);
         return matcher.find();
@@ -109,6 +128,34 @@ public class LoginActivity extends AppCompatActivity {
     private boolean validatePsswd(String psswd){
         Matcher matcher = VALID_PSSWD_REGEX.matcher(psswd);
         return matcher.find();
+    }
+
+    private void authenticateWithFB(){
+        String mail = editMailLogin.getText().toString();
+        String psswd = editPsswdLogin.getText().toString();
+        if(validateForm(mail, psswd)){
+            auth.signInWithEmailAndPassword(mail, psswd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        updateUI();
+                    }else{
+                        String message = task.getException().getMessage();
+                        Log.i("FirebaseTest", message);
+                    }
+                }
+            });
+        }
+    }
+
+    private boolean validateForm(String email, String password){
+        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(email);
+        return matcher.find();
+    }
+
+    private void updateUI(){
+        startActivity(new Intent(this, NavActivity.class));
     }
 
 }

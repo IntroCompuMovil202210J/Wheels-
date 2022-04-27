@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "483875256609",
+    "project_id": "wheelsplus-9b510",
+    "storage_bucket": "wheelsplus-9b510.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:483875256609:android:0110101d2e888bbc42a660",
+        "android_client_info": {
+          "package_name": "com.example.wheelsplus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "483875256609-cpkfnvtjpi2c07ol6oqud7nn6enh8i6o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgT_dKKXJr_6_7NMV-AFMqXho-9IVvFzA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "483875256609-cpkfnvtjpi2c07ol6oqud7nn6enh8i6o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
