@@ -1,12 +1,22 @@
 package com.example.wheelsplus;
 
+import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import com.google.firebase.auth.FirebaseAuth;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +24,26 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class SettingsFragment extends Fragment {
+
+    /**
+     * View
+     */
+    View root;
+
+    /**
+     * Screen elements (to inflate)
+     */
+    Button buttonSignOut;
+    ImageButton buttonModify;
+    CircleImageView profilePic;
+    TextView settingsName, settingsEmail;
+    LinearLayout trip, pay, adv, help;
+
+    /**
+     * Firebase
+     */
+    FirebaseAuth auth;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +89,35 @@ public class SettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_settings, container, false);
+        root =  inflater.inflate(R.layout.fragment_settings, container, false);
+
+        buttonSignOut = root.findViewById(R.id.buttonCerrarSesion);
+        buttonModify = root.findViewById(R.id.buttonModify);
+        profilePic = root.findViewById(R.id.profilePic);
+        settingsName = root.findViewById(R.id.settingsName);
+        settingsEmail = root.findViewById(R.id.settingsEmail);
+        trip = root.findViewById(R.id.layViajes);
+        pay = root.findViewById(R.id.layPay);
+        adv = root.findViewById(R.id.layAdvanced);
+        help = root.findViewById(R.id.layHelp);
+
+        auth = FirebaseAuth.getInstance();
+
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                auth.signOut();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
     }
 }

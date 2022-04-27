@@ -11,10 +11,14 @@ import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class MainActivity extends AppCompatActivity {
 
     Button buttonIniciarSesion, buttonRegistro;
     ConstraintLayout layout;
+
+    FirebaseAuth auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         buttonRegistro = findViewById(R.id.buttonRegistro);
 
         layout = findViewById(R.id.homeLayout);
+
+        auth = FirebaseAuth.getInstance();
 
         AnimationDrawable animationDrawable = (AnimationDrawable) layout.getBackground();
 
@@ -50,4 +56,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if(auth.getCurrentUser() != null){
+            updateUI();
+        }
+    }
+
+    private void updateUI(){
+        startActivity(new Intent(this, NavActivity.class));
+    }
+
 }

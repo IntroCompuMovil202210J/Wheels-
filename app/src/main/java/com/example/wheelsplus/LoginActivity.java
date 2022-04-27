@@ -55,11 +55,9 @@ public class LoginActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
 
-        //Pruebita
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //startActivity(new Intent(view.getContext(), NavActivity.class));
                 authenticateWithFB();
             }
         });
@@ -133,7 +131,7 @@ public class LoginActivity extends AppCompatActivity {
     private void authenticateWithFB(){
         String mail = editMailLogin.getText().toString();
         String psswd = editPsswdLogin.getText().toString();
-        if(validateForm(mail, psswd)){
+        if(emailValid && psswdValid){
             auth.signInWithEmailAndPassword(mail, psswd).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -146,12 +144,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         }
-    }
-
-    private boolean validateForm(String email, String password){
-        Pattern pattern = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(email);
-        return matcher.find();
     }
 
     private void updateUI(){
