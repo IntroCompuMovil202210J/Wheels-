@@ -1,7 +1,11 @@
 package com.example.wheelsplus;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +19,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -43,7 +50,6 @@ public class SettingsFragment extends Fragment {
      * Firebase
      */
     FirebaseAuth auth;
-
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -119,5 +125,29 @@ public class SettingsFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        buttonModify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        settingsName.setText(auth.getCurrentUser().getDisplayName());
+        settingsEmail.setText(auth.getCurrentUser().getEmail());
+        loadImage(auth.getCurrentUser().getPhotoUrl());
+
     }
+
+    private void loadImage(Uri uri){
+        try {
+            Log.i("Photo", uri.toString());
+            final InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
+            final Bitmap image = BitmapFactory.decodeStream(imageStream);
+            profilePic.setImageBitmap(image);
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

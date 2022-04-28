@@ -3,10 +3,13 @@ package com.example.wheelsplus;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -29,6 +32,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +51,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -55,7 +60,9 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -89,6 +96,12 @@ public class HomeFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextInputEditText if_viaje;
+    ImageView ic_profile;
+
+    /**
+     * Firebase
+     */
+    FirebaseAuth auth;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
@@ -158,6 +171,9 @@ public class HomeFragment extends Fragment {
         Context ctx = getActivity().getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
+        if_viaje = root.findViewById(R.id.editViaje);
+        ic_profile = root.findViewById(R.id.ic_profile);
+
         geocoder = new Geocoder(getActivity().getBaseContext());
 
         locationRequest = createLocationRequest();
@@ -169,15 +185,14 @@ public class HomeFragment extends Fragment {
 
         initMap();
 
+        auth = FirebaseAuth.getInstance();
+
         return root;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        if_viaje = root.findViewById(R.id.editViaje);
-
 
         if_viaje.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -209,6 +224,9 @@ public class HomeFragment extends Fragment {
                 return false;
             }
         });
+
+        loadImage(auth.getCurrentUser().getPhotoUrl());
+
     }
 
     private void replaceFragment(Fragment fragment){
@@ -233,6 +251,17 @@ public class HomeFragment extends Fragment {
         super.onPause();
         map.onPause();
         stopLocationUpdates();
+    }
+
+    private void loadImage(Uri uri){
+        try {
+            Log.i("Photo", uri.toString());
+            final InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
+            final Bitmap image = BitmapFactory.decodeStream(imageStream);
+            ic_profile.setImageBitmap(image);
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void initMap(){

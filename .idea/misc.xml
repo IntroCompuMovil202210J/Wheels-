@@ -19,6 +19,7 @@
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/ic_outline_place_24.xml" value="0.3585" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/mk_destination.xml" value="0.2005" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/shape_circle_message.xml" value="0.1" />
+        <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_forgot_passwd.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_login.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_nav.xml" value="0.1" />
@@ -30,6 +31,7 @@
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_init_location.xml" value="0.33" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_ride.xml" value="0.2898550724637681" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_settings.xml" value="0.3233695652173913" />
+        <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_update_profile.xml" value="0.33" />
       </map>
     </option>
   </component>

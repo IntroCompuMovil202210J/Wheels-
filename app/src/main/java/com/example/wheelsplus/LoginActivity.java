@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
 
     Button buttonSignIn;
     TextInputEditText editMailLogin, editPsswdLogin;
+    TextView forgotPasswd;
 
     ConstraintLayout layout;
 
@@ -52,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         buttonSignIn = findViewById(R.id.buttonSignIn);
         editMailLogin = findViewById(R.id.editEmailLogin);
         editPsswdLogin = findViewById(R.id.editPsswdLogin);
+        forgotPasswd = findViewById(R.id.tvForgotPasswd);
 
         auth = FirebaseAuth.getInstance();
 
@@ -108,6 +112,17 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        forgotPasswd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(view.getContext(), ForgotPasswdActivity.class);
+                if(emailValid){
+                    intent.putExtra("email", editMailLogin.getText().toString());
+                }
+                startActivity(intent);
+            }
+        });
+
     }
 
     @Override
@@ -139,7 +154,7 @@ public class LoginActivity extends AppCompatActivity {
                         updateUI();
                     }else{
                         String message = task.getException().getMessage();
-                        Log.i("FirebaseTest", message);
+                        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
                     }
                 }
             });
