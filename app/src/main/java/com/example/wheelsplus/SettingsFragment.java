@@ -11,12 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -24,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -121,7 +125,8 @@ public class SettingsFragment extends Fragment {
             public void onClick(View view) {
                 auth.signOut();
                 Intent intent = new Intent(getContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
             }
         });
@@ -129,25 +134,22 @@ public class SettingsFragment extends Fragment {
         buttonModify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                replaceFragment(new UpdateProfileFragment());
             }
         });
 
         settingsName.setText(auth.getCurrentUser().getDisplayName());
         settingsEmail.setText(auth.getCurrentUser().getEmail());
-        loadImage(auth.getCurrentUser().getPhotoUrl());
+        new DownloadImageTask((CircleImageView) root.findViewById(R.id.profilePic))
+                .execute(auth.getCurrentUser().getPhotoUrl().toString());
 
     }
 
-    private void loadImage(Uri uri){
-        try {
-            Log.i("Photo", uri.toString());
-            final InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
-            final Bitmap image = BitmapFactory.decodeStream(imageStream);
-            profilePic.setImageBitmap(image);
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
 }

@@ -29,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static final Pattern VALID_PSSWD_REGEX = Pattern.compile("^(?i)(?=.*[a-z])(?=.*[0-9])[a-z0-9#.!@$*&_]{6,12}$", Pattern.CASE_INSENSITIVE);
     boolean emailValid, psswdValid;
-    public static final String DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/wheelsplus-9b510.appspot.com/o/profilePics%2FdefaultProfilePic.png?alt=media&token=c8c71720-fd0b-402e-9b0f-e0317148efef";
+    public static final String DEFAULT_PROFILE_PIC = "${DEFAULT_PROFILE_PIC}";
 
     Button buttonRegister;
     TextInputEditText editMailRegister, editPsswdRegister, editPhoneRegister, editFullNameRegister;

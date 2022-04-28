@@ -11,6 +11,15 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.view.KeyEvent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -23,18 +32,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.Navigation;
-
-import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.EditorInfo;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -64,6 +61,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -96,7 +96,7 @@ public class HomeFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextInputEditText if_viaje;
-    ImageView ic_profile;
+    CircleImageView ic_profile;
 
     /**
      * Firebase
@@ -225,7 +225,10 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        loadImage(auth.getCurrentUser().getPhotoUrl());
+        Log.i("URL", auth.getCurrentUser().getPhotoUrl().toString());
+
+        new DownloadImageTask((CircleImageView) root.findViewById(R.id.ic_profile))
+                .execute(auth.getCurrentUser().getPhotoUrl().toString());
 
     }
 

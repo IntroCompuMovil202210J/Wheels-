@@ -2,11 +2,18 @@ package com.example.wheelsplus;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +21,27 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class UpdateProfileFragment extends Fragment {
+
+    /**
+     * View
+     */
+    View root;
+
+    /**
+     * Animations
+     */
+    Animation rotateOpen, rotateClose, fromBottom, toBottom;
+
+    /**
+     * Screen elements (to inflate)
+     */
+    FloatingActionButton buttonChangeProfilePic, buttonChangeCam, buttonChangeGallery;
+
+    /**
+     * Utils
+     */
+    boolean clicked = false;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +87,75 @@ public class UpdateProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_update_profile, container, false);
+        root = inflater.inflate(R.layout.fragment_update_profile, container, false);
+
+        buttonChangeProfilePic = root.findViewById(R.id.buttonChangeProfilePic);
+        buttonChangeCam = root.findViewById(R.id.buttonChangeCam);
+        buttonChangeGallery = root.findViewById(R.id.buttonChangeGallery);
+
+        rotateOpen = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_open_anim);
+        rotateClose = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_close_anim);
+        fromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.from_bottom_anim);
+        toBottom = AnimationUtils.loadAnimation(getContext(), R.anim.to_bottom_anim);
+
+        return root;
     }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        buttonChangeCam.setClickable(false);
+        buttonChangeGallery.setClickable(false);
+        buttonChangeProfilePic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                setVisibility();
+                setAnimation();
+                clicked = !clicked;
+            }
+        });
+
+        buttonChangeCam.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Camera", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        buttonChangeGallery.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Toast.makeText(getContext(), "Gallery", Toast.LENGTH_LONG).show();
+            }
+        });
+
+    }
+
+    private void setVisibility(){
+        if(!clicked){
+            buttonChangeCam.setVisibility(View.VISIBLE);
+            buttonChangeGallery.setVisibility(View.VISIBLE);
+            buttonChangeCam.setClickable(true);
+            buttonChangeGallery.setClickable(true);
+        }else{
+            buttonChangeCam.setVisibility(View.INVISIBLE);
+            buttonChangeGallery.setVisibility(View.INVISIBLE);
+            buttonChangeCam.setClickable(false);
+            buttonChangeGallery.setClickable(false);
+        }
+    }
+
+    private void setAnimation(){
+        if(!clicked){
+            buttonChangeCam.startAnimation(fromBottom);
+            buttonChangeGallery.startAnimation(fromBottom);
+            buttonChangeProfilePic.startAnimation(rotateOpen);
+        }else{
+            buttonChangeCam.startAnimation(toBottom);
+            buttonChangeGallery.startAnimation(toBottom);
+            buttonChangeProfilePic.startAnimation(rotateClose);
+        }
+    }
+
 }
