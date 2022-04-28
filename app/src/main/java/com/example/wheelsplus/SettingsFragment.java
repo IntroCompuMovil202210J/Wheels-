@@ -1,17 +1,11 @@
 package com.example.wheelsplus;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -22,9 +16,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.firebase.auth.FirebaseAuth;
-
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import services.DownloadImageTask;
@@ -44,7 +35,7 @@ public class SettingsFragment extends Fragment {
     /**
      * Screen elements (to inflate)
      */
-    Button buttonSignOut;
+    LinearLayout layCerrarSesion;
     ImageButton buttonModify;
     CircleImageView profilePic;
     TextView settingsName, settingsEmail;
@@ -101,7 +92,7 @@ public class SettingsFragment extends Fragment {
         // Inflate the layout for this fragment
         root =  inflater.inflate(R.layout.fragment_settings, container, false);
 
-        buttonSignOut = root.findViewById(R.id.buttonCerrarSesion);
+        layCerrarSesion = root.findViewById(R.id.layCerrarSesion);
         buttonModify = root.findViewById(R.id.buttonModify);
         profilePic = root.findViewById(R.id.profilePic);
         settingsName = root.findViewById(R.id.settingsName);
@@ -120,7 +111,7 @@ public class SettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        buttonSignOut.setOnClickListener(new View.OnClickListener() {
+        layCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 auth.signOut();
