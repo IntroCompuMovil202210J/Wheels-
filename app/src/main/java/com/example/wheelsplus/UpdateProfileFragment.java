@@ -1,19 +1,45 @@
 package com.example.wheelsplus;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
+import android.widget.Button;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,11 +62,42 @@ public class UpdateProfileFragment extends Fragment {
      * Screen elements (to inflate)
      */
     FloatingActionButton buttonChangeProfilePic, buttonChangeCam, buttonChangeGallery;
+    CircleImageView profilePicture;
+    TextInputEditText editChangeName, editChangeLastname;
+    Button buttonUpdateProfile;
+
+    /**
+     * Firebase
+     */
+    Uri uriProfilePic = null;
+    FirebaseAuth auth;
+    FirebaseStorage storage;
+    StorageReference storageReference;
 
     /**
      * Utils
      */
     boolean clicked = false;
+    public static final String FB_USERS_PP = "profilePics/";
+
+    ActivityResultLauncher<String> mGetContentGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
+        @Override
+        public void onActivityResult(Uri result) {
+            if(result != null){
+                uriProfilePic = result;
+                loadImage(uriProfilePic);
+            }
+        }
+    });
+
+    ActivityResultLauncher<Uri> mGetContentCamera = registerForActivityResult(new ActivityResultContracts.TakePicture(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean result) {
+            if(result){
+                loadImage(uriProfilePic);
+            }
+        }
+    });
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -92,11 +149,18 @@ public class UpdateProfileFragment extends Fragment {
         buttonChangeProfilePic = root.findViewById(R.id.buttonChangeProfilePic);
         buttonChangeCam = root.findViewById(R.id.buttonChangeCam);
         buttonChangeGallery = root.findViewById(R.id.buttonChangeGallery);
+        profilePicture = root.findViewById(R.id.editProfilePic);
+        editChangeName = root.findViewById(R.id.editChangeName);
+        editChangeLastname = root.findViewById(R.id.editChangeLastname);
+        buttonUpdateProfile = root.findViewById(R.id.buttonUpdateProfile);
 
         rotateOpen = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_open_anim);
         rotateClose = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_close_anim);
         fromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.from_bottom_anim);
         toBottom = AnimationUtils.loadAnimation(getContext(), R.anim.to_bottom_anim);
+
+        auth = FirebaseAuth.getInstance();
+        storage = FirebaseStorage.getInstance();
 
         return root;
     }
@@ -119,17 +183,36 @@ public class UpdateProfileFragment extends Fragment {
         buttonChangeCam.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Camera", Toast.LENGTH_LONG).show();
+                File file = new File(getContext().getFilesDir(), "picFromCamera");
+                uriProfilePic = FileProvider.getUriForFile(view.getContext(), getContext().getApplicationContext().getPackageName() + ".fileprovider", file);
+                mGetContentCamera.launch(uriProfilePic);
             }
         });
 
         buttonChangeGallery.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(getContext(), "Gallery", Toast.LENGTH_LONG).show();
+                mGetContentGallery.launch("image/*");
             }
         });
 
+        buttonUpdateProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateProfile();
+            }
+        });
+
+        new DownloadImageTask((CircleImageView) root.findViewById(R.id.editProfilePic))
+                .execute(auth.getCurrentUser().getPhotoUrl().toString());
+
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     private void setVisibility(){
@@ -156,6 +239,52 @@ public class UpdateProfileFragment extends Fragment {
             buttonChangeGallery.startAnimation(toBottom);
             buttonChangeProfilePic.startAnimation(rotateClose);
         }
+    }
+
+    private void loadImage(Uri uri){
+        try {
+            final InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
+            final Bitmap image = BitmapFactory.decodeStream(imageStream);
+            profilePicture.setImageBitmap(image);
+        }catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateProfile(){
+        storageReference = storage.getReference(FB_USERS_PP + auth.getCurrentUser().getUid());
+        storageReference.putFile(uriProfilePic).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        FirebaseUser user = auth.getCurrentUser();
+                        UserProfileChangeRequest.Builder upcrb = new UserProfileChangeRequest.Builder();
+                        upcrb.setDisplayName(editChangeName.getText().toString()+" "+ editChangeLastname.getText().toString());
+                        upcrb.setPhotoUri(uri);
+                        user.updateProfile(upcrb.build()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.i("FirebaseUser", "Profile updated");
+                                replaceFragment(new SettingsFragment());
+                                Snackbar.make(root, "Información de usuario actualizada", Snackbar.LENGTH_LONG).show();
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.i("FirebaseUser", "Profile saving failure");
+                    }
+                });
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.i("Storage", "Image could not be saved in FirebaseStorage");
+            }
+        });
     }
 
 }

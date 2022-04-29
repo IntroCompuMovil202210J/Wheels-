@@ -8,13 +8,32 @@
     tools:context=".InitLocationFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <org.osmdroid.views.MapView
-        android:id="@+id/initLocationMap"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="8">
 
-    </org.osmdroid.views.MapView>
+        <org.osmdroid.views.MapView
+            android:id="@+id/initLocationMap"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </org.osmdroid.views.MapView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonCenterLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:src="@drawable/ic_baseline_my_location_24"
+            app:backgroundTint="@color/azul_cool"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+    </FrameLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -75,10 +75,18 @@ public class NavActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
-        getSupportFragmentManager().putFragment(outState, "groupFragment", groupFragment);
-        getSupportFragmentManager().putFragment(outState, "chatFragment", chatFragment);
-        getSupportFragmentManager().putFragment(outState, "settingsFragment", settingsFragment);
+        if(homeFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "homeFragment", homeFragment);
+        }
+        if(groupFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "groupFragment", groupFragment);
+        }
+        if(chatFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "chatFragment", chatFragment);
+        }
+        if(settingsFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "settingsFragment", settingsFragment);
+        }
     }
 
 }

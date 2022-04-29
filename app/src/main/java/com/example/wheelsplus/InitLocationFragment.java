@@ -1,14 +1,29 @@
 package com.example.wheelsplus;
 
+import static android.content.Context.SENSOR_SERVICE;
+
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,6 +41,21 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.osmdroid.api.IMapController;
@@ -38,6 +68,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,14 +89,26 @@ public class InitLocationFragment extends Fragment {
     /**
      * Map/Location
      */
+    FusedLocationProviderClient mFusedLocationClient;
+    boolean settingsOK = false;
+    LocationRequest locationRequest;
+    LocationCallback locationCallback;
+    double latitude, longitude;
     MapView map;
     IMapController mapController;
-    GeoPoint startPoint;
-    GeoPoint destinationPoint;
+    GeoPoint startPoint, destinationPoint;
     Geocoder geocoder;
     Marker origin, destination;
     RoadManager roadManager;
     Polyline roadOverlay;
+
+    /**
+     * Light sensor
+     */
+    SensorManager sensorManager;
+    Sensor light;
+    SensorEventListener lightEvent;
+
 
     /**
      * Screen elements (to inflate)
@@ -73,6 +116,22 @@ public class InitLocationFragment extends Fragment {
     TextInputEditText editModOrigin;
     TextInputEditText editModDestination;
     Button buttonCancel, buttonConfirm;
+    FloatingActionButton buttonCenterLocation;
+
+    /**
+     * Utils
+     */
+    boolean actual = true;
+
+    ActivityResultLauncher<IntentSenderRequest> getLocationSettings = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if(result.getResultCode() == -1){
+                settingsOK = true;
+                startLocationUpdates();
+            }
+        }
+    });
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -129,6 +188,15 @@ public class InitLocationFragment extends Fragment {
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
+        locationRequest = createLocationRequest();
+        locationCallback = createLocationCallback();
+
+        sensorManager = (SensorManager) getActivity().getSystemService(SENSOR_SERVICE);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        lightEvent = createLightEventListener();
+
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+
         initMap();
 
         roadManager = new OSRMRoadManager(getActivity(), "ANDROID");
@@ -137,9 +205,9 @@ public class InitLocationFragment extends Fragment {
 
         editModOrigin = root.findViewById(R.id.editOrigin);
         editModDestination = root.findViewById(R.id.editDestination);
-
         buttonCancel = root.findViewById(R.id.buttonCancel);
         buttonConfirm = root.findViewById(R.id.buttonConfirm);
+        buttonCenterLocation = root.findViewById(R.id.buttonCenterLocation);
 
         return root;
     }
@@ -148,7 +216,7 @@ public class InitLocationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        drawRoute(startPoint, destinationPoint);
+        editPolilyne(startPoint, destinationPoint);
 
         buttonConfirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +248,8 @@ public class InitLocationFragment extends Fragment {
                                 origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
                                 map.getOverlays().add(origin);
                                 editPolilyne(startPoint, destinationPoint);
+                                actual = false;
+                                stopLocationUpdates();
                             } else {
                                 editModOrigin.setError("Dirección no encontrada");
                             }
@@ -223,6 +293,33 @@ public class InitLocationFragment extends Fragment {
             }
         });
 
+        buttonCenterLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                actual = true;
+                startLocationUpdates();
+            }
+        });
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        map.onResume();
+        mapController = map.getController();
+        centerToPolyline(startPoint, destinationPoint);
+        checkLocationSettings();
+        startLocationUpdates();
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        map.onPause();
+        stopLocationUpdates();
+        sensorManager.unregisterListener(lightEvent);
     }
 
     private void replaceFragment(Fragment fragment){
@@ -244,7 +341,6 @@ public class InitLocationFragment extends Fragment {
             map.getOverlays().add(origin);
             map.getOverlays().add(destination);
             mapController.setZoom(15.0);
-            centerToPolyline(startPoint, destinationPoint);
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -260,22 +356,6 @@ public class InitLocationFragment extends Fragment {
         double centerLat = (startPoint.getLatitude() + destinationPoint.getLatitude()) / 2;
         double centerLong = (startPoint.getLongitude() + destinationPoint.getLongitude()) / 2;
         mapController.setCenter(new GeoPoint(centerLat, centerLong));
-    }
-
-    private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
-        Marker marker = null;
-        if(map!=null) {
-            marker = new Marker(map);
-            if (title != null) marker.setTitle(title);
-            if (desc != null) marker.setSubDescription(desc);
-            if (iconID != 0) {
-                Drawable myIcon = getResources().getDrawable(iconID, getActivity().getTheme());
-                marker.setIcon(myIcon);
-            }
-            marker.setPosition(p);
-            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        }
-        return marker;
     }
 
     private void drawRoute(GeoPoint start, GeoPoint finish){
@@ -294,6 +374,130 @@ public class InitLocationFragment extends Fragment {
             roadOverlay.getOutlinePaint().setStrokeWidth(5);
             map.getOverlays().add(roadOverlay);
         }
+    }
+
+    private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
+        Marker marker = null;
+        if(map!=null) {
+            marker = new Marker(map);
+            if (title != null) marker.setTitle(title);
+            if (desc != null) marker.setSubDescription(desc);
+            if (iconID != 0) {
+                Drawable myIcon = getResources().getDrawable(iconID, getActivity().getTheme());
+                marker.setIcon(myIcon);
+            }
+            marker.setPosition(p);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        }
+        return marker;
+    }
+
+    public void startLocationUpdates(){
+        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            if(settingsOK){
+                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+            }
+        }
+    }
+
+    private void stopLocationUpdates(){
+        mFusedLocationClient.removeLocationUpdates(locationCallback);
+    }
+
+    private LocationRequest createLocationRequest(){
+        LocationRequest req = LocationRequest.create().setFastestInterval(1000).setInterval(10000).setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        return req;
+    }
+
+    private LocationCallback createLocationCallback() {
+        return new LocationCallback() {
+            @Override
+            public void onLocationResult(@NonNull LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+
+                Location lastLocation = locationResult.getLastLocation();
+
+                try {
+                    if (lastLocation != null) {
+                        Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
+                        latitude = lastLocation.getLatitude();
+                        longitude = lastLocation.getLongitude();
+                        if(distance(latitude, longitude, startPoint.getLatitude(), startPoint.getLongitude()) != 0 && actual){
+                            startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
+                            }
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            map.getOverlays().add(origin);
+                            editPolilyne(startPoint, destinationPoint);
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Log.e("Callback", e.toString());
+                }
+            }
+        };
+    }
+
+    private void checkLocationSettings(){
+        LocationSettingsRequest.Builder builder = new
+                LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(getActivity());
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                Log.i("LocationTest", "GPS is ON");
+                settingsOK = true;
+                startLocationUpdates();
+            }
+        });
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                if(((ApiException) e).getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED){
+                    ResolvableApiException resolvable = (ResolvableApiException) e;
+                    IntentSenderRequest isr = new IntentSenderRequest.Builder(resolvable.getResolution()).build();
+                    getLocationSettings.launch(isr);
+                }
+            }
+        });
+    }
+
+    private SensorEventListener createLightEventListener(){
+        return new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if (map != null) {
+                    if (event.values[0] < 10000) {
+                        Log.i("MAPS", "DARK MAP " + event.values[0]);
+                        map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                    } else {
+                        Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                        map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                    }
+
+                }
+
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
+    }
+
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        double latDistance = Math.toRadians(lat1 - lat2);
+        double lngDistance = Math.toRadians(long1 - long2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double result = HomeFragment.EARTH_RADIUS * c;
+        return Math.round(result*100.0)/100.0;
     }
 
 }

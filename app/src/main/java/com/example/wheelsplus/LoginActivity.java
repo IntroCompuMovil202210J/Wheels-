@@ -154,7 +154,8 @@ public class LoginActivity extends AppCompatActivity {
                         updateUI();
                     }else{
                         String message = task.getException().getMessage();
-                        Toast.makeText(LoginActivity.this, message, Toast.LENGTH_LONG).show();
+                        Log.i("Login", message);
+                        Toast.makeText(LoginActivity.this, "Ingreso invalido, intente de nuevo", Toast.LENGTH_LONG).show();
                     }
                 }
             });

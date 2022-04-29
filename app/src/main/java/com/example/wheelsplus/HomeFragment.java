@@ -87,10 +87,10 @@ public class HomeFragment extends Fragment {
     double latitude, longitude;
     GeoPoint startPoint = null;
     Geocoder geocoder;
-    public static final double EARTH_RADIUS = 6371;
     MapView map;
     Marker other = null;
     IMapController mapController;
+    public static final double EARTH_RADIUS = 6371;
 
     /**
      * Screen elements (to inflate)
@@ -225,8 +225,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Log.i("URL", auth.getCurrentUser().getPhotoUrl().toString());
-
         new DownloadImageTask((CircleImageView) root.findViewById(R.id.ic_profile))
                 .execute(auth.getCurrentUser().getPhotoUrl().toString());
 
@@ -254,17 +252,6 @@ public class HomeFragment extends Fragment {
         super.onPause();
         map.onPause();
         stopLocationUpdates();
-    }
-
-    private void loadImage(Uri uri){
-        try {
-            Log.i("Photo", uri.toString());
-            final InputStream imageStream = getActivity().getContentResolver().openInputStream(uri);
-            final Bitmap image = BitmapFactory.decodeStream(imageStream);
-            ic_profile.setImageBitmap(image);
-        }catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     private void initMap(){
