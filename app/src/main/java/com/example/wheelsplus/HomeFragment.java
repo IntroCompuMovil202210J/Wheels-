@@ -1,11 +1,16 @@
 package com.example.wheelsplus;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -56,6 +61,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -93,6 +99,13 @@ public class HomeFragment extends Fragment {
     public static final double EARTH_RADIUS = 6371;
 
     /**
+     * Light sensor
+     */
+    SensorManager sensorManager;
+    Sensor light;
+    SensorEventListener lightEvent;
+
+    /**
      * Screen elements (to inflate)
      */
     TextInputEditText if_viaje;
@@ -102,6 +115,11 @@ public class HomeFragment extends Fragment {
      * Firebase
      */
     FirebaseAuth auth;
+
+    /**
+     * Utils
+     */
+    boolean invert = false;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
@@ -179,6 +197,11 @@ public class HomeFragment extends Fragment {
         locationRequest = createLocationRequest();
         locationCallback = createLocationCallback();
 
+
+        sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        lightEvent = createLightEventListener();
+
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         requestPermissionLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION);
@@ -241,6 +264,7 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         map.onResume();
+        sensorManager.registerListener(lightEvent,light,SensorManager.SENSOR_DELAY_NORMAL);
         mapController = map.getController();
         mapController.setZoom(18.0);
         mapController.setCenter(this.startPoint);
@@ -251,6 +275,7 @@ public class HomeFragment extends Fragment {
     public void onPause() {
         super.onPause();
         map.onPause();
+        sensorManager.unregisterListener(lightEvent);
         stopLocationUpdates();
     }
 
@@ -313,7 +338,11 @@ public class HomeFragment extends Fragment {
                         if(other != null){
                             map.getOverlays().remove(other);
                         }
-                        other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                        if(invert){
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                        }else {
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                        }
                         map.getOverlays().add(other);
                     }
 
@@ -358,6 +387,46 @@ public class HomeFragment extends Fragment {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double result = EARTH_RADIUS * c;
         return Math.round(result*100.0)/100.0;
+    }
+
+    private SensorEventListener createLightEventListener(){
+        return new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                try {
+                    if (map != null) {
+                        if (event.values[0] < 5000) {
+                            Log.i("MAPS", "DARK MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                            invert = true;
+                            if (other != null) {
+                                map.getOverlays().remove(other);
+                            }
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            map.getOverlays().add(other);
+                        } else {
+                            Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                            invert = false;
+                            if(other != null){
+                                map.getOverlays().remove(other);
+                            }
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            map.getOverlays().add(other);
+                        }
+
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
 }

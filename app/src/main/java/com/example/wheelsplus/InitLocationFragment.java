@@ -3,6 +3,7 @@ package com.example.wheelsplus;
 import static android.content.Context.SENSOR_SERVICE;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -122,6 +123,7 @@ public class InitLocationFragment extends Fragment {
      * Utils
      */
     boolean actual = true;
+    boolean invert = false;
 
     ActivityResultLauncher<IntentSenderRequest> getLocationSettings = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
@@ -191,7 +193,7 @@ public class InitLocationFragment extends Fragment {
         locationRequest = createLocationRequest();
         locationCallback = createLocationCallback();
 
-        sensorManager = (SensorManager) getActivity().getSystemService(SENSOR_SERVICE);
+        sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
         light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         lightEvent = createLightEventListener();
 
@@ -245,8 +247,11 @@ public class InitLocationFragment extends Fragment {
                                 Address addressResult = addresses.get(0);
                                 startPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
                                 map.getOverlays().remove(origin);
-                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-                                map.getOverlays().add(origin);
+                                if(invert){
+                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                                }else {
+                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                                }                                map.getOverlays().add(origin);
                                 editPolilyne(startPoint, destinationPoint);
                                 actual = false;
                                 stopLocationUpdates();
@@ -336,8 +341,11 @@ public class InitLocationFragment extends Fragment {
             map.setMultiTouchControls(true);
             map.getZoomController().activate();
             mapController = map.getController();
-            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+            if(invert){
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+            }else {
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
             map.getOverlays().add(origin);
             map.getOverlays().add(destination);
             mapController.setZoom(15.0);
@@ -348,7 +356,11 @@ public class InitLocationFragment extends Fragment {
 
     private void editPolilyne(GeoPoint startPoint, GeoPoint destinationPoint){
         map.getOverlays().remove(roadOverlay);
-        drawRoute(startPoint, destinationPoint);
+        if(invert){
+            drawRoute(startPoint, destinationPoint, Color.rgb(255, 255, 255));
+        }else {
+            drawRoute(startPoint, destinationPoint, Color.rgb(39, 97, 198));
+        }
         centerToPolyline(startPoint, destinationPoint);
     }
 
@@ -358,7 +370,7 @@ public class InitLocationFragment extends Fragment {
         mapController.setCenter(new GeoPoint(centerLat, centerLong));
     }
 
-    private void drawRoute(GeoPoint start, GeoPoint finish){
+    private void drawRoute(GeoPoint start, GeoPoint finish, int color){
         ArrayList<GeoPoint> routePoints = new ArrayList<>();
         routePoints.add(start);
         routePoints.add(finish);
@@ -370,7 +382,7 @@ public class InitLocationFragment extends Fragment {
                 map.getOverlays().remove(roadOverlay);
             }
             roadOverlay = RoadManager.buildRoadOverlay(road);
-            roadOverlay.getOutlinePaint().setColor(Color.rgb(39, 97, 198));
+            roadOverlay.getOutlinePaint().setColor(color);
             roadOverlay.getOutlinePaint().setStrokeWidth(5);
             map.getOverlays().add(roadOverlay);
         }
@@ -427,8 +439,11 @@ public class InitLocationFragment extends Fragment {
                             if(origin != null){
                                 map.getOverlays().remove(origin);
                             }
-                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-                            map.getOverlays().add(origin);
+                            if(invert){
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            }else {
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            }                            map.getOverlays().add(origin);
                             editPolilyne(startPoint, destinationPoint);
                         }
                     }
@@ -469,15 +484,32 @@ public class InitLocationFragment extends Fragment {
         return new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
-                if (map != null) {
-                    if (event.values[0] < 10000) {
-                        Log.i("MAPS", "DARK MAP " + event.values[0]);
-                        map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
-                    } else {
-                        Log.i("MAPS", "LIGHT MAP " + event.values[0]);
-                        map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                try {
+                    if (map != null) {
+                        if (event.values[0] < 10000) {
+                            Log.i("MAPS", "DARK MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                            invert = true;
+                            editPolilyne(startPoint, destinationPoint);
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
+                            }
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            map.getOverlays().add(origin);
+                        } else {
+                            Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                            invert = false;
+                            editPolilyne(startPoint, destinationPoint);
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
+                            }
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            map.getOverlays().add(origin);
+                        }
                     }
-
+                }catch(Exception e){
+                    e.printStackTrace();
                 }
 
             }
