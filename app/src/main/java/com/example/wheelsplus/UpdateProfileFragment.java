@@ -186,6 +186,9 @@ public class UpdateProfileFragment extends Fragment {
                 File file = new File(getContext().getFilesDir(), "picFromCamera");
                 uriProfilePic = FileProvider.getUriForFile(view.getContext(), getContext().getApplicationContext().getPackageName() + ".fileprovider", file);
                 mGetContentCamera.launch(uriProfilePic);
+                setVisibility();
+                setAnimation();
+                clicked = !clicked;
             }
         });
 
@@ -193,6 +196,9 @@ public class UpdateProfileFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 mGetContentGallery.launch("image/*");
+                setVisibility();
+                setAnimation();
+                clicked = !clicked;
             }
         });
 

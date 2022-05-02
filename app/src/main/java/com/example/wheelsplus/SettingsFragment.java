@@ -1,5 +1,6 @@
 package com.example.wheelsplus;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -39,7 +41,7 @@ public class SettingsFragment extends Fragment {
     ImageButton buttonModify;
     CircleImageView profilePic;
     TextView settingsName, settingsEmail;
-    LinearLayout trip, pay, adv, help;
+    LinearLayout trip, pay, adv, driver;
 
     /**
      * Firebase
@@ -100,7 +102,7 @@ public class SettingsFragment extends Fragment {
         trip = root.findViewById(R.id.layViajes);
         pay = root.findViewById(R.id.layPay);
         adv = root.findViewById(R.id.layAdvanced);
-        help = root.findViewById(R.id.layHelp);
+        driver = root.findViewById(R.id.layDriver);
 
         auth = FirebaseAuth.getInstance();
 
@@ -119,6 +121,23 @@ public class SettingsFragment extends Fragment {
                 getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
+            }
+        });
+
+        driver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialAlertDialogBuilder(view.getContext()).setTitle("¿Cambiar a conductor?")
+                        .setMessage("Recuerda que si no estás registrado como conductor deberás registrar un vehículo para comenzar con la experiencia.")
+                        .setNegativeButton("Rechazar", null)
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Intent intent = new Intent(view.getContext(), VehicleRegisterActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                    }
+                }).show();
             }
         });
 

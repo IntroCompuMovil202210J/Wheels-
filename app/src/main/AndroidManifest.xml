@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WheelsPlus">
         <activity
+            android:name=".VehicleRegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".ForgotPasswdActivity"
             android:exported="false" />
         <activity
@@ -33,6 +36,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.example.wheelsplus.fileprovider"

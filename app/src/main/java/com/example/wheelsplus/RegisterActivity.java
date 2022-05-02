@@ -15,6 +15,7 @@ import android.widget.Button;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +34,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     Button buttonRegister;
     TextInputEditText editMailRegister, editPsswdRegister, editPhoneRegister, editFullNameRegister;
+    SwitchMaterial driverSwitch;
 
     FirebaseAuth auth;
 
@@ -48,6 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
         editPsswdRegister = findViewById(R.id.editPsswdRegister);
         editPhoneRegister = findViewById(R.id.editTelefonoRegister);
         editFullNameRegister = findViewById(R.id.editNombreRegister);
+        driverSwitch = findViewById(R.id.driverSwitch);
 
         auth = FirebaseAuth.getInstance();
 
@@ -120,7 +123,11 @@ public class RegisterActivity extends AppCompatActivity {
                             upcrb.setDisplayName(editFullNameRegister.getText().toString());
                             upcrb.setPhotoUri(Uri.parse(DEFAULT_PROFILE_PIC));
                             user.updateProfile(upcrb.build());
-                            updateUI();
+                            if(driverSwitch.isChecked()){
+                                updateUIDriver();
+                            }else{
+                                updateUIPassenger();
+                            }
                         }
                     }else{
                         Log.i("FirebaseRegister", task.getException().getMessage());
@@ -140,7 +147,11 @@ public class RegisterActivity extends AppCompatActivity {
         return matcher.find();
     }
 
-    private void updateUI(){
+    private void updateUIDriver(){
+        startActivity(new Intent(this, VehicleRegisterActivity.class));
+    }
+
+    private void updateUIPassenger(){
         startActivity(new Intent(this, NavActivity.class));
     }
 
