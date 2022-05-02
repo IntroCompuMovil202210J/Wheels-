@@ -1,12 +1,27 @@
 package com.example.wheelsplus;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
+
+import de.hdodenhof.circleimageview.CircleImageView;
+import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +29,25 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class DriverSettingsFragment extends Fragment {
+
+    /**
+     * View
+     */
+    View root;
+
+    /**
+     * Screen elements (to inflate)
+     */
+    LinearLayout layCerrarSesion;
+    ImageButton buttonModify;
+    CircleImageView profilePic;
+    TextView settingsName;
+    LinearLayout trip, pay, adv, pass, cars;
+
+    /**
+     * Firebase
+     */
+    FirebaseAuth auth;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +93,73 @@ public class DriverSettingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_driver_settings, container, false);
+        root =  inflater.inflate(R.layout.fragment_driver_settings, container, false);
+
+        layCerrarSesion = root.findViewById(R.id.layCerrarSesionD);
+        buttonModify = root.findViewById(R.id.buttonModifyD);
+        profilePic = root.findViewById(R.id.profilePicD);
+        settingsName = root.findViewById(R.id.settingsNameD);
+        trip = root.findViewById(R.id.layViajesD);
+        pay = root.findViewById(R.id.layPayD);
+        adv = root.findViewById(R.id.layAdvancedD);
+        pass = root.findViewById(R.id.layPassenger);
+        cars = root.findViewById(R.id.layCars);
+
+        auth = FirebaseAuth.getInstance();
+
+        return root;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+
+        layCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                auth.signOut();
+                Intent intent = new Intent(getContext(), MainActivity.class);
+                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            }
+        });
+
+        pass.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialAlertDialogBuilder(view.getContext()).setTitle("¿Cambiar a pasajero?")
+                        .setMessage("¿Estás seguro que quieres moverte a tu cuenta de pasajero?")
+                        .setNegativeButton("Rechazar", null)
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(view.getContext(), NavActivity.class);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                            }
+                        }).show();
+            }
+        });
+
+        buttonModify.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new UpdateProfileFragment());
+            }
+        });
+
+        settingsName.setText(auth.getCurrentUser().getDisplayName());
+        new DownloadImageTask((CircleImageView) root.findViewById(R.id.profilePicD))
+                .execute(auth.getCurrentUser().getPhotoUrl().toString());
+
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 }

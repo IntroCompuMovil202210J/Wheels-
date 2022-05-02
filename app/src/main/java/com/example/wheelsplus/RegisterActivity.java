@@ -148,7 +148,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void updateUIDriver(){
-        startActivity(new Intent(this, VehicleRegisterActivity.class));
+        startActivity(new Intent(this, DriverNavActivity.class));
     }
 
     private void updateUIPassenger(){
