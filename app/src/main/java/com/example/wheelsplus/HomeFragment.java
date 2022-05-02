@@ -197,7 +197,6 @@ public class HomeFragment extends Fragment {
         locationRequest = createLocationRequest();
         locationCallback = createLocationCallback();
 
-
         sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
         light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         lightEvent = createLightEventListener();
@@ -264,7 +263,7 @@ public class HomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         map.onResume();
-        sensorManager.registerListener(lightEvent,light,SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
         mapController = map.getController();
         mapController.setZoom(18.0);
         mapController.setCenter(this.startPoint);

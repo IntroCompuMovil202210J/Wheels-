@@ -106,7 +106,6 @@ public class InitLocationFragment extends Fragment {
     Sensor light;
     SensorEventListener lightEvent;
 
-
     /**
      * Screen elements (to inflate)
      */
@@ -304,6 +303,13 @@ public class InitLocationFragment extends Fragment {
 
     }
 
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -321,13 +327,6 @@ public class InitLocationFragment extends Fragment {
         map.onPause();
         stopLocationUpdates();
         sensorManager.unregisterListener(lightEvent);
-    }
-
-    private void replaceFragment(Fragment fragment){
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
-        fragmentTransaction.commit();
     }
 
     private void initMap(){

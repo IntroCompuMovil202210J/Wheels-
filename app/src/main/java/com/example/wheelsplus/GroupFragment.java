@@ -100,13 +100,7 @@ public class GroupFragment extends Fragment {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), android.R.style.Theme_Holo_Light_Dialog_NoActionBar, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        String AM_PM;
-                        if(hour < 12) {
-                            AM_PM = "AM";
-                        } else {
-                            AM_PM = "PM";
-                        }
-                        tvSelectedTime.setText("Hora de salida: " + hour + " : " + minute + " " + AM_PM);
+                        tvSelectedTime.setText("Hora de salida: " + hour + " : " + minute);
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
                 timePickerDialog.show();

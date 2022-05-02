@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -26,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,6 +35,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,29 +53,31 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-
-import de.hdodenhof.circleimageview.CircleImageView;
-import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link DriverHomeFragment#newInstance} factory method to
+ * Use the {@link DriverInitLocationFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DriverHomeFragment extends Fragment {
+public class DriverInitLocationFragment extends Fragment {
 
     /**
      * View
@@ -87,12 +92,13 @@ public class DriverHomeFragment extends Fragment {
     LocationRequest locationRequest;
     LocationCallback locationCallback;
     double latitude, longitude;
-    GeoPoint startPoint = null;
-    Geocoder geocoder;
     MapView map;
-    Marker other = null;
     IMapController mapController;
-    public static final double EARTH_RADIUS = 6371;
+    GeoPoint startPoint, destinationPoint;
+    Geocoder geocoder;
+    Marker origin, destination;
+    RoadManager roadManager;
+    Polyline roadOverlay;
 
     /**
      * Light sensor
@@ -104,27 +110,14 @@ public class DriverHomeFragment extends Fragment {
     /**
      * Screen elements (to inflate)
      */
-    TextInputEditText editDestinationDriver;
-    CircleImageView icDriverProfile;
-
-    /**
-     * Firebase
-     */
-    FirebaseAuth auth;
+    TextInputEditText editModDestinationDriver;
+    TextInputEditText editModFee;
+    Button buttonCancel, buttonConfirm;
 
     /**
      * Utils
      */
     boolean invert = false;
-
-    ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
-        @Override
-        public void onActivityResult(Boolean result) {
-            if(result){
-                startLocationUpdates();
-            }
-        }
-    });
 
     ActivityResultLauncher<IntentSenderRequest> getLocationSettings = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
@@ -145,7 +138,7 @@ public class DriverHomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public DriverHomeFragment() {
+    public DriverInitLocationFragment() {
         // Required empty public constructor
     }
 
@@ -155,11 +148,11 @@ public class DriverHomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment DriverHomeFragment.
+     * @return A new instance of fragment DriverInitLocationFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DriverHomeFragment newInstance(String param1, String param2) {
-        DriverHomeFragment fragment = new DriverHomeFragment();
+    public static DriverInitLocationFragment newInstance(String param1, String param2) {
+        DriverInitLocationFragment fragment = new DriverInitLocationFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -180,13 +173,13 @@ public class DriverHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        root = inflater.inflate(R.layout.fragment_driver_home, container, false);
+        root =  inflater.inflate(R.layout.fragment_driver_init_location, container, false);
 
         Context ctx = getActivity().getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
-        editDestinationDriver = root.findViewById(R.id.editDestinationDriver);
-        icDriverProfile = root.findViewById(R.id.icDriverProfile);
+        startPoint = getArguments().getParcelable("initOrigin");
+        destinationPoint = getArguments().getParcelable("initDestination");
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
@@ -199,11 +192,16 @@ public class DriverHomeFragment extends Fragment {
 
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
-        requestPermissionLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION);
-
         initMap();
 
-        auth = FirebaseAuth.getInstance();
+        roadManager = new OSRMRoadManager(getActivity(), "ANDROID");
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        editModDestinationDriver = root.findViewById(R.id.editDriverDestination);
+        editModFee = root.findViewById(R.id.editDriverFee);
+        buttonCancel = root.findViewById(R.id.buttonCancelDriver);
+        buttonConfirm = root.findViewById(R.id.buttonConfirmDriver);
 
         return root;
     }
@@ -212,25 +210,40 @@ public class DriverHomeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        editDestinationDriver.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        editPolilyne(startPoint, destinationPoint);
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DriverHomeFragment driverHomeFragment = new DriverHomeFragment();
+                replaceFragment(driverHomeFragment);
+            }
+        });
+
+        editModDestinationDriver.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if(i == EditorInfo.IME_ACTION_DONE){
-                    String address = editDestinationDriver.getText().toString();
+                if(i ==  EditorInfo.IME_ACTION_DONE){
+                    String address = editModDestinationDriver.getText().toString();
                     if(!address.isEmpty()){
                         try {
                             List<Address> addresses = geocoder.getFromLocationName(address, 2);
                             if (addresses != null && !addresses.isEmpty()) {
                                 Address addressResult = addresses.get(0);
-                                GeoPoint position = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
-                                Bundle bundle = new Bundle();
-                                bundle.putParcelable("initDestination", position);
-                                bundle.putParcelable("initOrigin", startPoint);
-                                DriverInitLocationFragment driverInitLocationFragment = new DriverInitLocationFragment();
-                                driverInitLocationFragment.setArguments(bundle);
-                                replaceFragment(driverInitLocationFragment);
+                                destinationPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
+                                map.getOverlays().remove(destination);
+                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                                map.getOverlays().add(destination);
+                                editPolilyne(startPoint, destinationPoint);
                             } else {
-                                editDestinationDriver.setError("Dirección no encontrada");
+                                editModDestinationDriver.setError("Dirección no encontrada");
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -242,9 +255,6 @@ public class DriverHomeFragment extends Fragment {
                 return false;
             }
         });
-
-        new DownloadImageTask((CircleImageView) root.findViewById(R.id.icDriverProfile))
-                .execute(auth.getCurrentUser().getPhotoUrl().toString());
 
     }
 
@@ -259,26 +269,73 @@ public class DriverHomeFragment extends Fragment {
     public void onResume() {
         super.onResume();
         map.onResume();
-        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
         mapController = map.getController();
-        mapController.setZoom(18.0);
-        mapController.setCenter(this.startPoint);
+        centerToPolyline(startPoint, destinationPoint);
         checkLocationSettings();
+        startLocationUpdates();
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     public void onPause() {
         super.onPause();
         map.onPause();
-        sensorManager.unregisterListener(lightEvent);
         stopLocationUpdates();
+        sensorManager.unregisterListener(lightEvent);
     }
 
     private void initMap(){
-        map = (MapView) root.findViewById(R.id.driverHomeMap);
-        map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setMultiTouchControls(true);
-        map.getZoomController().activate();
+        try {
+            map = (MapView) root.findViewById(R.id.driverInitLocationMap);
+            map.setTileSource(TileSourceFactory.MAPNIK);
+            map.setMultiTouchControls(true);
+            map.getZoomController().activate();
+            mapController = map.getController();
+            if(invert){
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+            }else {
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+            map.getOverlays().add(origin);
+            map.getOverlays().add(destination);
+            mapController.setZoom(15.0);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    private void editPolilyne(GeoPoint startPoint, GeoPoint destinationPoint){
+        map.getOverlays().remove(roadOverlay);
+        if(invert){
+            drawRoute(startPoint, destinationPoint, Color.rgb(255, 255, 255));
+        }else {
+            drawRoute(startPoint, destinationPoint, Color.rgb(39, 97, 198));
+        }
+        centerToPolyline(startPoint, destinationPoint);
+    }
+
+    private void centerToPolyline(GeoPoint startPoint, GeoPoint destinationPoint){
+        double centerLat = (startPoint.getLatitude() + destinationPoint.getLatitude()) / 2;
+        double centerLong = (startPoint.getLongitude() + destinationPoint.getLongitude()) / 2;
+        mapController.setCenter(new GeoPoint(centerLat, centerLong));
+    }
+
+    private void drawRoute(GeoPoint start, GeoPoint finish, int color){
+        ArrayList<GeoPoint> routePoints = new ArrayList<>();
+        routePoints.add(start);
+        routePoints.add(finish);
+        Road road = roadManager.getRoad(routePoints);
+        Log.i("RUTA", "Route length: "+road.mLength+" klm");
+        Log.i("RUTA", "Duration: "+road.mDuration/60+" min");
+        if(map!=null){
+            if(roadOverlay!=null){
+                map.getOverlays().remove(roadOverlay);
+            }
+            roadOverlay = RoadManager.buildRoadOverlay(road);
+            roadOverlay.getOutlinePaint().setColor(color);
+            roadOverlay.getOutlinePaint().setStrokeWidth(5);
+            map.getOverlays().add(roadOverlay);
+        }
     }
 
     private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
@@ -327,18 +384,18 @@ public class DriverHomeFragment extends Fragment {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();
-                        mapController.setZoom(15.0);
-                        mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
-                        startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
-                        if(other != null){
-                            map.getOverlays().remove(other);
+                        if(distance(latitude, longitude, startPoint.getLatitude(), startPoint.getLongitude()) != 0){
+                            startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
+                            }
+                            if(invert){
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                            }else {
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                            }                            map.getOverlays().add(origin);
+                            editPolilyne(startPoint, destinationPoint);
                         }
-                        if(invert){
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
-                        }else {
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
-                        }
-                        map.getOverlays().add(other);
                     }
 
                 } catch (Exception e) {
@@ -373,43 +430,33 @@ public class DriverHomeFragment extends Fragment {
         });
     }
 
-    public double distance(double lat1, double long1, double lat2, double long2) {
-        double latDistance = Math.toRadians(lat1 - lat2);
-        double lngDistance = Math.toRadians(long1 - long2);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double result = EARTH_RADIUS * c;
-        return Math.round(result*100.0)/100.0;
-    }
-
     private SensorEventListener createLightEventListener(){
         return new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
                 try {
                     if (map != null) {
-                        if (event.values[0] < 5000) {
+                        if (event.values[0] < 10000) {
                             Log.i("MAPS", "DARK MAP " + event.values[0]);
                             map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
                             invert = true;
-                            if (other != null) {
-                                map.getOverlays().remove(other);
+                            editPolilyne(startPoint, destinationPoint);
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
-                            map.getOverlays().add(other);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                            map.getOverlays().add(origin);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
                             map.getOverlayManager().getTilesOverlay().setColorFilter(null);
                             invert = false;
-                            if(other != null){
-                                map.getOverlays().remove(other);
+                            editPolilyne(startPoint, destinationPoint);
+                            if(origin != null){
+                                map.getOverlays().remove(origin);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-                            map.getOverlays().add(other);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                            map.getOverlays().add(origin);
                         }
-
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -422,6 +469,17 @@ public class DriverHomeFragment extends Fragment {
 
             }
         };
+    }
+
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        double latDistance = Math.toRadians(lat1 - lat2);
+        double lngDistance = Math.toRadians(long1 - long2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double result = HomeFragment.EARTH_RADIUS * c;
+        return Math.round(result*100.0)/100.0;
     }
 
 }
