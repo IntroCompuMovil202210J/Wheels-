@@ -13,6 +13,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WheelsPlus">
         <activity
+            android:name=".DriverNavActivity"
+            android:exported="false" />
+        <activity
             android:name=".VehicleRegisterActivity"
             android:exported="false" />
         <activity

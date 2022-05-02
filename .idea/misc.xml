@@ -32,6 +32,7 @@
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/ic_outline_place_24.xml" value="0.3585" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/mk_destination.xml" value="0.2005" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/drawable/shape_circle_message.xml" value="0.1" />
+        <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_driver_nav.xml" value="0.32575757575757575" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_forgot_passwd.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_login.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_main.xml" value="0.25" />
@@ -40,6 +41,8 @@
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/activity_vehicule_register.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/chat_row.xml" value="0.33" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_chat.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_driver_group.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_driver_home.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_group.xml" value="0.33" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_home.xml" value="0.25" />
         <entry key="..\:/Users/safer/Documents/GitHub/WheelsPlus/app/src/main/res/layout/fragment_init_location.xml" value="0.25" />
