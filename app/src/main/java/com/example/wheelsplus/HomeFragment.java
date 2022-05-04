@@ -247,6 +247,8 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        Log.i("IMAGEURL", auth.getCurrentUser().getPhotoUrl().toString());
+
         new DownloadImageTask((CircleImageView) root.findViewById(R.id.ic_profile))
                 .execute(auth.getCurrentUser().getPhotoUrl().toString());
 

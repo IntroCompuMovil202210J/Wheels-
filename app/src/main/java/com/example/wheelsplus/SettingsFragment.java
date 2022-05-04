@@ -124,6 +124,13 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        adv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new AdvancedSettingsFragment());
+            }
+        });
+
         driver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

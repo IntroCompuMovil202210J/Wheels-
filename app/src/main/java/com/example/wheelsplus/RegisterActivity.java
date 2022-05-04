@@ -21,6 +21,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,13 +32,16 @@ public class RegisterActivity extends AppCompatActivity {
     public static final Pattern VALID_EMAIL_ADDRESS_REGEX = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
     public static final Pattern VALID_PSSWD_REGEX = Pattern.compile("^(?i)(?=.*[a-z])(?=.*[0-9])[a-z0-9#.!@$*&_]{6,12}$", Pattern.CASE_INSENSITIVE);
     boolean emailValid, psswdValid;
-    public static final String DEFAULT_PROFILE_PIC = "${DEFAULT_PROFILE_PIC}";
+    public static final String DEFAULT_PROFILE_PIC = "https://firebasestorage.googleapis.com/v0/b/wheelsplus-9b510.appspot.com/o/profilePics%2FdefaultProfilePic.png?alt=media&token=f578e2b6-53d3-424f-94fa-1aeaefb873fa";
+    public static final String FB_FINGERPRINT_PATH = "finger/";
 
     Button buttonRegister;
     TextInputEditText editMailRegister, editPsswdRegister, editPhoneRegister, editFullNameRegister;
     SwitchMaterial driverSwitch;
 
     FirebaseAuth auth;
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
         driverSwitch = findViewById(R.id.driverSwitch);
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
 
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -123,6 +129,8 @@ public class RegisterActivity extends AppCompatActivity {
                             upcrb.setDisplayName(editFullNameRegister.getText().toString());
                             upcrb.setPhotoUri(Uri.parse(DEFAULT_PROFILE_PIC));
                             user.updateProfile(upcrb.build());
+                            myRef = database.getReference(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid());
+                            myRef.setValue(false);
                             if(driverSwitch.isChecked()){
                                 updateUIDriver();
                             }else{
