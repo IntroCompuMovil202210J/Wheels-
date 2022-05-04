@@ -128,14 +128,20 @@ public class RegisterActivity extends AppCompatActivity {
                             UserProfileChangeRequest.Builder upcrb = new UserProfileChangeRequest.Builder();
                             upcrb.setDisplayName(editFullNameRegister.getText().toString());
                             upcrb.setPhotoUri(Uri.parse(DEFAULT_PROFILE_PIC));
-                            user.updateProfile(upcrb.build());
-                            myRef = database.getReference(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid());
-                            myRef.setValue(false);
-                            if(driverSwitch.isChecked()){
-                                updateUIDriver();
-                            }else{
-                                updateUIPassenger();
-                            }
+                            user.updateProfile(upcrb.build()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if(task.isSuccessful()){
+                                        myRef = database.getReference(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid());
+                                        myRef.setValue(false);
+                                        if(driverSwitch.isChecked()){
+                                            updateUIDriver();
+                                        }else{
+                                            updateUIPassenger();
+                                        }
+                                    }
+                                }
+                            });
                         }
                     }else{
                         Log.i("FirebaseRegister", task.getException().getMessage());

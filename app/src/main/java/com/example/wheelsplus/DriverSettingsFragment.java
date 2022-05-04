@@ -166,7 +166,7 @@ public class DriverSettingsFragment extends Fragment {
     private void replaceFragment(Fragment fragment){
         FragmentManager fragmentManager = getParentFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.replace(R.id.driver_nav_host_fragment, fragment);
         fragmentTransaction.commit();
     }
 }
