@@ -47,6 +47,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -86,7 +87,7 @@ public class DriverHomeFragment extends Fragment {
     boolean settingsOK = false;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
-    double latitude, longitude;
+    double latitude = 0, longitude = 0;
     GeoPoint startPoint = null;
     Geocoder geocoder;
     MapView map;
@@ -105,6 +106,7 @@ public class DriverHomeFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextInputEditText editDestinationDriver;
+    TextView tvI_ubicacionD;
     CircleImageView icDriverProfile;
 
     /**
@@ -122,6 +124,8 @@ public class DriverHomeFragment extends Fragment {
         public void onActivityResult(Boolean result) {
             if(result){
                 startLocationUpdates();
+            }else{
+                Log.i("LocationTest", "GPS is OFF");
             }
         }
     });
@@ -186,6 +190,7 @@ public class DriverHomeFragment extends Fragment {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         editDestinationDriver = root.findViewById(R.id.editDestinationDriver);
+        tvI_ubicacionD = root.findViewById(R.id.tvI_ubicacionD);
         icDriverProfile = root.findViewById(R.id.icDriverProfile);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
@@ -256,14 +261,22 @@ public class DriverHomeFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        checkLocationSettings();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         map.onResume();
         sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
         mapController = map.getController();
-        mapController.setZoom(18.0);
-        mapController.setCenter(this.startPoint);
-        checkLocationSettings();
+        LatLng bogota = new LatLng(4.6269938175930525, -74.06389749953162);
+        startPoint = new GeoPoint(bogota.latitude, bogota.longitude);
+        mapController.setCenter(startPoint);
+        mapController.setZoom(14.0);
+        startLocationUpdates();
     }
 
     @Override
@@ -279,6 +292,17 @@ public class DriverHomeFragment extends Fragment {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.getZoomController().activate();
+        mapController = map.getController();
+    }
+
+    private String geoCoderBuscar(LatLng latLng){
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 2);
+            return addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
@@ -325,11 +349,14 @@ public class DriverHomeFragment extends Fragment {
                 try {
                     if (lastLocation != null) {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
+                        if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.03){
+                            mapController.setZoom(15.0);
+                            mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                        }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();
-                        mapController.setZoom(15.0);
-                        mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
                         startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                        tvI_ubicacionD.setText(geoCoderBuscar(new LatLng(latitude, longitude)));
                         if(other != null){
                             map.getOverlays().remove(other);
                         }
@@ -368,6 +395,8 @@ public class DriverHomeFragment extends Fragment {
                     ResolvableApiException resolvable = (ResolvableApiException) e;
                     IntentSenderRequest isr = new IntentSenderRequest.Builder(resolvable.getResolution()).build();
                     getLocationSettings.launch(isr);
+                }else{
+                    Log.i("LocationTest", "GPS is not available");
                 }
             }
         });
@@ -397,7 +426,7 @@ public class DriverHomeFragment extends Fragment {
                             if (other != null) {
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
                             map.getOverlays().add(other);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
@@ -406,7 +435,7 @@ public class DriverHomeFragment extends Fragment {
                             if(other != null){
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
                             map.getOverlays().add(other);
                         }
 

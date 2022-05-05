@@ -1,5 +1,7 @@
 package com.example.wheelsplus;
 
+import static android.app.Activity.RESULT_OK;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -49,6 +51,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -90,7 +93,7 @@ public class HomeFragment extends Fragment {
     boolean settingsOK = false;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
-    double latitude, longitude;
+    double latitude = 0, longitude = 0;
     GeoPoint startPoint = null;
     Geocoder geocoder;
     MapView map;
@@ -109,6 +112,7 @@ public class HomeFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextInputEditText if_viaje;
+    TextView tvI_ubicacionP;
     CircleImageView ic_profile;
 
     /**
@@ -133,9 +137,11 @@ public class HomeFragment extends Fragment {
     ActivityResultLauncher<IntentSenderRequest> getLocationSettings = registerForActivityResult(new ActivityResultContracts.StartIntentSenderForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if(result.getResultCode() == -1){
+            if(result.getResultCode() == RESULT_OK){
                 settingsOK = true;
                 startLocationUpdates();
+            }else{
+                Log.i("LocationTest", "GPS is OFF");
             }
         }
     });
@@ -190,6 +196,7 @@ public class HomeFragment extends Fragment {
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
 
         if_viaje = root.findViewById(R.id.editViaje);
+        tvI_ubicacionP = root.findViewById(R.id.tvI_ubicacionP);
         ic_profile = root.findViewById(R.id.ic_profile);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
@@ -247,8 +254,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        Log.i("IMAGEURL", auth.getCurrentUser().getPhotoUrl().toString());
-
         new DownloadImageTask((CircleImageView) root.findViewById(R.id.ic_profile))
                 .execute(auth.getCurrentUser().getPhotoUrl().toString());
 
@@ -262,14 +267,22 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        checkLocationSettings();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         map.onResume();
         sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
         mapController = map.getController();
-        mapController.setZoom(18.0);
-        mapController.setCenter(this.startPoint);
-        checkLocationSettings();
+        LatLng bogota = new LatLng(4.6269938175930525, -74.06389749953162);
+        startPoint = new GeoPoint(bogota.latitude, bogota.longitude);
+        mapController.setCenter(startPoint);
+        mapController.setZoom(14.0);
+        startLocationUpdates();
     }
 
     @Override
@@ -285,6 +298,17 @@ public class HomeFragment extends Fragment {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.getZoomController().activate();
+        mapController = map.getController();
+    }
+
+    private String geoCoderBuscar(LatLng latLng){
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 2);
+            return addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     private Marker createMarker(GeoPoint p, String title, String desc, int iconID){
@@ -331,11 +355,14 @@ public class HomeFragment extends Fragment {
                 try {
                     if (lastLocation != null) {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
+                        if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.03){
+                            mapController.setZoom(15.0);
+                            mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                        }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();
-                        mapController.setZoom(15.0);
-                        mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
                         startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
+                        tvI_ubicacionP.setText(geoCoderBuscar(new LatLng(latitude, longitude)));
                         if(other != null){
                             map.getOverlays().remove(other);
                         }
@@ -374,6 +401,8 @@ public class HomeFragment extends Fragment {
                     ResolvableApiException resolvable = (ResolvableApiException) e;
                     IntentSenderRequest isr = new IntentSenderRequest.Builder(resolvable.getResolution()).build();
                     getLocationSettings.launch(isr);
+                }else{
+                    Log.i("LocationTest", "GPS is not available");
                 }
             }
         });

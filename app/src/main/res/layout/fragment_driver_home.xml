@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/azul_cool"
+    android:layout_marginBottom="58dp"
     tools:context=".DriverHomeFragment">
 
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="150dp"
         android:fontFamily="@font/roboto_light"
         android:text="¿Arrancamos?"
@@ -39,7 +40,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="34dp"
+        android:layout_marginTop="24dp"
         android:src="@drawable/ic_outline_place_24"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -49,7 +50,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="16dp"
         android:fontFamily="@font/roboto_regular"
         android:text="Tu ubicación"
         android:textSize="12sp"
@@ -57,8 +58,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvI_ubicacion"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvI_ubicacionD"
+        android:layout_width="230dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:fontFamily="@font/roboto_medium"
@@ -71,6 +72,7 @@
         android:layout_width="match_parent"
         android:layout_height="550dp"
         android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
