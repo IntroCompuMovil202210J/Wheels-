@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginTop="10dp"
-            android:hint="Color"
+            android:hint="Marca"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -107,7 +107,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editColor"
+                android:id="@+id/editMarca"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -123,7 +123,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginTop="10dp"
-            android:hint="Marca"
+            android:hint="Modelo"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -132,7 +132,7 @@
             app:passwordToggleEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editMarca"
+                android:id="@+id/editModelo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -148,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_marginTop="10dp"
-            android:hint="Modelo"
+            android:hint="Año"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -157,7 +157,7 @@
             app:passwordToggleEnabled="false">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editModelo"
+                android:id="@+id/editAnno"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"

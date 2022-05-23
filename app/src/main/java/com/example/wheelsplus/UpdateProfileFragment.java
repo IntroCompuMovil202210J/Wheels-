@@ -22,14 +22,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -37,6 +41,8 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import services.DownloadImageTask;
@@ -63,7 +69,7 @@ public class UpdateProfileFragment extends Fragment {
      */
     FloatingActionButton buttonChangeProfilePic, buttonChangeCam, buttonChangeGallery;
     CircleImageView profilePicture;
-    TextInputEditText editChangeName, editChangeLastname;
+    TextInputEditText editChangeName, editChangeLastname, editChangePhone;
     Button buttonUpdateProfile;
 
     /**
@@ -71,14 +77,17 @@ public class UpdateProfileFragment extends Fragment {
      */
     Uri uriProfilePic = null;
     FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
     FirebaseStorage storage;
     StorageReference storageReference;
 
     /**
      * Utils
      */
-    boolean clicked = false;
+    public static final String FB_USERS_PATH = "users/";
     public static final String FB_USERS_PP = "profilePics/";
+    boolean clicked = false;
 
     ActivityResultLauncher<String> mGetContentGallery = registerForActivityResult(new ActivityResultContracts.GetContent(), new ActivityResultCallback<Uri>() {
         @Override
@@ -152,6 +161,7 @@ public class UpdateProfileFragment extends Fragment {
         profilePicture = root.findViewById(R.id.editProfilePic);
         editChangeName = root.findViewById(R.id.editChangeName);
         editChangeLastname = root.findViewById(R.id.editChangeLastname);
+        editChangePhone = root.findViewById(R.id.editChangePhone);
         buttonUpdateProfile = root.findViewById(R.id.buttonUpdateProfile);
 
         rotateOpen = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_open_anim);
@@ -160,6 +170,8 @@ public class UpdateProfileFragment extends Fragment {
         toBottom = AnimationUtils.loadAnimation(getContext(), R.anim.to_bottom_anim);
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
         storage = FirebaseStorage.getInstance();
 
         return root;
@@ -265,16 +277,32 @@ public class UpdateProfileFragment extends Fragment {
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
-                        FirebaseUser user = auth.getCurrentUser();
-                        UserProfileChangeRequest.Builder upcrb = new UserProfileChangeRequest.Builder();
-                        upcrb.setDisplayName(editChangeName.getText().toString()+" "+ editChangeLastname.getText().toString());
-                        upcrb.setPhotoUri(uri);
-                        user.updateProfile(upcrb.build()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        FirebaseUser firebaseUser = auth.getCurrentUser();
+                        String name = editChangeName.getText().toString();
+                        String lastname = editChangeLastname.getText().toString();
+                        String phone = editChangePhone.getText().toString();
+                        String url = uri.toString();
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        childUpdates.put(FB_USERS_PATH + firebaseUser.getUid() + "/nombre", name);
+                        childUpdates.put(FB_USERS_PATH + firebaseUser.getUid() + "/apellido", lastname);
+                        childUpdates.put(FB_USERS_PATH + firebaseUser.getUid() + "/telefono", phone);
+                        childUpdates.put(FB_USERS_PATH + firebaseUser.getUid() + "/urlFoto", url);
+                        myRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
-                            public void onSuccess(Void unused) {
-                                Log.i("FirebaseUser", "Profile updated");
-                                replaceFragment(new SettingsFragment());
-                                Snackbar.make(root, "Información de usuario actualizada", Snackbar.LENGTH_LONG).show();
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    UserProfileChangeRequest.Builder upcrb = new UserProfileChangeRequest.Builder();
+                                    upcrb.setDisplayName(name + " " + lastname);
+                                    upcrb.setPhotoUri(uri);
+                                    firebaseUser.updateProfile(upcrb.build()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void unused) {
+                                            Log.i("FirebaseUser", "Profile updated");
+                                            replaceFragment(new SettingsFragment());
+                                            Snackbar.make(root, "Información de usuario actualizada", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
                             }
                         });
                     }

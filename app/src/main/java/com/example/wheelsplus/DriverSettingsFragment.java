@@ -114,15 +114,23 @@ public class DriverSettingsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
         layCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                auth.signOut();
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                new MaterialAlertDialogBuilder(view.getContext())
+                    .setTitle("¿Desea cerrar sesión?")
+                    .setNegativeButton("Volver", null)
+                    .setPositiveButton("Cerrar sesión", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            auth.signOut();
+                            Intent intent = new Intent(getContext(), MainActivity.class);
+                            getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
             }
         });
 
@@ -133,20 +141,29 @@ public class DriverSettingsFragment extends Fragment {
             }
         });
 
+        cars.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(view.getContext(), VehicleRegisterActivity.class));
+            }
+        });
+
         pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new MaterialAlertDialogBuilder(view.getContext()).setTitle("¿Cambiar a pasajero?")
-                        .setMessage("¿Estás seguro que quieres moverte a tu cuenta de pasajero?")
-                        .setNegativeButton("Rechazar", null)
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                Intent intent = new Intent(view.getContext(), NavActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                            }
-                        }).show();
+                new MaterialAlertDialogBuilder(view.getContext())
+                    .setTitle("¿Cambiar a pasajero?")
+                    .setMessage("¿Estás seguro que quieres moverte a tu cuenta de pasajero?")
+                    .setNegativeButton("Rechazar", null)
+                    .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Intent intent = new Intent(view.getContext(), NavActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
             }
         });
 

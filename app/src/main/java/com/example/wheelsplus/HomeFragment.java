@@ -6,8 +6,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -16,7 +14,6 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -57,6 +54,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -66,9 +65,7 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.TilesOverlay;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -119,10 +116,13 @@ public class HomeFragment extends Fragment {
      * Firebase
      */
     FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     /**
      * Utils
      */
+    public static final String FB_USERS_PATH = "users/";
     boolean invert = false;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
@@ -215,6 +215,8 @@ public class HomeFragment extends Fragment {
         initMap();
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
 
         return root;
     }
@@ -358,6 +360,11 @@ public class HomeFragment extends Fragment {
                         if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.03){
                             mapController.setZoom(15.0);
                             mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                            latitude = lastLocation.getLatitude();
+                            longitude = lastLocation.getLongitude();
+                            myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid());
+                            myRef.child("latitud").setValue(latitude);
+                            myRef.child("longitud").setValue(longitude);
                         }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();

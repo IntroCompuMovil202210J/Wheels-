@@ -53,6 +53,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
@@ -113,10 +115,13 @@ public class DriverHomeFragment extends Fragment {
      * Firebase
      */
     FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     /**
      * Utils
      */
+    public static final String FB_USERS_PATH = "users/";
     boolean invert = false;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
@@ -209,6 +214,8 @@ public class DriverHomeFragment extends Fragment {
         initMap();
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
 
         return root;
     }
@@ -352,6 +359,11 @@ public class DriverHomeFragment extends Fragment {
                         if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.03){
                             mapController.setZoom(15.0);
                             mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
+                            latitude = lastLocation.getLatitude();
+                            longitude = lastLocation.getLongitude();
+                            myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid());
+                            myRef.child("latitud").setValue(latitude);
+                            myRef.child("longitud").setValue(longitude);
                         }
                         latitude = lastLocation.getLatitude();
                         longitude = lastLocation.getLongitude();

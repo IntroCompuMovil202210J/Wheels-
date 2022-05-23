@@ -16,10 +16,16 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import model.Conductor;
 import services.DownloadImageTask;
 
 /**
@@ -47,6 +53,13 @@ public class SettingsFragment extends Fragment {
      * Firebase
      */
     FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
+
+    /**
+     * Utils
+     */
+    public static final String FB_DRIVERS_PATH = "drivers/";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -105,6 +118,8 @@ public class SettingsFragment extends Fragment {
         driver = root.findViewById(R.id.layDriver);
 
         auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
 
         return root;
     }
@@ -116,11 +131,20 @@ public class SettingsFragment extends Fragment {
         layCerrarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                auth.signOut();
-                Intent intent = new Intent(getContext(), MainActivity.class);
-                getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                new MaterialAlertDialogBuilder(view.getContext())
+                    .setTitle("¿Desea cerrar sesión?")
+                    .setNegativeButton("Volver", null)
+                    .setPositiveButton("Cerrar sesión", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            auth.signOut();
+                            Intent intent = new Intent(getContext(), MainActivity.class);
+                            getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        }
+                    })
+                    .show();
             }
         });
 
@@ -134,18 +158,41 @@ public class SettingsFragment extends Fragment {
         driver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new MaterialAlertDialogBuilder(view.getContext()).setTitle("¿Cambiar a conductor?")
-                        .setMessage("Recuerda que si no estás registrado como conductor deberás registrar un vehículo para comenzar con la experiencia.")
-                        .setNegativeButton("Rechazar", null)
-                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Intent intent = new Intent(view.getContext(), DriverNavActivity.class);
-                        getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                    }
-                }).show();
+                new MaterialAlertDialogBuilder(view.getContext())
+                    .setTitle("¿Cambiar a conductor?")
+                    .setMessage("Recuerda que si no estás registrado como conductor deberás registrar un vehículo para comenzar con la experiencia.")
+                    .setNegativeButton("Rechazar", null)
+                    .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            myRef.child(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    if(task.getResult().exists()){
+                                        Intent intent = new Intent(view.getContext(), DriverNavActivity.class);
+                                        getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        startActivity(intent);
+                                    }else{
+                                        Conductor conductor = new Conductor(0, auth.getCurrentUser().getUid());
+                                        myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid());
+                                        myRef.setValue(conductor).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if(task.isSuccessful()){
+                                                    Intent intent = new Intent(view.getContext(), VehicleRegisterActivity.class);
+                                                    getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                                    startActivity(intent);
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .show();
             }
         });
 
