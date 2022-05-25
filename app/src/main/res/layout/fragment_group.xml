@@ -11,18 +11,46 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
-        android:layout_height="350dp"
+        android:layout_height="358dp"
         android:background="@drawable/group_border_rounded"
-        android:padding="16dp"
+        android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Destino"
+            android:textColorHint="#989898"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
+            app:startIconDrawable="@drawable/ic_outline_maps_home_work_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editGroupDestination"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
         <ImageView
             android:id="@+id/ic_search"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:src="@drawable/ic_baseline_search_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -31,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:fontFamily="@font/roboto_light"
             android:text="Buscar Grupo"
             android:textSize="18sp"
@@ -43,8 +71,8 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:hint="Destino"
+            android:layout_marginTop="8dp"
+            android:hint="Origen"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:boxCornerRadiusBottomEnd="20dp"
@@ -54,10 +82,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout4"
-            app:startIconDrawable="@drawable/ic_outline_maps_home_work_24">
+            app:startIconDrawable="@drawable/ic_outline_trip_origin_24">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editGroupDestination"
+                android:id="@+id/editGroupOrigin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -71,7 +99,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:hint="Nombre de grupo"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
@@ -98,10 +126,10 @@
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonTime"
@@ -134,13 +162,11 @@
             android:id="@+id/tvSelectedTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:fontFamily="@font/roboto_medium"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -149,7 +175,7 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="358dp"
+        android:layout_marginTop="366dp"
         android:src="@drawable/nv_group"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

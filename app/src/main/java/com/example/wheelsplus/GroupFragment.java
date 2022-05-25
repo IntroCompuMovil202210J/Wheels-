@@ -61,7 +61,7 @@ public class GroupFragment extends Fragment {
      * Screen elements (to inflate)
      */
     Button buttonTime, buttonSearchGroup;
-    TextInputEditText editGroupDestination, editGroupName;
+    TextInputEditText editGroupOrigin, editGroupDestination, editGroupName;
     TextView tvSelectedTime;
 
     /**
@@ -79,6 +79,7 @@ public class GroupFragment extends Fragment {
     boolean time, date = false;
     double latitud = 0;
     double longitud = 0;
+    double lat, lng;
     Calendar calendar = Calendar.getInstance();
 
     // TODO: Rename parameter arguments, choose names that match
@@ -130,6 +131,7 @@ public class GroupFragment extends Fragment {
 
         buttonTime = root.findViewById(R.id.buttonTime);
         buttonSearchGroup = root.findViewById(R.id.buttonSearchGroup);
+        editGroupOrigin = root.findViewById(R.id.editGroupOrigin);
         editGroupDestination = root.findViewById(R.id.editGroupDestination);
         editGroupName = root.findViewById(R.id.editGroupName);
         tvSelectedTime = root.findViewById(R.id.tvSelectedTime);
@@ -147,6 +149,8 @@ public class GroupFragment extends Fragment {
                     Usuario usuario = task.getResult().getValue(Usuario.class);
                     latitud = usuario.getLatitud();
                     longitud = usuario.getLongitud();
+                    lat = latitud;
+                    lng = longitud;
                 }
             }
         });
@@ -192,6 +196,7 @@ public class GroupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 boolean flag = true;
+
                 if(TextUtils.isEmpty(editGroupDestination.getText()) && TextUtils.isEmpty(editGroupName.getText())){
                     Toast.makeText(getContext(), "Alguno de los dos campos debe ser llenado para la búsqueda", Toast.LENGTH_SHORT).show();
                     flag = false;
@@ -199,6 +204,16 @@ public class GroupFragment extends Fragment {
                 if(!time || !date){
                     Toast.makeText(view.getContext(), "Hora y dia de acuerdo requeridos", Toast.LENGTH_SHORT).show();
                     flag = false;
+                }
+                if(!TextUtils.isEmpty(editGroupOrigin.getText())){
+                    LatLng origin = searchLatLngAddress(editGroupOrigin.getText().toString());
+                    if(origin != null) {
+                        lat = origin.lat;
+                        lng = origin.lng;
+                    }else{
+                        editGroupOrigin.setError("Direccion de origen no encontrada");
+                        flag = false;
+                    }
                 }
                 if(flag){
                     ArrayList<Grupo> grupos = new ArrayList<>();
@@ -212,9 +227,17 @@ public class GroupFragment extends Fragment {
                                 if(task.isSuccessful()){
                                     for(DataSnapshot single : task.getResult().getChildren()){
                                         Grupo grupo = single.getValue(Grupo.class);
-                                        if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
-                                            if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), latitud, longitud) <= 0.3){
-                                                grupos.add(single.getValue(Grupo.class));
+                                        long tiempo = grupo.getFechaAcuerdo();
+                                        Calendar c = Calendar.getInstance();
+                                        c.setTime(new Date(tiempo));
+                                        if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)){
+                                            Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
+                                            if(Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30){
+                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
+                                                    if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3){
+                                                        grupos.add(single.getValue(Grupo.class));
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -231,9 +254,17 @@ public class GroupFragment extends Fragment {
                                         if(task.isSuccessful()){
                                             for(DataSnapshot single : task.getResult().getChildren()){
                                                 Grupo grupo = single.getValue(Grupo.class);
-                                                if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), latitud, longitud) <= 0.3){
-                                                    if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
-                                                        grupos.add(single.getValue(Grupo.class));
+                                                long tiempo = grupo.getFechaAcuerdo();
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(new Date(tiempo));
+                                                if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
+                                                    Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
+                                                    if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
+                                                        if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), latitud, longitud) <= 0.3){
+                                                            if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
+                                                                grupos.add(single.getValue(Grupo.class));
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
@@ -248,10 +279,18 @@ public class GroupFragment extends Fragment {
                                         if(task.isSuccessful()){
                                             for(DataSnapshot single : task.getResult().getChildren()){
                                                 Grupo grupo = single.getValue(Grupo.class);
-                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
-                                                    if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), latitud, longitud) <= 0.3){
-                                                        if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
-                                                            grupos.add(single.getValue(Grupo.class));
+                                                long tiempo = grupo.getFechaAcuerdo();
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(new Date(tiempo));
+                                                if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
+                                                    Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
+                                                    if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
+                                                        if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
+                                                            if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), latitud, longitud) <= 0.3){
+                                                                if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
+                                                                    grupos.add(single.getValue(Grupo.class));
+                                                                }
+                                                            }
                                                         }
                                                     }
                                                 }
