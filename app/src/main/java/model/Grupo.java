@@ -4,42 +4,40 @@ import java.util.ArrayList;
 
 public class Grupo {
 
-    int idGrupo;
     String nombreGrupo;
     double tarifa;
     int cupo;
     double latitudAcuerdo;
     double longitudAcuerdo;
+    double latitudDestino;
+    double longitudDestino;
+    long fechaAcuerdo;
     ArrayList<String> preferenciasRuta;
 
     public Grupo() {
     }
 
-    public Grupo(int idGrupo, String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo) {
-        this.idGrupo = idGrupo;
+    public Grupo(String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo) {
         this.nombreGrupo = nombreGrupo;
         this.tarifa = tarifa;
         this.cupo = cupo;
         this.latitudAcuerdo = latitudAcuerdo;
         this.longitudAcuerdo = longitudAcuerdo;
+        this.latitudDestino = latitudDestino;
+        this.longitudDestino = longitudDestino;
+        this.fechaAcuerdo = fechaAcuerdo;
     }
 
-    public Grupo(int idGrupo, String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, ArrayList<String> preferenciasRuta) {
-        this.idGrupo = idGrupo;
+    public Grupo(String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo, ArrayList<String> preferenciasRuta) {
         this.nombreGrupo = nombreGrupo;
         this.tarifa = tarifa;
         this.cupo = cupo;
         this.latitudAcuerdo = latitudAcuerdo;
         this.longitudAcuerdo = longitudAcuerdo;
+        this.latitudDestino = latitudDestino;
+        this.longitudDestino = longitudDestino;
+        this.fechaAcuerdo = fechaAcuerdo;
         this.preferenciasRuta = preferenciasRuta;
-    }
-
-    public int getIdGrupo() {
-        return idGrupo;
-    }
-
-    public void setIdGrupo(int idGrupo) {
-        this.idGrupo = idGrupo;
     }
 
     public String getNombreGrupo() {
@@ -80,6 +78,30 @@ public class Grupo {
 
     public void setLongitudAcuerdo(double longitudAcuerdo) {
         this.longitudAcuerdo = longitudAcuerdo;
+    }
+
+    public double getLatitudDestino() {
+        return latitudDestino;
+    }
+
+    public void setLatitudDestino(double latitudDestino) {
+        this.latitudDestino = latitudDestino;
+    }
+
+    public double getLongitudDestino() {
+        return longitudDestino;
+    }
+
+    public void setLongitudDestino(double longitudDestino) {
+        this.longitudDestino = longitudDestino;
+    }
+
+    public long getFechaAcuerdo() {
+        return fechaAcuerdo;
+    }
+
+    public void setFechaAcuerdo(long fechaAcuerdo) {
+        this.fechaAcuerdo = fechaAcuerdo;
     }
 
     public ArrayList<String> getPreferenciasRuta() {

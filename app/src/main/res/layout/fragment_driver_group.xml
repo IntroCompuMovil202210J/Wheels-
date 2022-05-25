@@ -18,6 +18,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout2"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="Nombre de grupo"
+            android:textColorHint="#989898"
+            app:boxBackgroundColor="@color/white"
+            app:boxCornerRadiusBottomEnd="20dp"
+            app:boxCornerRadiusBottomStart="20dp"
+            app:boxCornerRadiusTopEnd="20dp"
+            app:boxCornerRadiusTopStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/ic_search"
+            app:startIconDrawable="@drawable/ic_baseline_keyboard_arrow_right_24">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editGroupNameDriver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
         <ImageView
             android:id="@+id/ic_search"
             android:layout_width="32dp"
@@ -28,6 +56,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+            android:id="@+id/labelCrearGrupo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
@@ -53,7 +82,7 @@
             app:boxCornerRadiusTopStart="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_search"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
             app:startIconDrawable="@drawable/ic_outline_maps_home_work_24">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -141,34 +170,6 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/textInputLayout5"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="Ruta"
-            android:textColorHint="#989898"
-            app:boxBackgroundColor="@color/white"
-            app:boxCornerRadiusBottomEnd="20dp"
-            app:boxCornerRadiusBottomStart="20dp"
-            app:boxCornerRadiusTopEnd="20dp"
-            app:boxCornerRadiusTopStart="20dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4"
-            app:startIconDrawable="@drawable/ic_outline_route_24">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editGroupRouteDriver"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/roboto_regular"
-                android:imeOptions="actionDone"
-                android:inputType="text" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout6"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
@@ -183,7 +184,7 @@
             app:boxCornerRadiusTopStart="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout5"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4"
             app:startIconDrawable="@drawable/ic_outline_monetization_on_24">
 
             <com.google.android.material.textfield.TextInputEditText

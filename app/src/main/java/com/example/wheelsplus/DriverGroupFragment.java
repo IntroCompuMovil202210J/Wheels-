@@ -1,5 +1,6 @@
 package com.example.wheelsplus;
 
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.location.Address;
 import android.location.Geocoder;
@@ -10,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -18,12 +20,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.maps.model.LatLng;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
+
+import model.Grupo;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -46,13 +56,23 @@ public class DriverGroupFragment extends Fragment {
      * Screen elements (to inflate)
      */
     Button buttonTimeDriver, buttonCreateGroup;
-    TextInputEditText editGroupDestinationDriver, editGroupOriginDriver, editGroupRouteDriver, editGroupFeeDriver;
+    TextInputEditText editGroupNameDriver, editGroupDestinationDriver, editGroupOriginDriver, editGroupFeeDriver;
     TextView tvSelectedTime;
+
+    /**
+     * Firebase
+     */
+    FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
 
     /**
      * Utils
      */
-    long groupTimestamp = 0;
+    public static final String FB_USERS_PATH = "users/";
+    public static final String FB_GROUPS_PATH = "groups/";
+    boolean time, date = false;
+    Calendar calendar = Calendar.getInstance();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -102,15 +122,17 @@ public class DriverGroupFragment extends Fragment {
 
         buttonTimeDriver = root.findViewById(R.id.buttonTimeDriver);
         buttonCreateGroup = root.findViewById(R.id.buttonCreateGroup);
+        editGroupNameDriver = root.findViewById(R.id.editGroupNameDriver);
         editGroupDestinationDriver = root.findViewById(R.id.editGroupDestinationDriver);
         editGroupOriginDriver = root.findViewById(R.id.editGroupOriginDriver);
-        editGroupRouteDriver = root.findViewById(R.id.editGroupRouteDriver);
         editGroupFeeDriver = root.findViewById(R.id.editGroupFeeDriver);
         tvSelectedTime = root.findViewById(R.id.tvSelectedTimeDriver);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
-        groupTimestamp = 0;
+        auth = FirebaseAuth.getInstance();
+        database = FirebaseDatabase.getInstance();
+        myRef = database.getReference();
 
         return root;
     }
@@ -122,19 +144,30 @@ public class DriverGroupFragment extends Fragment {
         buttonTimeDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
                 TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), android.R.style.Theme_Holo_Light_Dialog_NoActionBar, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                        tvSelectedTime.setText("Hora de salida: " + hour + " : " + minute);
-                        Calendar calendar = Calendar.getInstance();
                         calendar.set(Calendar.HOUR_OF_DAY, hour);
                         calendar.set(Calendar.MINUTE, minute);
                         calendar.set(Calendar.SECOND, 0);
-                        groupTimestamp = calendar.getTimeInMillis();
+                        time = true;
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
+                timePickerDialog.updateTime(calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
                 timePickerDialog.show();
+                DatePickerDialog datePickerDialog = new DatePickerDialog(view.getContext(), new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        calendar.set(Calendar.DAY_OF_MONTH, day);
+                        calendar.set(Calendar.MONTH, month);
+                        calendar.set(Calendar.YEAR, year);
+                        tvSelectedTime.setText(sdf.format(calendar.getTime()));
+                        date = true;
+                    }
+                }, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
+                datePickerDialog.updateDate(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+                datePickerDialog.show();
             }
         });
 
@@ -142,6 +175,10 @@ public class DriverGroupFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 boolean flag = true;
+                if(TextUtils.isEmpty(editGroupNameDriver.getText())){
+                    editGroupNameDriver.setError("Este campo no puede estar vacío");
+                    flag = false;
+                }
                 if(TextUtils.isEmpty(editGroupDestinationDriver.getText())){
                     editGroupDestinationDriver.setError("Este campo no puede estar vacío");
                     flag = false;
@@ -154,22 +191,41 @@ public class DriverGroupFragment extends Fragment {
                     editGroupFeeDriver.setError("Este campo no puede estar vacío");
                     flag = false;
                 }
-                if(groupTimestamp == 0){
+                if(!time || !date){
                     Toast.makeText(view.getContext(), "Hora de acuerdo requerida", Toast.LENGTH_SHORT).show();
-                }else{
                     flag = false;
                 }
                 if(flag){
+                    String groupName = editGroupNameDriver.getText().toString();
                     LatLng latLngDestination = searchLatLngAddress(editGroupDestinationDriver.getText().toString());
                     LatLng latLngOrigin = searchLatLngAddress(editGroupOriginDriver.getText().toString());
                     double fee = Double.parseDouble(editGroupFeeDriver.getText().toString());
+                    long timestamp = calendar.getTimeInMillis();
                     if(latLngDestination != null && latLngOrigin != null) {
-                        Log.i("Timestamp", String.valueOf(groupTimestamp));
-                        Log.i("LatLngDest", latLngDestination.toString());
-                        Log.i("LatLngOri", latLngOrigin.toString());
-                        Log.i("Fee", String.valueOf(fee));
+                        String key = myRef.push().getKey();
+                        Grupo grupo = new Grupo(groupName, fee, 0, latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp);
+                        myRef.child(FB_GROUPS_PATH + key).setValue(grupo).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    myRef.child(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if(task.isSuccessful()){
+                                                Toast.makeText(view.getContext(), "Grupo " + groupName + " creado correctamente", Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
                     }else{
-                        Toast.makeText(view.getContext(), "Dirección no encontrada, intente de nuevo", Toast.LENGTH_SHORT).show();
+                        if(latLngDestination == null){
+                            editGroupDestinationDriver.setError("Destino no encontrado, intente de nuevo");
+                        }
+                        if(latLngOrigin == null){
+                            editGroupOriginDriver.setError("Origen no encontrado, intente de nuevo");
+                        }
                     }
                 }
             }

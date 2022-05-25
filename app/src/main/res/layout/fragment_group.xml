@@ -53,7 +53,7 @@
             app:boxCornerRadiusTopStart="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/ic_search"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4"
             app:startIconDrawable="@drawable/ic_outline_maps_home_work_24">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -72,7 +72,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="Preferencias de ruta"
+            android:hint="Nombre de grupo"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:boxCornerRadiusBottomEnd="20dp"
@@ -81,11 +81,11 @@
             app:boxCornerRadiusTopStart="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
-            app:startIconDrawable="@drawable/ic_outline_route_24">
+            app:layout_constraintTop_toBottomOf="@+id/ic_search"
+            app:startIconDrawable="@drawable/ic_baseline_keyboard_arrow_right_24">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editGroupRoute"
+                android:id="@+id/editGroupName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -101,7 +101,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/buttonTime"
