@@ -1,39 +1,43 @@
 package adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.wheelsplus.R;
 
+import java.util.ArrayList;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import display.DisplayGroup;
 import services.DownloadImageTask;
 
-public class GroupsAdapter extends CursorAdapter {
-    public GroupsAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+public class GroupsAdapter extends ArrayAdapter<DisplayGroup> {
+    public GroupsAdapter(Context context, ArrayList<DisplayGroup> groups) {
+        super(context, 0, groups);
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.group_row, parent, false);
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View v = convertView;
+        if(v == null){
+            v = LayoutInflater.from(getContext()).inflate(R.layout.group_row, parent, false);
+        }
+        DisplayGroup displayGroup = getItem(position);
+        TextView tvDriverName = v.findViewById(R.id.tvDriverNameGroup);
+        TextView tvGroupName = v.findViewById(R.id.tvGroupName);
+        TextView tvGroupOrigin = v.findViewById(R.id.tvOriginGroup);
+        TextView tvGroupDestination = v.findViewById(R.id.tvDestinationGroup);
+        tvDriverName.setText(displayGroup.getNombreConductor());
+        tvGroupName.setText(displayGroup.getNombreGrupo());
+        tvGroupOrigin.setText(displayGroup.getOrigen());
+        tvGroupDestination.setText(displayGroup.getDestino());
+        new DownloadImageTask((CircleImageView) v.findViewById(R.id.profilePicDriver))
+                .execute(displayGroup.getUrlFoto());
+        return v;
     }
 
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        TextView tvDriverName = view.findViewById(R.id.tvDriverNameGroup);
-        TextView tvGroupName = view.findViewById(R.id.tvGroupName);
-        TextView tvGroupOrigin = view.findViewById(R.id.tvOriginGroup);
-        TextView tvGroupDestination = view.findViewById(R.id.tvDestinationGroup);
-        tvDriverName.setText(cursor.getString(0));
-        tvGroupName.setText(cursor.getString(1));
-        tvGroupOrigin.setText(cursor.getString(2));
-        tvGroupDestination.setText(cursor.getString(3));
-        new DownloadImageTask((CircleImageView) view.findViewById(R.id.profilePicDriver))
-                .execute(cursor.getString(4));
-    }
 }

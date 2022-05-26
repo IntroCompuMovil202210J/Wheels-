@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class Grupo {
 
     String nombreGrupo;
+    String idConductor;
     double tarifa;
     int cupo;
     double latitudAcuerdo;
@@ -17,8 +18,9 @@ public class Grupo {
     public Grupo() {
     }
 
-    public Grupo(String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo) {
+    public Grupo(String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo) {
         this.nombreGrupo = nombreGrupo;
+        this.idConductor = idConductor;
         this.tarifa = tarifa;
         this.cupo = cupo;
         this.latitudAcuerdo = latitudAcuerdo;
@@ -28,8 +30,9 @@ public class Grupo {
         this.fechaAcuerdo = fechaAcuerdo;
     }
 
-    public Grupo(String nombreGrupo, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo, ArrayList<String> preferenciasRuta) {
+    public Grupo(String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo, ArrayList<String> preferenciasRuta) {
         this.nombreGrupo = nombreGrupo;
+        this.idConductor = idConductor;
         this.tarifa = tarifa;
         this.cupo = cupo;
         this.latitudAcuerdo = latitudAcuerdo;
@@ -46,6 +49,14 @@ public class Grupo {
 
     public void setNombreGrupo(String nombreGrupo) {
         this.nombreGrupo = nombreGrupo;
+    }
+
+    public String getIdConductor() {
+        return idConductor;
+    }
+
+    public void setIdConductor(String idConductor) {
+        this.idConductor = idConductor;
     }
 
     public double getTarifa() {

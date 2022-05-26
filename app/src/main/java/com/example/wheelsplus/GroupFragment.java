@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -19,14 +21,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.model.LatLng;
 
 import java.io.IOException;
@@ -35,8 +41,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
+import adapters.GroupsAdapter;
+import display.DisplayGroup;
 import model.Grupo;
 import model.Usuario;
 
@@ -63,6 +70,7 @@ public class GroupFragment extends Fragment {
     Button buttonTime, buttonSearchGroup;
     TextInputEditText editGroupOrigin, editGroupDestination, editGroupName;
     TextView tvSelectedTime;
+    ListView listGroups;
 
     /**
      * Firebase
@@ -70,6 +78,7 @@ public class GroupFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference myRef;
+    ValueEventListener vel;
 
     /**
      * Utils
@@ -135,6 +144,7 @@ public class GroupFragment extends Fragment {
         editGroupDestination = root.findViewById(R.id.editGroupDestination);
         editGroupName = root.findViewById(R.id.editGroupName);
         tvSelectedTime = root.findViewById(R.id.tvSelectedTime);
+        listGroups = root.findViewById(R.id.listGroups);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
@@ -154,6 +164,8 @@ public class GroupFragment extends Fragment {
                 }
             }
         });
+
+        loadGroups();
 
         return root;
     }
@@ -307,6 +319,40 @@ public class GroupFragment extends Fragment {
                 }
             }
         });
+
+        listGroups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                DisplayGroup displayGroup = (DisplayGroup) adapterView.getItemAtPosition(i);
+                GroupDetailFragment groupDetailFragment = new GroupDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("displayGroup", displayGroup);
+                groupDetailFragment.setArguments(bundle);
+                replaceFragment(groupDetailFragment);
+            }
+        });
+
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
+        fragmentTransaction.commit();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        loadGroups();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if(myRef != null){
+            myRef.removeEventListener(vel);
+        }
     }
 
     public LatLng searchLatLngAddress(String address){
@@ -331,6 +377,68 @@ public class GroupFragment extends Fragment {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         double result = HomeFragment.EARTH_RADIUS * c;
         return Math.round(result*100.0)/100.0;
+    }
+
+    private String geoCoderBuscar(LatLng latLng){
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latLng.lat, latLng.lng, 2);
+            return addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private void loadGroups(){
+        myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+        vel = myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listGroups.setAdapter(null);
+                ArrayList<DisplayGroup> displayGroups = new ArrayList<>();
+                ArrayList<String> keyGroups = new ArrayList<>();
+                for(DataSnapshot single : snapshot.getChildren()){
+                    keyGroups.add(single.getKey());
+                }
+                myRef = database.getReference(FB_GROUPS_PATH);
+                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if(task.isSuccessful()){
+                            ArrayList<Grupo> grupos = new ArrayList<>();
+                            for(DataSnapshot single : task.getResult().getChildren()){
+                                if(keyGroups.contains(single.getKey())){
+                                    grupos.add(single.getValue(Grupo.class));
+                                }
+                            }
+                            myRef = database.getReference(FB_USERS_PATH);
+                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    for(DataSnapshot single : task.getResult().getChildren()){
+                                        Usuario usuario = single.getValue(Usuario.class);
+                                        for(Grupo grupo : grupos){
+                                            if(grupo.getIdConductor().equals(single.getKey()) && !grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
+                                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto()));
+                                            }
+                                        }
+                                    }
+                                    if(getActivity() != null) {
+                                        GroupsAdapter groupsAdapter = new GroupsAdapter(getActivity(), displayGroups);
+                                        listGroups.setAdapter(groupsAdapter);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 }

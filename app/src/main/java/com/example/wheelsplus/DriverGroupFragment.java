@@ -6,7 +6,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,8 +68,8 @@ public class DriverGroupFragment extends Fragment {
     /**
      * Utils
      */
-    public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_DRIVERS_PATH = "drivers/";
     boolean time, date = false;
     Calendar calendar = Calendar.getInstance();
 
@@ -203,12 +202,12 @@ public class DriverGroupFragment extends Fragment {
                     long timestamp = calendar.getTimeInMillis();
                     if(latLngDestination != null && latLngOrigin != null) {
                         String key = myRef.push().getKey();
-                        Grupo grupo = new Grupo(groupName, fee, 0, latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp);
+                        Grupo grupo = new Grupo(groupName, auth.getCurrentUser().getUid(), fee, 0, latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp);
                         myRef.child(FB_GROUPS_PATH + key).setValue(grupo).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
-                                    myRef.child(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    myRef.child(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
