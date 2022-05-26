@@ -7,6 +7,7 @@ public class DisplayGroup implements Parcelable {
 
     String nombreConductor;
     String nombreGrupo;
+    String tarifa;
     String origen;
     String destino;
     String urlFoto;
@@ -14,9 +15,10 @@ public class DisplayGroup implements Parcelable {
     public DisplayGroup() {
     }
 
-    public DisplayGroup(String nombreConductor, String nombreGrupo, String origen, String destino, String urlFoto) {
+    public DisplayGroup(String nombreConductor, String nombreGrupo, String tarifa, String origen, String destino, String urlFoto) {
         this.nombreConductor = nombreConductor;
         this.nombreGrupo = nombreGrupo;
+        this.tarifa = tarifa;
         this.origen = origen;
         this.destino = destino;
         this.urlFoto = urlFoto;
@@ -25,9 +27,25 @@ public class DisplayGroup implements Parcelable {
     protected DisplayGroup(Parcel in) {
         nombreConductor = in.readString();
         nombreGrupo = in.readString();
+        tarifa = in.readString();
         origen = in.readString();
         destino = in.readString();
         urlFoto = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(nombreConductor);
+        dest.writeString(nombreGrupo);
+        dest.writeString(tarifa);
+        dest.writeString(origen);
+        dest.writeString(destino);
+        dest.writeString(urlFoto);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<DisplayGroup> CREATOR = new Creator<DisplayGroup>() {
@@ -58,6 +76,14 @@ public class DisplayGroup implements Parcelable {
         this.nombreGrupo = nombreGrupo;
     }
 
+    public String getTarifa() {
+        return tarifa;
+    }
+
+    public void setTarifa(String tarifa) {
+        this.tarifa = tarifa;
+    }
+
     public String getOrigen() {
         return origen;
     }
@@ -82,17 +108,4 @@ public class DisplayGroup implements Parcelable {
         this.urlFoto = urlFoto;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(nombreConductor);
-        parcel.writeString(nombreGrupo);
-        parcel.writeString(origen);
-        parcel.writeString(destino);
-        parcel.writeString(urlFoto);
-    }
 }

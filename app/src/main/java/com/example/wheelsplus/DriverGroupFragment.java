@@ -150,6 +150,7 @@ public class DriverGroupFragment extends Fragment {
                         calendar.set(Calendar.HOUR_OF_DAY, hour);
                         calendar.set(Calendar.MINUTE, minute);
                         calendar.set(Calendar.SECOND, 0);
+                        tvSelectedTime.setText(sdf.format(calendar.getTime()));
                         time = true;
                     }
                 }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
@@ -161,7 +162,6 @@ public class DriverGroupFragment extends Fragment {
                         calendar.set(Calendar.DAY_OF_MONTH, day);
                         calendar.set(Calendar.MONTH, month);
                         calendar.set(Calendar.YEAR, year);
-                        tvSelectedTime.setText(sdf.format(calendar.getTime()));
                         date = true;
                     }
                 }, calendar.get(Calendar.DAY_OF_MONTH), calendar.get(Calendar.MONTH), calendar.get(Calendar.YEAR));
