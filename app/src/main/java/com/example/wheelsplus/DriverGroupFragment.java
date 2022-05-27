@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -33,6 +36,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import model.Grupo;
+import model.Vehiculo;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,7 +60,8 @@ public class DriverGroupFragment extends Fragment {
      */
     Button buttonTimeDriver, buttonCreateGroup;
     TextInputEditText editGroupNameDriver, editGroupDestinationDriver, editGroupOriginDriver, editGroupFeeDriver;
-    TextView tvSelectedTime;
+    TextView tvSelectedTime, tvPlacaVehiculo;
+    ImageButton buttonChooseVehicle;
 
     /**
      * Firebase
@@ -72,6 +77,7 @@ public class DriverGroupFragment extends Fragment {
     public static final String FB_DRIVERS_PATH = "drivers/";
     boolean time, date = false;
     Calendar calendar = Calendar.getInstance();
+    Vehiculo vehiculo = null;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -126,12 +132,18 @@ public class DriverGroupFragment extends Fragment {
         editGroupOriginDriver = root.findViewById(R.id.editGroupOriginDriver);
         editGroupFeeDriver = root.findViewById(R.id.editGroupFeeDriver);
         tvSelectedTime = root.findViewById(R.id.tvSelectedTimeDriver);
+        buttonChooseVehicle = root.findViewById(R.id.buttonChooseVehicle);
+        tvPlacaVehiculo = root.findViewById(R.id.tvPlacaVehiculo);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
+
+        if(getArguments() != null) {
+            vehiculo = getArguments().getParcelable("carSelected");
+        }
 
         return root;
     }
@@ -140,11 +152,22 @@ public class DriverGroupFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if(vehiculo != null){
+            tvPlacaVehiculo.setText(vehiculo.getPlaca());
+        }
+
+        buttonChooseVehicle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new SelectVehicleFragment());
+            }
+        });
+
         buttonTimeDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-                TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), android.R.style.Theme_Holo_Light_Dialog_NoActionBar, new TimePickerDialog.OnTimeSetListener() {
+                TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
                         calendar.set(Calendar.HOUR_OF_DAY, hour);
@@ -194,6 +217,10 @@ public class DriverGroupFragment extends Fragment {
                     Toast.makeText(view.getContext(), "Hora de acuerdo requerida", Toast.LENGTH_SHORT).show();
                     flag = false;
                 }
+                if(vehiculo == null){
+                    Toast.makeText(view.getContext(), "Recuerda que debes escoger un vehiculo para salir", Toast.LENGTH_SHORT).show();
+                    flag = false;
+                }
                 if(flag){
                     String groupName = editGroupNameDriver.getText().toString();
                     LatLng latLngDestination = searchLatLngAddress(editGroupDestinationDriver.getText().toString());
@@ -202,7 +229,7 @@ public class DriverGroupFragment extends Fragment {
                     long timestamp = calendar.getTimeInMillis();
                     if(latLngDestination != null && latLngOrigin != null) {
                         String key = myRef.push().getKey();
-                        Grupo grupo = new Grupo(groupName, auth.getCurrentUser().getUid(), fee, 0, latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp);
+                        Grupo grupo = new Grupo(key, groupName, auth.getCurrentUser().getUid(), fee, vehiculo.getCapacidad(), latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp, vehiculo.getIdVehiculo());
                         myRef.child(FB_GROUPS_PATH + key).setValue(grupo).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -212,6 +239,12 @@ public class DriverGroupFragment extends Fragment {
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
                                                 Toast.makeText(view.getContext(), "Grupo " + groupName + " creado correctamente", Toast.LENGTH_SHORT).show();
+                                                tvSelectedTime.setText("");
+                                                tvPlacaVehiculo.setText("");
+                                                editGroupDestinationDriver.setText("");
+                                                editGroupFeeDriver.setText("");
+                                                editGroupNameDriver.setText("");
+                                                editGroupOriginDriver.setText("");
                                             }
                                         }
                                     });
@@ -229,6 +262,13 @@ public class DriverGroupFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void replaceFragment(Fragment fragment){
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.driver_nav_host_fragment, fragment);
+        fragmentTransaction.commit();
     }
 
     public LatLng searchLatLngAddress(String address){

@@ -1,9 +1,13 @@
 package model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 
-public class Grupo {
+public class Grupo implements Parcelable {
 
+    String id_Grupo;
     String nombreGrupo;
     String idConductor;
     double tarifa;
@@ -13,12 +17,14 @@ public class Grupo {
     double latitudDestino;
     double longitudDestino;
     long fechaAcuerdo;
+    String idVehiculo;
     ArrayList<String> preferenciasRuta;
 
     public Grupo() {
     }
 
-    public Grupo(String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo) {
+    public Grupo(String id_Grupo, String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo, String idVehiculo) {
+        this.id_Grupo = id_Grupo;
         this.nombreGrupo = nombreGrupo;
         this.idConductor = idConductor;
         this.tarifa = tarifa;
@@ -28,20 +34,34 @@ public class Grupo {
         this.latitudDestino = latitudDestino;
         this.longitudDestino = longitudDestino;
         this.fechaAcuerdo = fechaAcuerdo;
+        this.idVehiculo = idVehiculo;
     }
 
-    public Grupo(String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, long fechaAcuerdo, ArrayList<String> preferenciasRuta) {
-        this.nombreGrupo = nombreGrupo;
-        this.idConductor = idConductor;
-        this.tarifa = tarifa;
-        this.cupo = cupo;
-        this.latitudAcuerdo = latitudAcuerdo;
-        this.longitudAcuerdo = longitudAcuerdo;
-        this.latitudDestino = latitudDestino;
-        this.longitudDestino = longitudDestino;
-        this.fechaAcuerdo = fechaAcuerdo;
-        this.preferenciasRuta = preferenciasRuta;
+    protected Grupo(Parcel in) {
+        nombreGrupo = in.readString();
+        idConductor = in.readString();
+        tarifa = in.readDouble();
+        cupo = in.readInt();
+        latitudAcuerdo = in.readDouble();
+        longitudAcuerdo = in.readDouble();
+        latitudDestino = in.readDouble();
+        longitudDestino = in.readDouble();
+        fechaAcuerdo = in.readLong();
+        idVehiculo = in.readString();
+        preferenciasRuta = in.createStringArrayList();
     }
+
+    public static final Creator<Grupo> CREATOR = new Creator<Grupo>() {
+        @Override
+        public Grupo createFromParcel(Parcel in) {
+            return new Grupo(in);
+        }
+
+        @Override
+        public Grupo[] newArray(int size) {
+            return new Grupo[size];
+        }
+    };
 
     public String getNombreGrupo() {
         return nombreGrupo;
@@ -91,6 +111,14 @@ public class Grupo {
         this.longitudAcuerdo = longitudAcuerdo;
     }
 
+    public String getIdVehiculo() {
+        return idVehiculo;
+    }
+
+    public void setIdVehiculo(String idVehiculo) {
+        this.idVehiculo = idVehiculo;
+    }
+
     public double getLatitudDestino() {
         return latitudDestino;
     }
@@ -123,4 +151,31 @@ public class Grupo {
         this.preferenciasRuta = preferenciasRuta;
     }
 
+    public String getId_Grupo() {
+        return id_Grupo;
+    }
+
+    public void setId_Grupo(String id_Grupo) {
+        this.id_Grupo = id_Grupo;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(nombreGrupo);
+        parcel.writeString(idConductor);
+        parcel.writeDouble(tarifa);
+        parcel.writeInt(cupo);
+        parcel.writeDouble(latitudAcuerdo);
+        parcel.writeDouble(longitudAcuerdo);
+        parcel.writeDouble(latitudDestino);
+        parcel.writeDouble(longitudDestino);
+        parcel.writeLong(fechaAcuerdo);
+        parcel.writeString(idVehiculo);
+        parcel.writeStringList(preferenciasRuta);
+    }
 }

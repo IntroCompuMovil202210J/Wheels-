@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -40,21 +41,6 @@ public class VehicleRegisterActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_vehicle_register);
 
-        new MaterialAlertDialogBuilder(this)
-            .setTitle("Bienvenido al modo conductor")
-            .setNegativeButton("Volver al modo pasajero", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    Intent intent = new Intent(getApplicationContext(), NavActivity.class);
-                    getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                }
-            })
-            .setMessage("Hola, bienvenido al modo conductor, mediante este podrás ofrecer el servicio de Wheels, pero antes, debes registrar un vehiculo. ")
-            .setPositiveButton("Entendido", null)
-            .show();
-
         buttonVehicleRegister = findViewById(R.id.buttonVehicleRegister);
         editPlaca = findViewById(R.id.editPlaca);
         editCapacidad = findViewById(R.id.editCapacidad);
@@ -65,6 +51,29 @@ public class VehicleRegisterActivity extends AppCompatActivity {
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
+
+        myRef = database.getReference(FB_VEHICLES_PATH + auth.getCurrentUser().getUid());
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(!task.getResult().exists()){
+                    new MaterialAlertDialogBuilder(VehicleRegisterActivity.this)
+                            .setTitle("Bienvenido al modo conductor")
+                            .setNegativeButton("Volver al modo pasajero", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    Intent intent = new Intent(getApplicationContext(), NavActivity.class);
+                                    getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
+                                }
+                            })
+                            .setMessage("Hola, bienvenido al modo conductor, mediante este podrás ofrecer el servicio de Wheels, pero antes, debes registrar un vehiculo. ")
+                            .setPositiveButton("Entendido", null)
+                            .show();
+                }
+            }
+        });
 
         buttonVehicleRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,8 +100,10 @@ public class VehicleRegisterActivity extends AppCompatActivity {
                     flag = false;
                 }
                 if(flag){
-                    Vehiculo vehiculo = new Vehiculo(editPlaca.getText().toString(), Integer.parseInt(editCapacidad.getText().toString()), editMarca.getText().toString(), editModelo.getText().toString(), Integer.parseInt(editAnno.getText().toString()));
-                    myRef.child(FB_VEHICLES_PATH + auth.getCurrentUser().getUid()).push().setValue(vehiculo).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    String key = myRef.push().getKey();
+                    myRef = database.getReference(FB_VEHICLES_PATH + auth.getCurrentUser().getUid()).child(key);
+                    Vehiculo vehiculo = new Vehiculo(key, editPlaca.getText().toString(), Integer.parseInt(editCapacidad.getText().toString()), editMarca.getText().toString(), editModelo.getText().toString(), Integer.parseInt(editAnno.getText().toString()));
+                    myRef.setValue(vehiculo).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){

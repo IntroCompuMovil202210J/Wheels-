@@ -3,30 +3,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:orientation="horizontal">
+
 
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="150dp"
-        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profilePicDriver"
+        <ImageView
+            android:id="@+id/imageView5"
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/sample_profile"
-            app:civ_border_color="#80DAD7D7"
-            app:civ_border_width="1dp" />
-
-        <TextView
-            android:id="@+id/tvDriverNameGroup"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="NombreConductor" />
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_baseline_directions_car_24" />
     </LinearLayout>
 
     <LinearLayout
@@ -35,41 +27,33 @@
         android:layout_marginLeft="25dp"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvGroupName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_bold"
-            android:text="NombreGrupo"
-            android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/tvOriginGroup"
+            android:id="@+id/tvPlaca"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_light"
-            android:text="Origen: " />
+            android:text="Placa: " />
 
         <TextView
-            android:id="@+id/tvDestinationGroup"
+            android:id="@+id/tvModelo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_light"
-            android:text="Destino: " />
+            android:text="Modelo: " />
 
         <TextView
-            android:id="@+id/tvGroupFee"
+            android:id="@+id/tvMarca"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_light"
-            android:text="Tarifa: " />
-
+            android:text="Marca: " />
         <TextView
-            android:id="@+id/tvFecha"
+            android:id="@+id/tvCapacidad"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_light"
-            android:text="Fecha: " />
+            android:text="Capacidad: " />
     </LinearLayout>
 
 </LinearLayout>

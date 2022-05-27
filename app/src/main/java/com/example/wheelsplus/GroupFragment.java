@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -90,6 +91,7 @@ public class GroupFragment extends Fragment {
     double longitud = 0;
     double lat, lng;
     Calendar calendar = Calendar.getInstance();
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -243,20 +245,28 @@ public class GroupFragment extends Fragment {
                                         long tiempo = grupo.getFechaAcuerdo();
                                         Calendar c = Calendar.getInstance();
                                         c.setTime(new Date(tiempo));
-                                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-                                        Log.i("OurCalendar", sdf.format(calendar));
-                                        Log.i("FBCalendar", sdf.format(c));
-                                        Log.i("TimeTime", calendar.getTimeInMillis() + " " + tiempo);
                                         if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)){
-                                            Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
+                                            Log.i("Diferencia", String.valueOf(Math.abs(timestamp - c.getTimeInMillis())));
                                             if(Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30){
-                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
+                                                Log.i("NameGrupo1", grupo.getNombreGrupo().toLowerCase());
+                                                Log.i("NameGrupo2", groupName.toLowerCase());
+                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase()) && grupo.getCupo() > 0){
+                                                    Log.i("Distance", String.valueOf(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng)));
                                                     if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3){
                                                         grupos.add(single.getValue(Grupo.class));
                                                     }
                                                 }
                                             }
                                         }
+                                    }
+                                    if(grupos.isEmpty()){
+                                        Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
+                                    }else {
+                                        SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
+                                        Bundle bundle = new Bundle();
+                                        bundle.putParcelableArrayList("grupos", grupos);
+                                        selectGroupFragment.setArguments(bundle);
+                                        replaceFragment(selectGroupFragment);
                                     }
                                 }
                             }
@@ -273,20 +283,24 @@ public class GroupFragment extends Fragment {
                                                 long tiempo = grupo.getFechaAcuerdo();
                                                 Calendar c = Calendar.getInstance();
                                                 c.setTime(new Date(tiempo));
-                                                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-                                                Log.i("OurCalendar", sdf.format(calendar.getTime()));
-                                                Log.i("FBCalendar", sdf.format(c.getTime()));
-                                                Log.i("TimeTime", calendar.getTimeInMillis() + " " + tiempo);
                                                 if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
-                                                    Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
                                                     if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
-                                                        if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3){
+                                                        if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3  && grupo.getCupo() > 0){
                                                             if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
                                                                 grupos.add(single.getValue(Grupo.class));
                                                             }
                                                         }
                                                     }
                                                 }
+                                            }
+                                            if(grupos.isEmpty()){
+                                                Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putParcelableArrayList("grupos", grupos);
+                                                selectGroupFragment.setArguments(bundle);
+                                                replaceFragment(selectGroupFragment);
                                             }
                                         }
                                     }
@@ -301,15 +315,10 @@ public class GroupFragment extends Fragment {
                                                 long tiempo = grupo.getFechaAcuerdo();
                                                 Calendar c = Calendar.getInstance();
                                                 c.setTime(new Date(tiempo));
-                                                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-                                                Log.i("OurCalendar", sdf.format(calendar));
-                                                Log.i("FBCalendar", sdf.format(c));
-                                                Log.i("TimeTime", calendar.getTimeInMillis() + " " + tiempo);
                                                 if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
-                                                    Log.i("ABSDiff", String.valueOf(Math.abs(timestamp - c.getTimeInMillis()) / 60000));
                                                     if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
                                                         if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
-                                                            if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3){
+                                                            if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3  && grupo.getCupo() > 0){
                                                                 if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
                                                                     grupos.add(single.getValue(Grupo.class));
                                                                 }
@@ -317,6 +326,15 @@ public class GroupFragment extends Fragment {
                                                         }
                                                     }
                                                 }
+                                            }
+                                            if(grupos.isEmpty()){
+                                                Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
+                                            }else {
+                                                SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
+                                                Bundle bundle = new Bundle();
+                                                bundle.putParcelableArrayList("grupos", grupos);
+                                                selectGroupFragment.setArguments(bundle);
+                                                replaceFragment(selectGroupFragment);
                                             }
                                         }
                                     }
@@ -429,7 +447,7 @@ public class GroupFragment extends Fragment {
                                         Usuario usuario = single.getValue(Usuario.class);
                                         for(Grupo grupo : grupos){
                                             if(grupo.getIdConductor().equals(single.getKey()) && !grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
-                                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto()));
+                                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo())));
                                             }
                                         }
                                     }

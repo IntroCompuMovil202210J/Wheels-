@@ -11,17 +11,21 @@ public class DisplayGroup implements Parcelable {
     String origen;
     String destino;
     String urlFoto;
+    String idGrupo;
+    String fecha;
 
     public DisplayGroup() {
     }
 
-    public DisplayGroup(String nombreConductor, String nombreGrupo, String tarifa, String origen, String destino, String urlFoto) {
+    public DisplayGroup(String nombreConductor, String nombreGrupo, String tarifa, String origen, String destino, String urlFoto, String idGrupo, String fecha) {
         this.nombreConductor = nombreConductor;
         this.nombreGrupo = nombreGrupo;
         this.tarifa = tarifa;
         this.origen = origen;
         this.destino = destino;
         this.urlFoto = urlFoto;
+        this.idGrupo = idGrupo;
+        this.fecha = fecha;
     }
 
     protected DisplayGroup(Parcel in) {
@@ -108,4 +112,19 @@ public class DisplayGroup implements Parcelable {
         this.urlFoto = urlFoto;
     }
 
+    public String getIdGrupo() {
+        return idGrupo;
+    }
+
+    public void setIdGrupo(String idGrupo) {
+        this.idGrupo = idGrupo;
+    }
+
+    public String getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(String fecha) {
+        this.fecha = fecha;
+    }
 }

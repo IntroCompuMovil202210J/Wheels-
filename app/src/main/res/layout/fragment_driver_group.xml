@@ -197,6 +197,29 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
+        <ImageButton
+            android:id="@+id/buttonChooseVehicle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:minHeight="48dp"
+            android:src="@drawable/ic_baseline_directions_car_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <TextView
+            android:id="@+id/tvPlacaVehiculo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:text=""
+            android:fontFamily="@font/roboto_light"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonChooseVehicle"
+            app:layout_constraintEnd_toStartOf="@+id/buttonChooseVehicle"
+            app:layout_constraintTop_toTopOf="@+id/buttonChooseVehicle" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView

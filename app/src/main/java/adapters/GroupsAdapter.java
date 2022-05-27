@@ -32,11 +32,13 @@ public class GroupsAdapter extends ArrayAdapter<DisplayGroup> {
         TextView tvGroupOrigin = v.findViewById(R.id.tvOriginGroup);
         TextView tvGroupDestination = v.findViewById(R.id.tvDestinationGroup);
         TextView tvGroupFee = v.findViewById(R.id.tvGroupFee);
+        TextView tvFecha = v.findViewById(R.id.tvFecha);
         tvDriverName.setText(displayGroup.getNombreConductor());
         tvGroupName.setText(displayGroup.getNombreGrupo());
-        tvGroupOrigin.setText(displayGroup.getOrigen());
-        tvGroupDestination.setText(displayGroup.getDestino());
-        tvGroupFee.setText(displayGroup.getTarifa());
+        tvGroupOrigin.setText("Origen: " + displayGroup.getOrigen());
+        tvGroupDestination.setText("Destino: " + displayGroup.getDestino());
+        tvGroupFee.setText("Tarifa: " + displayGroup.getTarifa());
+        tvFecha.setText("Fecha: " + displayGroup.getFecha());
         new DownloadImageTask((CircleImageView) v.findViewById(R.id.profilePicDriver))
                 .execute(displayGroup.getUrlFoto());
         return v;

@@ -9,6 +9,7 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,9 +27,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 
 import adapters.GroupUsersAdapter;
+import de.hdodenhof.circleimageview.CircleImageView;
 import display.DisplayGroup;
 import model.Grupo;
 import model.Usuario;
+import services.DownloadImageTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -131,10 +134,12 @@ public class GroupDetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         tvDetailGroupName.setText(displayGroup.getNombreGrupo());
-        tvDetailOrigin.setText(displayGroup.getOrigen());
-        tvDetailDestination.setText(displayGroup.getDestino());
-        tvDetailDate.setText("");
+        tvDetailOrigin.setText("Origen: " + displayGroup.getOrigen());
+        tvDetailDestination.setText("Destino: " + displayGroup.getDestino());
+        tvDetailDate.setText("Fecha: " + displayGroup.getFecha());
         tvDetailDriverName.setText(displayGroup.getNombreConductor());
+        new DownloadImageTask((CircleImageView) root.findViewById(R.id.profilePicDriver))
+                .execute(displayGroup.getUrlFoto());
 
         listGroupUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -169,9 +174,24 @@ public class GroupDetailFragment extends Fragment {
                                                             for(DataSnapshot single : task.getResult().getChildren()){
                                                                 for(DataSnapshot superSingle : single.child(FB_GROUPS_PATH).getChildren()){
                                                                     if(key.equals(superSingle.getKey())){
-                                                                        superSingle.getRef().removeValue();
-                                                                        getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
-                                                                        replaceFragment(new GroupFragment());
+                                                                        myRef = database.getReference(FB_GROUPS_PATH + grupo.getId_Grupo());
+                                                                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                            @Override
+                                                                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                                if(task.isSuccessful()){
+                                                                                    Grupo gr = task.getResult().getValue(Grupo.class);
+                                                                                    myRef = database.getReference(FB_GROUPS_PATH + grupo.getId_Grupo()).child("cupo");
+                                                                                    myRef.setValue(gr.getCupo() + 1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            superSingle.getRef().removeValue();
+                                                                                            getActivity().getSupportFragmentManager().popBackStack(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                                                                                            replaceFragment(new GroupFragment());
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                            }
+                                                                        });
                                                                     }
                                                                 }
                                                             }
