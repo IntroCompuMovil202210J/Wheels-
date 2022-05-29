@@ -9,8 +9,10 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.MenuItem;
 import android.view.Window;
+import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -23,6 +25,7 @@ public class NavActivity extends AppCompatActivity {
     GroupFragment groupFragment = new GroupFragment();
     ChatFragment chatFragment = new ChatFragment();
     SettingsFragment settingsFragment = new SettingsFragment();
+    int contador = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,33 @@ public class NavActivity extends AppCompatActivity {
         if(settingsFragment.isAdded()){
             getSupportFragmentManager().putFragment(outState, "settingsFragment", settingsFragment);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (contador == 0){
+            Toast.makeText(getApplicationContext(), "Presione nuevamente para salir", Toast.LENGTH_SHORT).show();
+            contador++;
+        }
+
+        else {
+            super.onBackPressed();
+            finishAffinity();
+        }
+
+        new CountDownTimer(3000,1000){
+
+            @Override
+            public void onTick(long l) {
+
+            }
+
+            @Override
+            public void onFinish() {
+                contador = 0;
+            }
+        }.start();
     }
 
 }

@@ -1,5 +1,7 @@
 package com.example.wheelsplus;
 
+import static com.google.android.material.textfield.TextInputLayout.END_ICON_NONE;
+
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -34,6 +37,7 @@ public class LoginActivity extends AppCompatActivity {
     Button buttonSignIn;
     TextInputEditText editMailLogin, editPsswdLogin;
     TextView forgotPasswd;
+    TextInputLayout textInputLayoutPassword;
 
     ConstraintLayout layout;
 
@@ -56,35 +60,41 @@ public class LoginActivity extends AppCompatActivity {
         editMailLogin = findViewById(R.id.editEmailLogin);
         editPsswdLogin = findViewById(R.id.editPsswdLogin);
         forgotPasswd = findViewById(R.id.tvForgotPasswd);
+        textInputLayoutPassword = findViewById(R.id.textInputLayoutPas);
 
         auth = FirebaseAuth.getInstance();
 
         buttonSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                authenticateWithFB();
-            }
-        });
 
-        editMailLogin.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                emailValid = validateEmail(editable.toString());
-                if(!emailValid){
+                emailValid = validateEmail(editMailLogin.getText().toString());
+                if(!emailValid)
                     editMailLogin.setError("Correo invalido");
+
+
+                psswdValid = validatePsswd(editPsswdLogin.getText().toString());
+                if(!psswdValid){
+
+                    textInputLayoutPassword.setEndIconMode(END_ICON_NONE);
+                    textInputLayoutPassword.setPasswordVisibilityToggleEnabled(false);
+
+                    if(editPsswdLogin.getText().toString().length() < 6)
+                        editPsswdLogin.setError("La contraseña debe ser mayor a 6 caracteres");
+
+                    else if(editPsswdLogin.getText().toString().length() > 12)
+                        editPsswdLogin.setError("La contraseña debe ser menor a 12 caracteres");
+
+                    else
+                        editPsswdLogin.setError("Su contraseña debe tener al menos un número");
                 }
+
+
+                if (emailValid & psswdValid)
+                    authenticateWithFB();
             }
         });
+
 
         editPsswdLogin.addTextChangedListener(new TextWatcher() {
             @Override
@@ -99,16 +109,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                psswdValid = validatePsswd(editable.toString());
-                if(!psswdValid){
-                    if(editable.toString().length() < 6){
-                        editPsswdLogin.setError("La contraseña debe ser mayor a 6 caracteres");
-                    }else if(editable.toString().length() > 12){
-                        editPsswdLogin.setError("La contraseña debe ser menor a 12 caracteres");
-                    }else{
-                        editPsswdLogin.setError("Su contraseña debe tener al menos un número");
-                    }
-                }
+                textInputLayoutPassword.setPasswordVisibilityToggleEnabled(true);
             }
         });
 
@@ -116,10 +117,16 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(view.getContext(), ForgotPasswdActivity.class);
+                emailValid = validateEmail(editMailLogin.getText().toString());
+
                 if(emailValid){
                     intent.putExtra("email", editMailLogin.getText().toString());
+                    startActivity(intent);
                 }
-                startActivity(intent);
+                else{
+                    editMailLogin.setError("Ingrese un correo valido");
+                    Toast.makeText(getApplicationContext(), "Ingrese su correo para continuar", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

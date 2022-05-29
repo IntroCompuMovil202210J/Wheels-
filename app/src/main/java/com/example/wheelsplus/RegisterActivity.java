@@ -1,5 +1,7 @@
 package com.example.wheelsplus;
 
+import static com.google.android.material.textfield.TextInputLayout.END_ICON_NONE;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -41,10 +44,12 @@ public class RegisterActivity extends AppCompatActivity {
     Button buttonRegister;
     TextInputEditText editMailRegister, editPsswdRegister, editPhoneRegister, editNameRegister, editLastnameRegister;
     SwitchMaterial driverSwitch;
+    TextInputLayout textInputLayoutPasReg;
 
     FirebaseAuth auth;
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity {
         editPhoneRegister = findViewById(R.id.editTelefonoRegister);
         editNameRegister = findViewById(R.id.editNombreRegister);
         editLastnameRegister = findViewById(R.id.editLastnameRegister);
+        textInputLayoutPasReg = findViewById(R.id.textInputLayoutPasReg);
         driverSwitch = findViewById(R.id.driverSwitch);
 
         auth = FirebaseAuth.getInstance();
@@ -68,29 +74,35 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                registerWithFB();
-            }
-        });
 
-        editMailRegister.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean dt = validarDatosPrincipales(editNameRegister.getText().toString(), editLastnameRegister.getText().toString(), editPhoneRegister.getText().toString());
 
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                emailValid = validateEmail(editable.toString());
-                if(!emailValid){
+                emailValid = validateEmail(editMailRegister.getText().toString());
+                if(!emailValid)
                     editMailRegister.setError("Correo invalido");
+
+                psswdValid = validatePsswd(editPsswdRegister.getText().toString());
+                if(!psswdValid){
+
+                    textInputLayoutPasReg.setEndIconMode(END_ICON_NONE);
+                    textInputLayoutPasReg.setPasswordVisibilityToggleEnabled(false);
+
+                    if(editPsswdRegister.getText().toString().length() < 6)
+                        editPsswdRegister.setError("La contraseña debe ser mayor a 6 caracteres");
+
+                    else if(editPsswdRegister.getText().toString().length() > 12)
+                        editPsswdRegister.setError("La contraseña debe ser menor a 12 caracteres");
+
+                    else
+                        editPsswdRegister.setError("Su contraseña debe tener al menos un número");
+
                 }
+
+                if(dt && emailValid && psswdValid)
+                    registerWithFB();
             }
         });
+
 
         editPsswdRegister.addTextChangedListener(new TextWatcher() {
             @Override
@@ -105,19 +117,32 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                psswdValid = validatePsswd(editable.toString());
-                if(!psswdValid){
-                    if(editable.toString().length() < 6){
-                        editPsswdRegister.setError("La contraseña debe ser mayor a 6 caracteres");
-                    }else if(editable.toString().length() > 12){
-                        editPsswdRegister.setError("La contraseña debe ser menor a 12 caracteres");
-                    }else{
-                        editPsswdRegister.setError("Su contraseña debe tener al menos un número");
-                    }
-                }
+                textInputLayoutPasReg.setPasswordVisibilityToggleEnabled(true);
             }
         });
 
+    }
+
+    public boolean validarDatosPrincipales(String nombre, String apellido, String numero){
+
+        boolean r = true;
+
+        if (!(nombre.length() > 4 && nombre.length() < 11)){
+            editNameRegister.setError("Ingrese un nombre valido");
+            r = false;
+        }
+
+        if(!(apellido.length() > 4 && nombre.length() < 11)){
+            editLastnameRegister.setError("Ingrese un apellido valido");
+            r = false;
+        }
+
+        if (numero.length() != 10){
+            editPhoneRegister.setError("Ingrese un numero telefonico valido");
+            r = false;
+        }
+
+        return r;
     }
 
     public void registerWithFB(){

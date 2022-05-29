@@ -3,6 +3,7 @@ package com.example.wheelsplus;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     BiometricPrompt biometricPrompt;
     BiometricPrompt.PromptInfo promptInfo;
 
+    int contador = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                finish();
             }
         });
 
@@ -69,7 +71,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(MainActivity.this, RegisterActivity.class));
-                finish();
             }
         });
     }
@@ -118,6 +119,31 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateUI(){
         startActivity(new Intent(this, NavActivity.class));
+        onStop();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+
+        if (contador == 0){
+            Toast.makeText(getApplicationContext(), "Presione nuevamente para salir", Toast.LENGTH_SHORT).show();
+            contador++;
+        }
+
+        else super.onBackPressed();
+
+
+        new CountDownTimer(3000,1000){
+
+            @Override
+            public void onTick(long l) {}
+
+            @Override
+            public void onFinish() {
+                contador = 0;
+            }
+        }.start();
     }
 
 }
