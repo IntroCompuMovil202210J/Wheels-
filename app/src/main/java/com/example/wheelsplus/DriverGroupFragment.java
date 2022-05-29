@@ -6,12 +6,15 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -26,16 +29,25 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.maps.model.LatLng;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+import adapters.DriverGroupsAdapter;
+import adapters.GroupsAdapter;
+import display.DisplayGroup;
+import display.DisplayGroupDriver;
 import model.Grupo;
+import model.Usuario;
 import model.Vehiculo;
 
 /**
@@ -62,6 +74,7 @@ public class DriverGroupFragment extends Fragment {
     TextInputEditText editGroupNameDriver, editGroupDestinationDriver, editGroupOriginDriver, editGroupFeeDriver;
     TextView tvSelectedTime, tvPlacaVehiculo;
     ImageButton buttonChooseVehicle;
+    ListView listGroups;
 
     /**
      * Firebase
@@ -69,15 +82,18 @@ public class DriverGroupFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference myRef;
+    ValueEventListener vel;
 
     /**
      * Utils
      */
     public static final String FB_GROUPS_PATH = "groups/";
     public static final String FB_DRIVERS_PATH = "drivers/";
+    public static final String FB_VEHICLES_PATH = "vehicles/";
     boolean time, date = false;
     Calendar calendar = Calendar.getInstance();
     Vehiculo vehiculo = null;
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -134,6 +150,7 @@ public class DriverGroupFragment extends Fragment {
         tvSelectedTime = root.findViewById(R.id.tvSelectedTimeDriver);
         buttonChooseVehicle = root.findViewById(R.id.buttonChooseVehicle);
         tvPlacaVehiculo = root.findViewById(R.id.tvPlacaVehiculo);
+        listGroups = root.findViewById(R.id.listGroupsDriver);
 
         geocoder = new Geocoder(getActivity().getBaseContext());
 
@@ -144,6 +161,8 @@ public class DriverGroupFragment extends Fragment {
         if(getArguments() != null) {
             vehiculo = getArguments().getParcelable("carSelected");
         }
+
+        loadGroups();
 
         return root;
     }
@@ -230,11 +249,13 @@ public class DriverGroupFragment extends Fragment {
                     if(latLngDestination != null && latLngOrigin != null) {
                         String key = myRef.push().getKey();
                         Grupo grupo = new Grupo(key, groupName, auth.getCurrentUser().getUid(), fee, vehiculo.getCapacidad(), latLngOrigin.lat, latLngOrigin.lng, latLngDestination.lat, latLngDestination.lng, timestamp, vehiculo.getIdVehiculo());
-                        myRef.child(FB_GROUPS_PATH + key).setValue(grupo).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        myRef = database.getReference((FB_GROUPS_PATH + key));
+                        myRef.setValue(grupo).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
-                                    myRef.child(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key).setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key);
+                                    myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){
@@ -262,6 +283,18 @@ public class DriverGroupFragment extends Fragment {
                 }
             }
         });
+
+        listGroups.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                DisplayGroupDriver displayGroup = (DisplayGroupDriver) adapterView.getItemAtPosition(i);
+                DriverGroupDetailFragment groupDetailFragment = new DriverGroupDetailFragment();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("displayDriverGroup", displayGroup);
+                groupDetailFragment.setArguments(bundle);
+                replaceFragment(groupDetailFragment);
+            }
+        });
     }
 
     private void replaceFragment(Fragment fragment){
@@ -282,6 +315,68 @@ public class DriverGroupFragment extends Fragment {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private String geoCoderBuscar(LatLng latLng){
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latLng.lat, latLng.lng, 2);
+            return addresses.get(0).getAddressLine(0);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    private void loadGroups(){
+        myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+        vel = myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listGroups.setAdapter(null);
+                ArrayList<DisplayGroupDriver> displayGroups = new ArrayList<>();
+                ArrayList<String> keyGroups = new ArrayList<>();
+                for(DataSnapshot single : snapshot.getChildren()){
+                    keyGroups.add(single.getKey());
+                }
+                myRef = database.getReference(FB_GROUPS_PATH);
+                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                        if(task.isSuccessful()){
+                            ArrayList<Grupo> grupos = new ArrayList<>();
+                            for(DataSnapshot single : task.getResult().getChildren()){
+                                if(keyGroups.contains(single.getKey())){
+                                    grupos.add(single.getValue(Grupo.class));
+                                }
+                            }
+                            myRef = database.getReference(FB_VEHICLES_PATH + auth.getCurrentUser().getUid());
+                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    for(DataSnapshot single : task.getResult().getChildren()){
+                                        Vehiculo vehiculo = single.getValue(Vehiculo.class);
+                                        for(Grupo grupo : grupos){
+                                            if(grupo.getIdVehiculo().equals(single.getKey())){
+                                                displayGroups.add(new DisplayGroupDriver(grupo.getNombreGrupo(), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())),geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), sdf.format(grupo.getFechaAcuerdo()), String.valueOf(grupo.getTarifa()), vehiculo.getPlaca(), vehiculo.getMarca(), grupo.getId_Grupo(), vehiculo.getModelo()));
+                                            }
+                                        }
+                                    }
+                                    if(getActivity() != null) {
+                                        DriverGroupsAdapter groupsAdapter = new DriverGroupsAdapter(getActivity(), displayGroups);
+                                        listGroups.setAdapter(groupsAdapter);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
 }

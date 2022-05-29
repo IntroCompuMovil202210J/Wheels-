@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:padding="30dp"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tvGrNameDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nombre grupo"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_bold"
+            android:textSize="16sp"/>
+        <TextView
+            android:id="@+id/tvGrOriginDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Origen: "
+            android:gravity="center_vertical"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/tvGrDestDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Destino: "
+            android:gravity="center_vertical"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/tvGrDateDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Horario: "
+            android:gravity="center_vertical"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/tvGrFeeDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tarifa: "
+            android:gravity="center_vertical"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="14sp"/>
+        <TextView
+            android:id="@+id/tvGrPlacaDriver"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Placa: "
+            android:gravity="center_vertical"
+            android:fontFamily="@font/roboto_light"
+            android:textSize="14sp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

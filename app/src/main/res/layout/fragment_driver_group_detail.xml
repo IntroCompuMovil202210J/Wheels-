@@ -11,25 +11,12 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
-        android:layout_height="328dp"
+        android:layout_height="332dp"
         android:background="@drawable/group_border_rounded"
         android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
-        <RatingBar
-            android:id="@+id/ratingBar3"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:isIndicator="true"
-            android:numStars="5"
-            android:rating="4.5"
-            android:scaleX=".6"
-            android:scaleY=".6"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/profilePicDriver"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverName" />
 
         <ImageView
             android:id="@+id/ic_search"
@@ -54,83 +41,112 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/tvDetailGroupName"
+            android:id="@+id/tvDetailDriverGroupName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_light"
             android:text="Nombre de Grupo: "
-            app:layout_constraintStart_toStartOf="@+id/tvDetailOrigin"
+            app:layout_constraintStart_toStartOf="@+id/tvDetailDriverOrigin"
             app:layout_constraintTop_toBottomOf="@+id/ic_search" />
 
         <TextView
-            android:id="@+id/tvDetailOrigin"
+            android:id="@+id/tvDetailDriverOrigin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_light"
             android:text="Origen: "
-            app:layout_constraintStart_toStartOf="@+id/tvDetailDestination"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailGroupName" />
+            app:layout_constraintStart_toStartOf="@+id/tvDetailDriverDestination"
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverGroupName" />
 
         <TextView
-            android:id="@+id/tvDetailDestination"
+            android:id="@+id/tvDetailDriverDestination"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_light"
             android:text="Destino: "
-            app:layout_constraintStart_toStartOf="@+id/tvDetailDate"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailOrigin" />
+            app:layout_constraintStart_toStartOf="@+id/tvDetailDriverDate"
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverOrigin" />
 
         <TextView
-            android:id="@+id/tvDetailDate"
+            android:id="@+id/tvDetailDriverDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_light"
             android:text="Horario: "
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailDestination" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profilePicDriver"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
-            android:src="@drawable/sample_profile"
-            app:civ_border_color="#80DAD7D7"
-            app:civ_border_width="1dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailDate" />
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverDestination" />
 
         <TextView
-            android:id="@+id/tvDetailDriverName"
+            android:id="@+id/tvDetailDriverFee"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="76dp"
-            android:layout_marginTop="32dp"
-            android:fontFamily="@font/roboto_black"
-            android:text="Nombre conductor"
-            app:layout_constraintStart_toEndOf="@+id/profilePicDriver"
-            app:layout_constraintTop_toBottomOf="@+id/tvDetailDate" />
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/roboto_light"
+            android:text="Tarifa: "
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverDate" />
 
         <ImageButton
-            android:id="@+id/buttonRemoveGroup"
+            android:id="@+id/buttonModifyDriverGroup"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:minHeight="48dp"
-            android:src="@drawable/ic_baseline_exit_to_app_24"
+            android:src="@drawable/ic_outline_border_color_24_black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
 
+        <ImageButton
+            android:id="@+id/buttonRemoveDriverGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:minHeight="48dp"
+            android:src="@drawable/ic_twotone_group_off_24"
+            app:layout_constraintEnd_toStartOf="@+id/buttonModifyDriverGroup"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_baseline_directions_car_24"
+            app:layout_constraintStart_toStartOf="@+id/tvDetailDriverFee"
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverFee" />
+
+        <TextView
+            android:id="@+id/tvPlacaDriverDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:fontFamily="@font/roboto_light"
+            android:text="Placa"
+            android:textSize="16sp"
+            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverFee" />
+
+        <TextView
+            android:id="@+id/tvMarcaDriverDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_light"
+            android:text="Marca"
+            app:layout_constraintStart_toStartOf="@+id/tvPlacaDriverDetail"
+            app:layout_constraintTop_toBottomOf="@+id/tvPlacaDriverDetail" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ListView
-        android:id="@+id/listGroupUsers"
+        android:id="@+id/listGroupDriverUsers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"

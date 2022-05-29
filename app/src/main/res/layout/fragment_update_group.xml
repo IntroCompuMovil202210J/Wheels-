@@ -8,68 +8,16 @@
     android:background="@drawable/gradient_group_gradient_anim"
     tools:context=".UpdateProfileFragment">
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/editProfilePic"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="32dp"
-        android:src="@drawable/sample_profile"
-        app:civ_border_color="#80DAD7D7"
-        app:civ_border_width="1dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/buttonChangeProfilePic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="-32dp"
-        android:layout_marginBottom="535dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/fab_button"
-        app:fabCustomSize="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/editProfilePic"
-        tools:ignore="SpeakableTextPresentCheck" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/buttonChangeCam"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/fab_camera"
-        android:visibility="invisible"
-        app:fabCustomSize="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonChangeProfilePic"
-        app:layout_constraintEnd_toEndOf="@+id/buttonChangeProfilePic" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/buttonChangeGallery"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/fab_gallery"
-        android:visibility="invisible"
-        app:fabCustomSize="50dp"
-        app:layout_constraintBottom_toTopOf="@+id/buttonChangeCam"
-        app:layout_constraintEnd_toEndOf="@+id/buttonChangeCam" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="580dp"
         android:background="@drawable/group_border_rounded"
         android:orientation="vertical"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.454"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ModGrupo">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
@@ -77,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="8dp"
             android:hint="Nombre"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
@@ -86,7 +34,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editChangeName"
+                android:id="@+id/editChangeNameGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -101,8 +49,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_marginTop="20dp"
-            android:hint="Apellido"
+            android:layout_marginTop="8dp"
+            android:hint="Origen"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -110,7 +58,7 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editChangeLastname"
+                android:id="@+id/editChangeOrigin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -125,8 +73,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:layout_marginTop="20dp"
-            android:hint="Teléfono celular"
+            android:layout_marginTop="8dp"
+            android:hint="Destino"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
@@ -134,7 +82,31 @@
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editChangePhone"
+                android:id="@+id/editChangeDestino"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_regular"
+                android:imeOptions="actionDone"
+                android:inputType="text" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputLayout4"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:layout_marginTop="8dp"
+            android:hint="Tarifa"
+            android:textColorHint="#989898"
+            app:boxBackgroundColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editChangeFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
@@ -144,21 +116,75 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/buttonUpdateProfile"
-            android:layout_width="300dp"
+            android:id="@+id/buttonUpdateGroup"
+            android:layout_width="280dp"
             android:layout_height="70dp"
-            android:layout_marginTop="225dp"
-            android:layout_marginBottom="64dp"
+            android:layout_marginBottom="40dp"
             android:layout_weight="0.5"
             android:backgroundTint="#0D324D"
-            android:text="Actualizar Perfil"
+            android:text="Actualizar Grupo"
             android:theme="@style/textoFuenteBoton"
             app:cornerRadius="10dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <ListView
+            android:id="@+id/listCars"
+            android:layout_width="match_parent"
+            android:layout_height="116dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout2" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout4" />
+
+        <TextView
+            android:id="@+id/tvCarDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Placa"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/listCars" />
+
+        <TextView
+            android:id="@+id/tvChangeDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Fecha"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvCarDetail" />
+
+
+        <ImageButton
+            android:id="@+id/buttonUpDate"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:backgroundTint="#0D324D"
+            android:scaleType="fitStart"
+            android:src="@drawable/ic_baseline_access_time_24"
+            app:layout_constraintBottom_toBottomOf="@+id/buttonUpdateGroup"
+            app:layout_constraintEnd_toStartOf="@+id/buttonUpdateGroup"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/buttonUpdateGroup"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/ModGrupo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/roboto_black"
+        android:text="Modificar Grupo"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

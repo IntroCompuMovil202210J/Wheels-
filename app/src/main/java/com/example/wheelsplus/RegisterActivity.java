@@ -135,7 +135,8 @@ public class RegisterActivity extends AppCompatActivity {
                         double latitude = 0;
                         double longitude = 0;
                         Usuario user = new Usuario(name, lastname, phone, DEFAULT_PROFILE_PIC, latitude, longitude);
-                        myRef.child(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid()).setValue(false);
+                        myRef = database.getReference(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid());
+                        myRef.setValue(false);
                         myRef = database.getReference(FB_USERS_PATH + firebaseUser.getUid());
                         myRef.setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override

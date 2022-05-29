@@ -100,7 +100,8 @@ public class AdvancedSettingsFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         myRef = FirebaseDatabase.getInstance().getReference();
 
-        myRef.child(RegisterActivity.FB_FINGERPRINT_PATH).child(auth.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        myRef = database.getReference(RegisterActivity.FB_FINGERPRINT_PATH).child(auth.getCurrentUser().getUid());
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()){
