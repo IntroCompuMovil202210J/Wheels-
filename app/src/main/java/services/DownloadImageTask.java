@@ -4,15 +4,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ImageView;
 
 import java.io.InputStream;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
 public class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    CircleImageView bmImage;
+    ImageView bmImage;
 
-    public DownloadImageTask(CircleImageView bmImage) {
+    public DownloadImageTask(ImageView bmImage) {
         this.bmImage = bmImage;
     }
 

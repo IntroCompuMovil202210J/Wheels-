@@ -157,7 +157,8 @@ public class SelectGroupFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + grupoEscogido.getIdGrupo());
-                            myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>(){
+
+                            myRef.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task){
                                     if(task.isSuccessful()){
@@ -236,7 +237,7 @@ public class SelectGroupFragment extends Fragment {
                         for(DataSnapshot single : task.getResult().getChildren()){
                             Usuario usuario = single.getValue(Usuario.class);
                             if(grupo.getIdConductor().equals(single.getKey())){
-                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo()), grupo.getLatUser(), grupo.getLonUser()));
+                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), single.getKey(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo()), grupo.getLatUser(), grupo.getLonUser()));
                             }
                         }
                         if(getActivity() != null) {
