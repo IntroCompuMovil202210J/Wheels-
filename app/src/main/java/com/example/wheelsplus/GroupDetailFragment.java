@@ -148,6 +148,7 @@ public class GroupDetailFragment extends Fragment {
             }
         });
 
+
         buttonRemoveGroup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

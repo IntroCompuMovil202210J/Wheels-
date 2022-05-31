@@ -112,6 +112,14 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
 
+        <ImageButton
+            android:id="@+id/buttonDriverMapDetail"
+            android:layout_width="47dp"
+            android:layout_height="47dp"
+            app:layout_constraintEnd_toStartOf="@+id/buttonRemoveDriverGroup"
+            app:layout_constraintStart_toEndOf="@+id/textView12"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <ImageView
             android:id="@+id/imageView6"
             android:layout_width="64dp"

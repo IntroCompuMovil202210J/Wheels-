@@ -36,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.maps.model.LatLng;
 
+import org.osmdroid.util.GeoPoint;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -46,6 +48,7 @@ import java.util.List;
 import adapters.GroupsAdapter;
 import display.DisplayGroup;
 import model.Grupo;
+import model.PuntoRuta;
 import model.Usuario;
 
 /**
@@ -78,7 +81,7 @@ public class GroupFragment extends Fragment {
      */
     FirebaseAuth auth;
     FirebaseDatabase database;
-    DatabaseReference myRef;
+    DatabaseReference myRef, myRefAux;
     ValueEventListener vel;
 
     /**
@@ -90,7 +93,8 @@ public class GroupFragment extends Fragment {
     boolean time, date = false;
     double latitud = 0;
     double longitud = 0;
-    double lat, lng;
+    double latOrigin, lngOrigin;
+    LatLng latLngDestino;
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
 
@@ -162,8 +166,8 @@ public class GroupFragment extends Fragment {
                     Usuario usuario = task.getResult().getValue(Usuario.class);
                     latitud = usuario.getLatitud();
                     longitud = usuario.getLongitud();
-                    lat = latitud;
-                    lng = longitud;
+                    latOrigin = latitud;
+                    lngOrigin = longitud;
                 }
             }
         });
@@ -207,7 +211,7 @@ public class GroupFragment extends Fragment {
             }
         });
 
-        buttonSearchGroup.setOnClickListener(new View.OnClickListener() {
+        buttonSearchGroup.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
                 boolean flag = true;
@@ -216,49 +220,76 @@ public class GroupFragment extends Fragment {
                     Toast.makeText(getContext(), "Alguno de los dos campos debe ser llenado para la búsqueda", Toast.LENGTH_SHORT).show();
                     flag = false;
                 }
+
                 if(!time || !date){
                     Toast.makeText(view.getContext(), "Hora y dia de acuerdo requeridos", Toast.LENGTH_SHORT).show();
                     flag = false;
                 }
+
                 if(!TextUtils.isEmpty(editGroupOrigin.getText())){
                     LatLng origin = searchLatLngAddress(editGroupOrigin.getText().toString());
+
                     if(origin != null) {
-                        lat = origin.lat;
-                        lng = origin.lng;
+                        latOrigin = origin.lat;
+                        lngOrigin = origin.lng;
+
                     }else{
                         editGroupOrigin.setError("Direccion de origen no encontrada");
                         flag = false;
                     }
                 }
+
+
                 if(flag){
+
+
                     ArrayList<Grupo> grupos = new ArrayList<>();
-                    LatLng latLng = searchLatLngAddress(editGroupDestination.getText().toString());
+
+                    latLngDestino = searchLatLngAddress(editGroupDestination.getText().toString());
+
                     long timestamp = calendar.getTimeInMillis();
+
                     String groupName = editGroupName.getText().toString();
+
+
                     myRef = database.getReference(FB_GROUPS_PATH);
+
+
                     if(!TextUtils.isEmpty(editGroupName.getText()) && TextUtils.isEmpty(editGroupDestination.getText())){
+
                         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                 if(task.isSuccessful()){
+
                                     for(DataSnapshot single : task.getResult().getChildren()){
                                         Grupo grupo = single.getValue(Grupo.class);
-                                        long tiempo = grupo.getFechaAcuerdo();
-                                        Calendar c = Calendar.getInstance();
-                                        c.setTime(new Date(tiempo));
-                                        if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)){
-                                            if(Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30){
-                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase()) && grupo.getCupo() > 0){
-                                                    if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
-                                                        grupos.add(single.getValue(Grupo.class));
+
+                                        if(candidatoGrupoXDistancia(grupo.getLatitudAcuerdo(), grupo.getLatitudDestino(), grupo.getLongitudAcuerdo(), grupo.getLongitudDestino(), new LatLng(latOrigin, lngOrigin))){
+
+                                            long tiempo = grupo.getFechaAcuerdo();
+                                            Calendar c = Calendar.getInstance();
+                                            c.setTime(new Date(tiempo));
+
+                                            if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)){
+                                                if(Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30){
+                                                    if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase()) && grupo.getCupo() > 0){
+                                                        if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
+                                                            Grupo aux = single.getValue(Grupo.class);
+                                                            aux.setLatUser(latOrigin);
+                                                            aux.setLonUser(lngOrigin);
+                                                            grupos.add(aux);
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                    if(grupos.isEmpty()){
+
+                                    if(grupos.isEmpty())
                                         Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
-                                    }else {
+
+                                    else {
                                         SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
                                         Bundle bundle = new Bundle();
                                         bundle.putParcelableArrayList("grupos", grupos);
@@ -268,32 +299,44 @@ public class GroupFragment extends Fragment {
                                 }
                             }
                         });
-                    }else if(TextUtils.isEmpty(editGroupName.getText()) && !TextUtils.isEmpty(editGroupDestination.getText())){
-                        if(latLng != null) {
+                    }
+
+
+                    else if(TextUtils.isEmpty(editGroupName.getText()) && !TextUtils.isEmpty(editGroupDestination.getText())){
+                        if(latLngDestino != null) {
                             myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                                 @Override
                                 public void onComplete(@NonNull Task<DataSnapshot> task) {
                                     if(task.isSuccessful()){
                                         for(DataSnapshot single : task.getResult().getChildren()){
                                             Grupo grupo = single.getValue(Grupo.class);
-                                            long tiempo = grupo.getFechaAcuerdo();
-                                            Calendar c = Calendar.getInstance();
-                                            c.setTime(new Date(tiempo));
-                                            if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
-                                                if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
-                                                    if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3  && grupo.getCupo() > 0){
-                                                        if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
-                                                            if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
-                                                                grupos.add(single.getValue(Grupo.class));
+
+                                            if(candidatoGrupoXDistancia(grupo.getLatitudAcuerdo(), grupo.getLatitudDestino(), grupo.getLongitudAcuerdo(), grupo.getLongitudDestino(), new LatLng(latOrigin, lngOrigin))){
+
+                                                long tiempo = grupo.getFechaAcuerdo();
+                                                Calendar c = Calendar.getInstance();
+                                                c.setTime(new Date(tiempo));
+                                                if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
+                                                    if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
+                                                        if(grupo.getCupo() > 0){
+                                                            if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLngDestino.lat, latLngDestino.lng) <= 0.3){
+                                                                if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
+                                                                    Grupo aux = single.getValue(Grupo.class);
+                                                                    aux.setLatUser(latOrigin);
+                                                                    aux.setLonUser(lngOrigin);
+                                                                    grupos.add(aux);
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
-                                        if(grupos.isEmpty()){
+
+                                        if(grupos.isEmpty())
                                             Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
-                                        }else {
+
+                                        else {
                                             SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
                                             Bundle bundle = new Bundle();
                                             bundle.putParcelableArrayList("grupos", grupos);
@@ -303,27 +346,35 @@ public class GroupFragment extends Fragment {
                                     }
                                 }
                             });
-
-                        }else{
-                            editGroupDestination.setError("Dirección no encontrada, intente de nuevo");
                         }
-                    }else{
+                        else
+                            editGroupDestination.setError("Dirección no encontrada, intente de nuevo");
+
+                    }
+
+                    else{
                         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                 if(task.isSuccessful()){
                                     for(DataSnapshot single : task.getResult().getChildren()){
                                         Grupo grupo = single.getValue(Grupo.class);
-                                        long tiempo = grupo.getFechaAcuerdo();
-                                        Calendar c = Calendar.getInstance();
-                                        c.setTime(new Date(tiempo));
-                                        if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
-                                            if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
-                                                if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
-                                                    if(distance(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo(), lat, lng) <= 0.3  && grupo.getCupo() > 0){
-                                                        if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLng.lat, latLng.lng) <= 0.3){
-                                                            if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
-                                                                grupos.add(single.getValue(Grupo.class));
+
+                                        if(candidatoGrupoXDistancia(grupo.getLatitudAcuerdo(), grupo.getLatitudDestino(), grupo.getLongitudAcuerdo(), grupo.getLongitudDestino(), new LatLng(latOrigin, lngOrigin))){
+                                            long tiempo = grupo.getFechaAcuerdo();
+                                            Calendar c = Calendar.getInstance();
+                                            c.setTime(new Date(tiempo));
+                                            if(calendar.get(Calendar.DAY_OF_MONTH) == c.get(Calendar.DAY_OF_MONTH) && calendar.get(Calendar.MONTH) == c.get(Calendar.MONTH) && calendar.get(Calendar.YEAR) == c.get(Calendar.YEAR)) {
+                                                if (Math.abs(timestamp - c.getTimeInMillis()) / 60000 <= 30) {
+                                                    if(grupo.getNombreGrupo().toLowerCase().contains(groupName.toLowerCase())){
+                                                        if(grupo.getCupo() > 0){
+                                                            if(distance(grupo.getLatitudDestino(), grupo.getLongitudDestino(), latLngDestino.lat, latLngDestino.lng) <= 0.3){
+                                                                if(!grupo.getIdConductor().equals(auth.getCurrentUser().getUid())){
+                                                                    Grupo aux = single.getValue(Grupo.class);
+                                                                    aux.setLatUser(latOrigin);
+                                                                    aux.setLonUser(lngOrigin);
+                                                                    grupos.add(aux);
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -331,9 +382,11 @@ public class GroupFragment extends Fragment {
                                             }
                                         }
                                     }
-                                    if(grupos.isEmpty()){
+
+                                    if(grupos.isEmpty())
                                         Toast.makeText(getActivity(), "No se encontraron grupos", Toast.LENGTH_SHORT).show();
-                                    }else {
+
+                                    else {
                                         SelectGroupFragment selectGroupFragment = new SelectGroupFragment();
                                         Bundle bundle = new Bundle();
                                         bundle.putParcelableArrayList("grupos", grupos);
@@ -359,7 +412,46 @@ public class GroupFragment extends Fragment {
                 replaceFragment(groupDetailFragment);
             }
         });
+    }
 
+
+    private boolean candidatoGrupoXDistancia (Double latitudA, Double latitudB, Double longitudA, Double longitudB, LatLng origenUsuario){
+
+        GeoPoint A, B, C;
+        Double disAux;
+
+        B = calcularPuntoMedio(latitudA, latitudB, longitudA, longitudB);
+        A = calcularPuntoMedio(latitudA, B.getLatitude(), longitudA, B.getLongitude());
+        C = calcularPuntoMedio(B.getLatitude(), latitudB, B.getLongitude(), longitudB);
+
+        Double dis = (distance(latitudA, longitudA, latitudB, longitudB));
+
+        if (distance(A.getLatitude(), A.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+            return true;
+
+        else if(distance(B.getLatitude(), B.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+            return true;
+
+        else if(distance(C.getLatitude(), C.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+            return true;
+
+        else
+            return false;
+    }
+
+    private GeoPoint calcularPuntoMedio (Double latitudA, Double latitudB, Double longitudA, Double longitudB){
+        return new GeoPoint(((latitudA+latitudB)/2), ((longitudA+longitudB)/2));
+    }
+
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        double latDistance = Math.toRadians(lat1 - lat2);
+        double lngDistance = Math.toRadians(long1 - long2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double result = HomeFragment.EARTH_RADIUS * c;
+        return (Math.round(result*100.0)/100.0);
     }
 
     private void replaceFragment(Fragment fragment){
@@ -394,17 +486,6 @@ public class GroupFragment extends Fragment {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public double distance(double lat1, double long1, double lat2, double long2) {
-        double latDistance = Math.toRadians(lat1 - lat2);
-        double lngDistance = Math.toRadians(long1 - long2);
-        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        double result = HomeFragment.EARTH_RADIUS * c;
-        return Math.round(result*100.0)/100.0;
     }
 
     private String geoCoderBuscar(LatLng latLng){
@@ -463,9 +544,7 @@ public class GroupFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {}
         });
     }
 

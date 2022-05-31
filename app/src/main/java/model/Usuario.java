@@ -11,10 +11,10 @@ public class Usuario {
     double latitud;
     double longitud;
 
-    ArrayList<Grupo> grupos = new ArrayList<>();
+   /* ArrayList<Grupo> grupos = new ArrayList<>();
     ArrayList<Viaje> viajes = new ArrayList<>();
     ArrayList<Chat> chats = new ArrayList<>();
-
+*/
     public Usuario() {
     }
 
@@ -34,9 +34,9 @@ public class Usuario {
         this.urlFoto = urlFoto;
         this.latitud = latitud;
         this.longitud = longitud;
-        this.grupos = grupos;
+      /*  this.grupos = grupos;
         this.viajes = viajes;
-        this.chats = chats;
+        this.chats = chats;*/
     }
 
     public String getNombre() {
@@ -86,7 +86,7 @@ public class Usuario {
     public void setLongitud(double longitud) {
         this.longitud = longitud;
     }
-
+/*
     public ArrayList<Grupo> getGrupos() {
         return grupos;
     }
@@ -110,5 +110,5 @@ public class Usuario {
     public void setChats(ArrayList<Chat> chats) {
         this.chats = chats;
     }
-
+*/
 }

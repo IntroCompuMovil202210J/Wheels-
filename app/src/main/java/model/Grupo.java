@@ -16,9 +16,15 @@ public class Grupo implements Parcelable {
     double longitudAcuerdo;
     double latitudDestino;
     double longitudDestino;
+
+
+    double latUser, lonUser;
+
+
     long fechaAcuerdo;
     String idVehiculo;
     ArrayList<String> preferenciasRuta;
+
 
     public Grupo() {
     }
@@ -35,6 +41,23 @@ public class Grupo implements Parcelable {
         this.longitudDestino = longitudDestino;
         this.fechaAcuerdo = fechaAcuerdo;
         this.idVehiculo = idVehiculo;
+    }
+
+    public Grupo(String id_Grupo, String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, double latUser, double lonUser, long fechaAcuerdo, String idVehiculo, ArrayList<String> preferenciasRuta) {
+        this.id_Grupo = id_Grupo;
+        this.nombreGrupo = nombreGrupo;
+        this.idConductor = idConductor;
+        this.tarifa = tarifa;
+        this.cupo = cupo;
+        this.latitudAcuerdo = latitudAcuerdo;
+        this.longitudAcuerdo = longitudAcuerdo;
+        this.latitudDestino = latitudDestino;
+        this.longitudDestino = longitudDestino;
+        this.latUser = latUser;
+        this.lonUser = lonUser;
+        this.fechaAcuerdo = fechaAcuerdo;
+        this.idVehiculo = idVehiculo;
+        this.preferenciasRuta = preferenciasRuta;
     }
 
     protected Grupo(Parcel in) {
@@ -177,5 +200,21 @@ public class Grupo implements Parcelable {
         parcel.writeLong(fechaAcuerdo);
         parcel.writeString(idVehiculo);
         parcel.writeStringList(preferenciasRuta);
+    }
+
+    public double getLatUser() {
+        return latUser;
+    }
+
+    public void setLatUser(double latUser) {
+        this.latUser = latUser;
+    }
+
+    public double getLonUser() {
+        return lonUser;
+    }
+
+    public void setLonUser(double lonUser) {
+        this.lonUser = lonUser;
     }
 }

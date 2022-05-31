@@ -2,13 +2,11 @@ package com.example.wheelsplus;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -25,11 +22,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.util.ArrayList;
-
 import adapters.GroupUsersAdapter;
-import display.DisplayGroup;
 import display.DisplayGroupDriver;
 import model.Grupo;
 import model.Usuario;
@@ -50,7 +44,7 @@ public class DriverGroupDetailFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextView tvDetailDriverGroupName, tvDetailDriverOrigin, tvDetailDriverDestination, tvDetailDriverDate, tvDetailDriverFee, tvDetailDriverPlaca, tvDetailDriverMarca;
-    ImageButton buttonRemoveGroup, buttonModifyGroup;
+    ImageButton buttonRemoveGroup, buttonModifyGroup, buttonDriverMapDetail;
     ListView listDriverGroupUsers;
 
     /**
@@ -67,6 +61,7 @@ public class DriverGroupDetailFragment extends Fragment {
     public static final String FB_DRIVERS_PATH = "drivers/";
     public static final String FB_GROUPS_PATH = "groups/";
     DisplayGroupDriver displayGroup;
+    DriverMapDetailFragment driverMapDetailFragment = new DriverMapDetailFragment();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -124,6 +119,7 @@ public class DriverGroupDetailFragment extends Fragment {
         buttonRemoveGroup = root.findViewById(R.id.buttonRemoveDriverGroup);
         buttonModifyGroup = root.findViewById(R.id.buttonModifyDriverGroup);
         listDriverGroupUsers = root.findViewById(R.id.listGroupDriverUsers);
+        buttonDriverMapDetail = root.findViewById(R.id.buttonDriverMapDetail);
 
         displayGroup = getArguments().getParcelable("displayDriverGroup");
 
@@ -153,6 +149,16 @@ public class DriverGroupDetailFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
+            }
+        });
+
+        buttonDriverMapDetail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("displayDriverGroupInfo", displayGroup);
+                driverMapDetailFragment.setArguments(bundle);
+                replaceFragment(driverMapDetailFragment);
             }
         });
 
@@ -188,9 +194,8 @@ public class DriverGroupDetailFragment extends Fragment {
                                                     if(task.isSuccessful()){
                                                         for(DataSnapshot single : task.getResult().getChildren()){
                                                             for(DataSnapshot minisingle : single.child(FB_GROUPS_PATH).getChildren()){
-                                                                if(minisingle.getKey().equals(displayGroup.getIdGrupo())){
+                                                                if(minisingle.getKey().equals(displayGroup.getIdGrupo()))
                                                                     minisingle.getRef().removeValue();
-                                                                }
                                                             }
                                                         }
                                                     }
@@ -209,10 +214,7 @@ public class DriverGroupDetailFragment extends Fragment {
                             }
                         }).show();
             }
-
         });
-
-
     }
 
     private void replaceFragment(Fragment fragment){
@@ -242,9 +244,8 @@ public class DriverGroupDetailFragment extends Fragment {
                                         for(DataSnapshot single : task.getResult().getChildren()){
                                             Usuario usuario = single.getValue(Usuario.class);
                                             for(DataSnapshot superSingle : single.child(FB_GROUPS_PATH).getChildren()){
-                                                if(key.equals(superSingle.getKey()) && !grupo.getIdConductor().equals(single.getKey())){
+                                                if(key.equals(superSingle.getKey()) && !grupo.getIdConductor().equals(single.getKey()))
                                                     usuarios.add(usuario);
-                                                }
                                             }
                                         }
                                         if(getActivity() != null) {

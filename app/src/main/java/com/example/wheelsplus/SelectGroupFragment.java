@@ -41,6 +41,7 @@ import adapters.GroupsAdapter;
 import adapters.VehiclesAdapter;
 import display.DisplayGroup;
 import model.Grupo;
+import model.PuntoRuta;
 import model.Usuario;
 import model.Vehiculo;
 
@@ -71,7 +72,7 @@ public class SelectGroupFragment extends Fragment {
      */
     FirebaseAuth auth;
     FirebaseDatabase database;
-    DatabaseReference myRef;
+    DatabaseReference myRef, myRefAux;
 
     /**
      * Utils
@@ -152,16 +153,16 @@ public class SelectGroupFragment extends Fragment {
                 new MaterialAlertDialogBuilder(view.getContext())
                     .setTitle("¿Seguro que desea entrar en el grupo " + grupoEscogido.getNombreGrupo() + "?")
                     .setNegativeButton("Rechazar", null)
-                    .setPositiveButton("Unirse", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Unirse", new DialogInterface.OnClickListener(){
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + grupoEscogido.getIdGrupo());
-                            myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>(){
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
+                                public void onComplete(@NonNull Task<Void> task){
                                     if(task.isSuccessful()){
                                         myRef = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo());
-                                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>(){
                                             @Override
                                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                                 if(task.isSuccessful()){
@@ -170,6 +171,26 @@ public class SelectGroupFragment extends Fragment {
                                                     myRef.setValue(gr.getCupo() - 1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
+
+                                                            myRef = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta");
+                                                            PuntoRuta puntoRuta = new PuntoRuta(auth.getCurrentUser().getUid(), grupoEscogido.getLatOrigin(), grupoEscogido.getLonOrigin());
+
+                                                            String key = myRef.push().getKey();
+                                                            myRefAux = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta/" + key);
+                                                            myRefAux.setValue(puntoRuta);
+
+                                                            myRefAux = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta/cuposOcupados");
+                                                            myRefAux.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                    if (task.isSuccessful()){
+                                                                        Long auxNum = (Long) task.getResult().getValue();
+                                                                        myRefAux.setValue(auxNum + 1);
+                                                                    }
+                                                                }
+
+                                                            });
+
                                                             Toast.makeText(getActivity(), "Grupo añadido correctamente", Toast.LENGTH_LONG).show();
                                                             replaceFragment(new GroupFragment());
                                                         }
@@ -181,11 +202,9 @@ public class SelectGroupFragment extends Fragment {
                                 }
                             });
                         }
-                    })
-                    .show();
+                    }).show();
             }
         });
-
     }
 
     private String geoCoderBuscar(LatLng latLng){
@@ -205,7 +224,6 @@ public class SelectGroupFragment extends Fragment {
         fragmentTransaction.commit();
     }
 
-
     private void loadGroups(){
         listGroupsUser.setAdapter(null);
         myRef = database.getReference(FB_USERS_PATH);
@@ -218,7 +236,7 @@ public class SelectGroupFragment extends Fragment {
                         for(DataSnapshot single : task.getResult().getChildren()){
                             Usuario usuario = single.getValue(Usuario.class);
                             if(grupo.getIdConductor().equals(single.getKey())){
-                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo())));
+                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo()), grupo.getLatUser(), grupo.getLonUser()));
                             }
                         }
                         if(getActivity() != null) {
