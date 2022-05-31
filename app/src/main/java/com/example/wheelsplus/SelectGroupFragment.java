@@ -218,7 +218,7 @@ public class SelectGroupFragment extends Fragment {
                         for(DataSnapshot single : task.getResult().getChildren()){
                             Usuario usuario = single.getValue(Usuario.class);
                             if(grupo.getIdConductor().equals(single.getKey())){
-                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo())));
+                                displayGroups.add(new DisplayGroup(usuario.getNombre() + " " + usuario.getApellido(), grupo.getNombreGrupo(), single.getKey(), String.valueOf(grupo.getTarifa()), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), usuario.getUrlFoto(), grupo.getId_Grupo(), sdf.format(grupo.getFechaAcuerdo())));
                             }
                         }
                         if(getActivity() != null) {

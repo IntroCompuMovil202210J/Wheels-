@@ -159,7 +159,7 @@ public class RegisterActivity extends AppCompatActivity {
                         String phone = editPhoneRegister.getText().toString();
                         double latitude = 0;
                         double longitude = 0;
-                        Usuario user = new Usuario(name, lastname, phone, DEFAULT_PROFILE_PIC, latitude, longitude);
+                        Usuario user = new Usuario(firebaseUser.getUid(), name, lastname, phone, DEFAULT_PROFILE_PIC, latitude, longitude);
                         myRef = database.getReference(FB_FINGERPRINT_PATH + auth.getCurrentUser().getUid());
                         myRef.setValue(false);
                         myRef = database.getReference(FB_USERS_PATH + firebaseUser.getUid());

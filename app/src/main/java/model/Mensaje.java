@@ -1,19 +1,19 @@
 package model;
 
-import org.joda.time.DateTime;
-
 public class Mensaje {
 
     String dato;
-    DateTime fecha;
-    TipoMensaje tipo;
+    long fecha;
+    String idEnvio;
+    String tipo;
 
     public Mensaje() {
     }
 
-    public Mensaje(String dato, DateTime fecha, TipoMensaje tipo) {
+    public Mensaje(String dato, long fecha, String idEnvio, String tipo) {
         this.dato = dato;
         this.fecha = fecha;
+        this.idEnvio = idEnvio;
         this.tipo = tipo;
     }
 
@@ -25,19 +25,27 @@ public class Mensaje {
         this.dato = dato;
     }
 
-    public DateTime getFecha() {
+    public long getFecha() {
         return fecha;
     }
 
-    public void setFecha(DateTime fecha) {
+    public void setFecha(long fecha) {
         this.fecha = fecha;
     }
 
-    public TipoMensaje getTipo() {
+    public String getIdEnvio() {
+        return idEnvio;
+    }
+
+    public void setIdEnvio(String idEnvio) {
+        this.idEnvio = idEnvio;
+    }
+
+    public String getTipo() {
         return tipo;
     }
 
-    public void setTipo(TipoMensaje tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 

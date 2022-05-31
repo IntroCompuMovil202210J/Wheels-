@@ -7,6 +7,7 @@ public class DisplayGroup implements Parcelable {
 
     String nombreConductor;
     String nombreGrupo;
+    String idConductor;
     String tarifa;
     String origen;
     String destino;
@@ -17,9 +18,10 @@ public class DisplayGroup implements Parcelable {
     public DisplayGroup() {
     }
 
-    public DisplayGroup(String nombreConductor, String nombreGrupo, String tarifa, String origen, String destino, String urlFoto, String idGrupo, String fecha) {
+    public DisplayGroup(String nombreConductor, String nombreGrupo, String idConductor, String tarifa, String origen, String destino, String urlFoto, String idGrupo, String fecha) {
         this.nombreConductor = nombreConductor;
         this.nombreGrupo = nombreGrupo;
+        this.idConductor = idConductor;
         this.tarifa = tarifa;
         this.origen = origen;
         this.destino = destino;
@@ -31,20 +33,26 @@ public class DisplayGroup implements Parcelable {
     protected DisplayGroup(Parcel in) {
         nombreConductor = in.readString();
         nombreGrupo = in.readString();
+        idConductor = in.readString();
         tarifa = in.readString();
         origen = in.readString();
         destino = in.readString();
         urlFoto = in.readString();
+        idGrupo = in.readString();
+        fecha = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(nombreConductor);
         dest.writeString(nombreGrupo);
+        dest.writeString(idConductor);
         dest.writeString(tarifa);
         dest.writeString(origen);
         dest.writeString(destino);
         dest.writeString(urlFoto);
+        dest.writeString(idGrupo);
+        dest.writeString(fecha);
     }
 
     @Override
@@ -78,6 +86,14 @@ public class DisplayGroup implements Parcelable {
 
     public void setNombreGrupo(String nombreGrupo) {
         this.nombreGrupo = nombreGrupo;
+    }
+
+    public String getIdConductor() {
+        return idConductor;
+    }
+
+    public void setIdConductor(String idConductor) {
+        this.idConductor = idConductor;
     }
 
     public String getTarifa() {
@@ -127,4 +143,5 @@ public class DisplayGroup implements Parcelable {
     public void setFecha(String fecha) {
         this.fecha = fecha;
     }
+
 }
