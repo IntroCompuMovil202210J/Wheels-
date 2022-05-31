@@ -223,6 +223,7 @@ public class DriverGroupDetailFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + displayGroup.getIdGrupo());
+                                Log.i("JIJIJA", displayGroup.getNombre());
                                 myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {

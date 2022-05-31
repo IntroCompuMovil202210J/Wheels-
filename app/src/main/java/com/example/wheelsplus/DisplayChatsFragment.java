@@ -136,7 +136,6 @@ public class DisplayChatsFragment extends Fragment {
                 DisplayChat displayChat = (DisplayChat) adapterView.getItemAtPosition(i);
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("chatKey", displayChat.getIdChat());
-                intent.putExtra("otherUser", displayChat.getIdOther());
                 startActivity(intent);
             }
         });
@@ -185,7 +184,11 @@ public class DisplayChatsFragment extends Fragment {
                                                         long aux = 0;
                                                         for(DataSnapshot minisingle : task.getResult().getChildren()){
                                                             if(aux == count - 1){
-                                                                lastMessage = minisingle.getValue(Mensaje.class).getDato();
+                                                                if(minisingle.getValue(Mensaje.class).getTipo().equals("TEXT")) {
+                                                                    lastMessage = minisingle.getValue(Mensaje.class).getDato();
+                                                                }else{
+                                                                    lastMessage = "Foto";
+                                                                }
                                                                 timeLastMessage = minisingle.getValue(Mensaje.class).getFecha();
                                                             }
                                                             aux++;

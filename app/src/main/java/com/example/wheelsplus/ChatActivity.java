@@ -36,6 +36,7 @@ import java.util.Calendar;
 
 import adapters.MessagesAdapter;
 import de.hdodenhof.circleimageview.CircleImageView;
+import model.Chat;
 import model.Mensaje;
 import model.Usuario;
 import services.DownloadImageTask;
@@ -127,7 +128,6 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         chatKey = getIntent().getStringExtra("chatKey");
-        String other = getIntent().getStringExtra("otherUser");
 
         tvOtherUserName = findViewById(R.id.tvOtherChatUsername);
         recyclerView = findViewById(R.id.recyclerView);
@@ -147,15 +147,30 @@ public class ChatActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
-        myRef = database.getReference(FB_USERS_PATH + other);
+        myRef = database.getReference(FB_CHATS_PATH + chatKey);
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if(task.isSuccessful()){
-                    otherUser = task.getResult().getValue(Usuario.class);
-                    tvOtherUserName.setText(otherUser.getNombre() + " " + otherUser.getApellido());
-                    new DownloadImageTask((CircleImageView) findViewById(R.id.profilePicOtherUser))
-                            .execute(otherUser.getUrlFoto());
+                if (task.isSuccessful()) {
+                    Chat chat = task.getResult().getValue(Chat.class);
+                    String other;
+                    if (chat.getIdEmisor().equals(auth.getCurrentUser().getUid())) {
+                        other = chat.getIdReceptor();
+                    } else {
+                        other = chat.getIdEmisor();
+                    }
+                    myRef = database.getReference(FB_USERS_PATH + other);
+                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                otherUser = task.getResult().getValue(Usuario.class);
+                                tvOtherUserName.setText(otherUser.getNombre() + " " + otherUser.getApellido());
+                                new DownloadImageTask((CircleImageView) findViewById(R.id.profilePicOtherUser))
+                                        .execute(otherUser.getUrlFoto());
+                            }
+                        }
+                    });
                 }
             }
         });
