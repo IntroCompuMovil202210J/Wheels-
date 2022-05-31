@@ -19,7 +19,7 @@ public class DriverNavActivity extends AppCompatActivity {
 
     DriverHomeFragment driverHomeFragment = new DriverHomeFragment();
     DriverGroupFragment driverGroupFragment = new DriverGroupFragment();
-    ChatFragment chatFragment = new ChatFragment();
+    DisplayChatsFragment displayChatsFragment = new DisplayChatsFragment();
     DriverSettingsFragment driverSettingsFragment = new DriverSettingsFragment();
 
     @Override
@@ -36,7 +36,7 @@ public class DriverNavActivity extends AppCompatActivity {
         if(savedInstanceState != null){
             driverHomeFragment = (DriverHomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "driverHomeFragment");
             driverGroupFragment = (DriverGroupFragment) getSupportFragmentManager().getFragment(savedInstanceState, "driverGroupFragment");
-            chatFragment = (ChatFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatFragment");
+            displayChatsFragment = (DisplayChatsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "displayChatsFragment");
             driverSettingsFragment = (DriverSettingsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "driverSettingsFragment");
         }
 
@@ -51,7 +51,7 @@ public class DriverNavActivity extends AppCompatActivity {
                         replaceFragment(driverGroupFragment);
                         break;
                     case R.id.chat:
-                        replaceFragment(chatFragment);
+                        replaceFragment(displayChatsFragment);
                         break;
                     case R.id.settings:
                         replaceFragment(driverSettingsFragment);
@@ -79,8 +79,8 @@ public class DriverNavActivity extends AppCompatActivity {
         if(driverGroupFragment.isAdded()){
             getSupportFragmentManager().putFragment(outState, "driverGroupFragment", driverGroupFragment);
         }
-        if(chatFragment.isAdded()){
-            getSupportFragmentManager().putFragment(outState, "chatFragment", chatFragment);
+        if(displayChatsFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "displayChatsFragment", displayChatsFragment);
         }
         if(driverSettingsFragment.isAdded()){
             getSupportFragmentManager().putFragment(outState, "driverSettingsFragment", driverSettingsFragment);

@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.navigation.NavController;
-import androidx.navigation.fragment.NavHostFragment;
 
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -23,7 +21,7 @@ public class NavActivity extends AppCompatActivity {
 
     HomeFragment homeFragment = new HomeFragment();
     GroupFragment groupFragment = new GroupFragment();
-    ChatFragment chatFragment = new ChatFragment();
+    DisplayChatsFragment displayChatsFragment = new DisplayChatsFragment();
     SettingsFragment settingsFragment = new SettingsFragment();
     int contador = 0;
 
@@ -41,7 +39,7 @@ public class NavActivity extends AppCompatActivity {
         if(savedInstanceState != null){
             homeFragment = (HomeFragment) getSupportFragmentManager().getFragment(savedInstanceState, "homeFragment");
             groupFragment = (GroupFragment) getSupportFragmentManager().getFragment(savedInstanceState, "groupFragment");
-            chatFragment = (ChatFragment) getSupportFragmentManager().getFragment(savedInstanceState, "chatFragment");
+            displayChatsFragment = (DisplayChatsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "displayChatsFragment");
             settingsFragment = (SettingsFragment) getSupportFragmentManager().getFragment(savedInstanceState, "settingsFragment");
         }
 
@@ -56,7 +54,7 @@ public class NavActivity extends AppCompatActivity {
                         replaceFragment(groupFragment);
                         break;
                     case R.id.chat:
-                        replaceFragment(chatFragment);
+                        replaceFragment(displayChatsFragment);
                         break;
                     case R.id.settings:
                         replaceFragment(settingsFragment);
@@ -84,8 +82,8 @@ public class NavActivity extends AppCompatActivity {
         if(groupFragment.isAdded()){
             getSupportFragmentManager().putFragment(outState, "groupFragment", groupFragment);
         }
-        if(chatFragment.isAdded()){
-            getSupportFragmentManager().putFragment(outState, "chatFragment", chatFragment);
+        if(displayChatsFragment.isAdded()){
+            getSupportFragmentManager().putFragment(outState, "displayChatsFragment", displayChatsFragment);
         }
         if(settingsFragment.isAdded()){
             getSupportFragmentManager().putFragment(outState, "settingsFragment", settingsFragment);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Usuario {
 
+    String idUsuario;
     String nombre;
     String apellido;
     String telefono;
@@ -11,14 +12,15 @@ public class Usuario {
     double latitud;
     double longitud;
 
-    ArrayList<Grupo> grupos = new ArrayList<>();
-    ArrayList<Viaje> viajes = new ArrayList<>();
-    ArrayList<Chat> chats = new ArrayList<>();
+    //ArrayList<Grupo> grupos = new ArrayList<>();
+    //ArrayList<Viaje> viajes = new ArrayList<>();
+    //ArrayList<Chat> chats = new ArrayList<>();
 
     public Usuario() {
     }
 
-    public Usuario(String nombre, String apellido, String telefono, String urlFoto, double latitud, double longitud) {
+    public Usuario(String idUsuario, String nombre, String apellido, String telefono, String urlFoto, double latitud, double longitud) {
+        this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -27,7 +29,7 @@ public class Usuario {
         this.longitud = longitud;
     }
 
-    public Usuario(String nombre, String apellido, String telefono, String urlFoto, double latitud, double longitud, ArrayList<Grupo> grupos, ArrayList<Viaje> viajes, ArrayList<Chat> chats) {
+    /*public Usuario(String nombre, String apellido, String telefono, String urlFoto, double latitud, double longitud, ArrayList<Grupo> grupos, ArrayList<Viaje> viajes, ArrayList<Chat> chats) {
         this.nombre = nombre;
         this.apellido = apellido;
         this.telefono = telefono;
@@ -37,6 +39,14 @@ public class Usuario {
         this.grupos = grupos;
         this.viajes = viajes;
         this.chats = chats;
+    }*/
+
+    public String getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(String idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getNombre() {
@@ -87,7 +97,7 @@ public class Usuario {
         this.longitud = longitud;
     }
 
-    public ArrayList<Grupo> getGrupos() {
+    /*public ArrayList<Grupo> getGrupos() {
         return grupos;
     }
 
@@ -109,6 +119,6 @@ public class Usuario {
 
     public void setChats(ArrayList<Chat> chats) {
         this.chats = chats;
-    }
+    }*/
 
 }

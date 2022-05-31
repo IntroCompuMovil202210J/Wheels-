@@ -1,37 +1,41 @@
 package adapters;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CursorAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.example.wheelsplus.R;
 
+import java.util.ArrayList;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import display.DisplayChat;
 import services.DownloadImageTask;
 
-public class ChatsAdapter extends CursorAdapter {
-    public ChatsAdapter(Context context, Cursor c, int flags) {
-        super(context, c, flags);
+public class ChatsAdapter extends ArrayAdapter<DisplayChat> {
+
+    public ChatsAdapter(Context context, ArrayList<DisplayChat> displayChats) {
+        super(context, 0, displayChats);
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        return LayoutInflater.from(context).inflate(R.layout.chat_row, parent, false);
-    }
-
-    @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-        TextView tvNameContact = view.findViewById(R.id.tvChatName);
-        TextView tvMessageContent = view.findViewById(R.id.tvChatContent);
-        TextView tvCantMessages = view.findViewById(R.id.cantMessages);
-        tvNameContact.setText(cursor.getString(0));
-        tvMessageContent.setText(cursor.getString(1));
-        tvCantMessages.setText(cursor.getString(2));
-        new DownloadImageTask((CircleImageView) view.findViewById(R.id.profilePicChat))
-                .execute(cursor.getString(3));
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View v = convertView;
+        if(v == null){
+            v = LayoutInflater.from(getContext()).inflate(R.layout.chat_row, parent, false);
+        }
+        DisplayChat displayChat = getItem(position);
+        TextView tvNameContact = v.findViewById(R.id.tvChatName);
+        TextView tvMessageContent = v.findViewById(R.id.tvChatContent);
+        TextView tvChatLastHour = v.findViewById(R.id.tvChatLastHour);
+        tvNameContact.setText(displayChat.getNombreChat());
+        tvMessageContent.setText(displayChat.getUltimoMensaje());
+        tvChatLastHour.setText(displayChat.getHoraUltimoMensaje());
+        new DownloadImageTask((CircleImageView) v.findViewById(R.id.profilePicChat))
+                .execute(displayChat.getUrlFoto());
+        return v;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.wheelsplus;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,15 +21,19 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import adapters.GroupUsersAdapter;
 import de.hdodenhof.circleimageview.CircleImageView;
 import display.DisplayGroup;
+import model.Chat;
 import model.Grupo;
 import model.Usuario;
 import services.DownloadImageTask;
@@ -49,12 +54,13 @@ public class GroupDetailFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextView tvDetailGroupName, tvDetailOrigin, tvDetailDestination, tvDetailDate, tvDetailDriverName;
-    ImageButton buttonRemoveGroup;
+    ImageButton buttonRemoveGroup, buttonChatDriver;
     ListView listGroupUsers;
 
     /**
      * Firebase
      */
+    FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference myRef;
 
@@ -63,7 +69,9 @@ public class GroupDetailFragment extends Fragment {
      */
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_CHATS_PATH = "chats/";
     DisplayGroup displayGroup;
+    String idDriver;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -117,14 +125,27 @@ public class GroupDetailFragment extends Fragment {
         tvDetailDate = root.findViewById(R.id.tvDetailDate);
         tvDetailDriverName = root.findViewById(R.id.tvDetailDriverName);
         buttonRemoveGroup = root.findViewById(R.id.buttonRemoveGroup);
+        buttonChatDriver = root.findViewById(R.id.buttonChatDriver);
         listGroupUsers = root.findViewById(R.id.listGroupUsers);
 
         displayGroup = getArguments().getParcelable("displayGroup");
 
+        auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
 
         loadGroupUsers();
+
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.isSuccessful()){
+                    Grupo grupo = task.getResult().getValue(Grupo.class);
+                    idDriver = grupo.getIdConductor();
+                }
+            }
+        });
 
         return root;
     }
@@ -209,6 +230,80 @@ public class GroupDetailFragment extends Fragment {
             }
         });
 
+        buttonChatDriver.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!auth.getCurrentUser().getUid().equals(displayGroup.getIdConductor())){
+                    myRef = database.getReference(FB_CHATS_PATH);
+                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                Chat previousChat = null;
+                                boolean exist = false;
+                                for (DataSnapshot single : task.getResult().getChildren()) {
+                                    Chat chat = single.getValue(Chat.class);
+                                    if ((chat.getIdEmisor().equals(auth.getCurrentUser().getUid()) && chat.getIdReceptor().equals(displayGroup.getIdConductor())) || (chat.getIdEmisor().equals(displayGroup.getIdConductor()) && chat.getIdReceptor().equals(auth.getCurrentUser().getUid()))) {
+                                        previousChat = chat;
+                                        exist = true;
+                                    }
+                                }
+                                if (exist) {
+                                    Intent intent = new Intent(getContext(), ChatActivity.class);
+                                    intent.putExtra("chatKey", previousChat.getIdChat());
+                                    intent.putExtra("otherUser", displayGroup.getIdConductor());
+                                    startActivity(intent);
+                                } else {
+                                    new MaterialAlertDialogBuilder(view.getContext())
+                                            .setTitle("¿Desea iniciar un chat con el conductor + " + displayGroup.getNombreConductor() + "?")
+                                            .setNegativeButton("Volver", null)
+                                            .setPositiveButton("Crear chat", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialogInterface, int i) {
+                                                    String key = myRef.push().getKey();
+                                                    myRef = database.getReference(FB_CHATS_PATH + key);
+                                                    myRef.setValue(new Chat(key, auth.getCurrentUser().getUid(), displayGroup.getIdConductor())).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
+                                                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            Grupo grupo = task.getResult().getValue(Grupo.class);
+                                                                            Map<String, Object> childUpdates = new HashMap<>();
+                                                                            myRef = database.getReference();
+                                                                            childUpdates.put(FB_USERS_PATH + grupo.getIdConductor() + "/" + FB_CHATS_PATH + key, true);
+                                                                            childUpdates.put(FB_USERS_PATH + auth.getCurrentUser().getUid() + "/" + FB_CHATS_PATH + key, true);
+                                                                            myRef.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                @Override
+                                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                                    Toast.makeText(view.getContext(), "Chat creado correctamente", Toast.LENGTH_SHORT).show();
+                                                                                    Intent intent = new Intent(getActivity(), ChatActivity.class);
+                                                                                    intent.putExtra("chatKey", key);
+                                                                                    intent.putExtra("otherUser", grupo.getIdConductor());
+                                                                                    startActivity(intent);
+                                                                                }
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            })
+                                            .show();
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    Toast.makeText(getContext(), "No se puede realizar un chat con si mismo", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     private void replaceFragment(Fragment fragment){

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="20dp">
@@ -17,11 +18,22 @@
         android:id="@+id/tvGroupUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
         android:layout_gravity="center"
         android:gravity="center"
-        android:layout_marginStart="20dp"
+        android:layout_marginStart="15dp"
         android:layout_weight="1"
         android:text="Username"
         android:fontFamily="@font/roboto_medium"/>
+
+    <ImageButton
+        android:id="@+id/buttonChatUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:layout_weight=".5"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/ic_click_new_chat"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
 </LinearLayout>
