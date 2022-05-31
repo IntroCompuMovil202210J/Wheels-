@@ -156,7 +156,7 @@ public class SelectGroupFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
                             myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + grupoEscogido.getIdGrupo());
-                            myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            myRef.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                                 @Override
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if(task.isSuccessful()){

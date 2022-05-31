@@ -255,7 +255,7 @@ public class DriverGroupFragment extends Fragment {
                             public void onComplete(@NonNull Task<Void> task) {
                                 if(task.isSuccessful()){
                                     myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + key);
-                                    myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    myRef.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if(task.isSuccessful()){

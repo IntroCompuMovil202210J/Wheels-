@@ -143,6 +143,18 @@
             app:layout_constraintStart_toStartOf="@+id/tvPlacaDriverDetail"
             app:layout_constraintTop_toBottomOf="@+id/tvPlacaDriverDetail" />
 
+        <ImageButton
+            android:id="@+id/buttonStart"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_marginEnd="8dp"
+            android:scaleType="fitStart"
+            android:src="@drawable/ic_baseline_play_arrow_24"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/imageView6" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ListView

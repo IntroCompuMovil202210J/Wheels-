@@ -50,7 +50,7 @@ public class DriverGroupDetailFragment extends Fragment {
      * Screen elements (to inflate)
      */
     TextView tvDetailDriverGroupName, tvDetailDriverOrigin, tvDetailDriverDestination, tvDetailDriverDate, tvDetailDriverFee, tvDetailDriverPlaca, tvDetailDriverMarca;
-    ImageButton buttonRemoveGroup, buttonModifyGroup;
+    ImageButton buttonRemoveGroup, buttonModifyGroup, buttonStart;
     ListView listDriverGroupUsers;
 
     /**
@@ -123,6 +123,7 @@ public class DriverGroupDetailFragment extends Fragment {
         tvDetailDriverMarca = root.findViewById(R.id.tvMarcaDriverDetail);
         buttonRemoveGroup = root.findViewById(R.id.buttonRemoveDriverGroup);
         buttonModifyGroup = root.findViewById(R.id.buttonModifyDriverGroup);
+        buttonStart = root.findViewById(R.id.buttonStart);
         listDriverGroupUsers = root.findViewById(R.id.listGroupDriverUsers);
 
         displayGroup = getArguments().getParcelable("displayDriverGroup");
@@ -210,6 +211,43 @@ public class DriverGroupDetailFragment extends Fragment {
                         }).show();
             }
 
+        });
+
+        buttonStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new MaterialAlertDialogBuilder(view.getContext())
+                        .setTitle("¿Desea iniciar el grupo " + displayGroup.getNombre() + "?")
+                        .setNegativeButton("Cancelar", null)
+                        .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + displayGroup.getIdGrupo());
+                                myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if(task.isSuccessful()){
+                                            myRef = database.getReference(FB_USERS_PATH);
+                                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                    if(task.isSuccessful()){
+                                                        for(DataSnapshot single : task.getResult().getChildren()){
+                                                            for(DataSnapshot minisingle : single.child(FB_GROUPS_PATH).getChildren()){
+                                                                if(minisingle.getKey().equals(displayGroup.getIdGrupo())){
+                                                                    minisingle.getRef().setValue(true);
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        }).show();
+            }
         });
 
 
