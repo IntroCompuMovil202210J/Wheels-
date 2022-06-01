@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WheelsPlus">
         <activity
+            android:name=".PassengerTripActivity"
+            android:exported="false" />
+        <activity
             android:name=".TripActivity"
             android:exported="false" />
         <activity

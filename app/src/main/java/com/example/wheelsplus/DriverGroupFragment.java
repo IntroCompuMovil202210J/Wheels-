@@ -274,8 +274,6 @@ public class DriverGroupFragment extends Fragment {
                                                 editGroupFeeDriver.setText("");
                                                 editGroupNameDriver.setText("");
                                                 editGroupOriginDriver.setText("");
-                                                myRef = database.getReference(FB_GROUPS_PATH + key + "/ruta/cuposOcupados");
-                                                myRef.setValue(0);
                                             }
                                         }
                                     });
