@@ -60,6 +60,7 @@ import java.util.List;
 
 import adapters.PassengersAdapter;
 import display.DisplayGroupDriver;
+import model.Grupo;
 import model.PuntoRuta;
 import model.Usuario;
 
@@ -69,7 +70,7 @@ public class TripActivity extends AppCompatActivity {
 
     private MapView map;
     private IMapController mapController;
-    private Marker marker, marker1, marker2;
+    private Marker marker, other;
 
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
@@ -87,15 +88,16 @@ public class TripActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
-    ValueEventListener vel;
+    ValueEventListener vel, sel;
 
     private DisplayGroupDriver displayGroup;
 
     private ArrayList<GeoPoint> points = new ArrayList<>();
     private ArrayList<GeoPoint> pointsAux = new ArrayList<>();
-    private double latitude = 4.76943, longitude = -74.04317, latitudA, longitudA;
+    boolean mainRoute = false;
+    ArrayList<Marker> previousMarkers = new ArrayList<>();
+    private double latitude = 4.76943, longitude = -74.04317, latitudA, longitudA, latitudDestino, longitudDestino;
     private GeoPoint startPoint;
-
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
@@ -131,9 +133,9 @@ public class TripActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
 
-        geocoder = new Geocoder(TripActivity.this);
+        geocoder = new Geocoder(this);
 
-        roadManager = new OSRMRoadManager(TripActivity.this, "ANDROID");
+        roadManager = new OSRMRoadManager(this, "ANDROID");
 
         locationRequest = createLocationRequest();
         locationCallback = createLocationCallback();
@@ -185,6 +187,7 @@ public class TripActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 listTripPassengers.setAdapter(null);
+                usuarios.clear();
                 for(DataSnapshot single : snapshot.getChildren()){
                     PuntoRuta puntoRuta = single.getValue(PuntoRuta.class);
                     myRef = database.getReference(FB_USERS_PATH + puntoRuta.getIdUsuario());
@@ -241,6 +244,9 @@ public class TripActivity extends AppCompatActivity {
                 android.location.Location lastLocation = locationResult.getLastLocation();
                 try {
                     if (lastLocation != null) {
+                        if(mainRoute){
+                            drawRoute(startPoint, new GeoPoint(latitudDestino, longitudDestino), Color.RED);
+                        }
                         if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.01){
                             mapController.setZoom(15.0);
                             mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
@@ -253,7 +259,7 @@ public class TripActivity extends AppCompatActivity {
                                 map.getOverlays().remove(marker);
                             }
 
-                            marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_baseline_directions_car_24);
+                            marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
                             map.getOverlays().add(marker);
                             points.clear();
                             pointsAux.clear();
@@ -333,53 +339,65 @@ public class TripActivity extends AppCompatActivity {
         points.add(new GeoPoint(latitudA, longitudA));
 
         myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
-        myRef.child("latitudDestino").addValueEventListener(new ValueEventListener() {
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) latitudA = (Double) snapshot.getValue();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-
-        myRef.child("longitudDestino").addValueEventListener(new ValueEventListener(){
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists()){
-                    longitudA = (Double) snapshot.getValue();
-                    points.add(new GeoPoint(latitudA, longitudA));
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.isSuccessful()){
+                    Grupo grupo = task.getResult().getValue(Grupo.class);
+                    latitudDestino = grupo.getLatitudDestino();
+                    longitudDestino = grupo.getLongitudDestino();
+                    points.add(new GeoPoint(grupo.getLatitudDestino(), grupo.getLongitudDestino()));
                 }
             }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
         });
 
         myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
-        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+        sel = myRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task){
-                if (task.isSuccessful()){
-                    for (DataSnapshot s : task.getResult().getChildren()) {
-                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/latitud");
-                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                if (task.isSuccessful()) latitudA = (Double) task.getResult().getValue();
-                            }
-                        });
-
-                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/longitud");
-                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DataSnapshot> task){
-                                if (task.isSuccessful())
-                                    longitudA = (Double) task.getResult().getValue();
-                                points.add(new GeoPoint(latitudA, longitudA));
-                                sortGeoPoint(points);
-                            }
-                        });
-                    }
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.getChildrenCount() == 0){
+                    mainRoute = true;
                 }
+                for(Marker mark : previousMarkers){
+                    map.getOverlays().remove(mark);
+                }
+                previousMarkers.clear();
+                for (DataSnapshot s : snapshot.getChildren()) {
+                    myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH + s.getKey());
+                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if(task.isSuccessful()){
+                                PuntoRuta puntoRuta = task.getResult().getValue(PuntoRuta.class);
+                                latitudA = puntoRuta.getLatitud();
+                                longitudA = puntoRuta.getLongitud();
+                                myRef = database.getReference(FB_USERS_PATH + puntoRuta.getIdUsuario());
+                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                        if(task.isSuccessful()){
+                                            Usuario pasajero = task.getResult().getValue(Usuario.class);
+                                            try {
+                                                other = createMarker(new GeoPoint(latitudA, longitudA), pasajero.getNombre() + " " + pasajero.getApellido(), geoCoderBuscar(new LatLng(latitudA, longitudA)), R.drawable.vector_mk_origin);
+                                                map.getOverlays().add(other);
+                                                points.add(new GeoPoint(latitudA, longitudA));
+                                                previousMarkers.add(other);
+                                                sortGeoPoint(points);
+                                            }catch (Exception e){
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }
@@ -446,12 +464,28 @@ public class TripActivity extends AppCompatActivity {
 
                 roadOverlay = RoadManager.buildRoadOverlay(road);
                 roadOverlay.getOutlinePaint().setColor(Color.RED);
-                roadOverlay.getOutlinePaint().setStrokeWidth(10);
+                roadOverlay.getOutlinePaint().setStrokeWidth(5);
                 map.getOverlays().add(roadOverlay);
             }
         }
     }
 
-
+    private void drawRoute(GeoPoint start, GeoPoint finish, int color){
+        ArrayList<GeoPoint> routePoints = new ArrayList<>();
+        routePoints.add(start);
+        routePoints.add(finish);
+        Road road = roadManager.getRoad(routePoints);
+        Log.i("RUTA", "Route length: "+road.mLength+" klm");
+        Log.i("RUTA", "Duration: "+road.mDuration/60+" min");
+        if(map!=null){
+            if(roadOverlay!=null){
+                map.getOverlays().remove(roadOverlay);
+            }
+            roadOverlay = RoadManager.buildRoadOverlay(road);
+            roadOverlay.getOutlinePaint().setColor(color);
+            roadOverlay.getOutlinePaint().setStrokeWidth(5);
+            map.getOverlays().add(roadOverlay);
+        }
+    }
 
 }

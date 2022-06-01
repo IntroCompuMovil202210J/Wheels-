@@ -45,6 +45,7 @@ public class BackgroundBootService extends Service {
     public static final String CHANNEL_ID = "WheelsPlus";
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_DRIVERS_PATH = "drivers/";
     public static final String FB_CHATS_PATH = "chats/";
     public static final String FB_MESSAGES_PATH = "messages/";
     public static final String FB_ROUTE_PATH = "ruta/";
@@ -56,7 +57,7 @@ public class BackgroundBootService extends Service {
     ChildEventListener vel, velC;
 
     String uuid;
-    Map<String, String> mapGroup = new HashMap<>();
+    Map<String, Grupo> mapGroup = new HashMap<>();
     ArrayList<Mensaje> arrayMessage = new ArrayList<>();
 
     @Nullable
@@ -108,7 +109,7 @@ public class BackgroundBootService extends Service {
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
                             if (task.isSuccessful()) {
                                 Grupo grupo = task.getResult().getValue(Grupo.class);
-                                mapGroup.put(grupo.getId_Grupo(), grupo.getNombreGrupo());
+                                mapGroup.put(grupo.getId_Grupo(), grupo);
                             }
                         }
                     });
@@ -123,8 +124,8 @@ public class BackgroundBootService extends Service {
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                     String grupoId = snapshot.getKey();
+                    groupRemoved(mapGroup.get(grupoId).getNombreGrupo());
                     mapGroup.remove(grupoId);
-                    groupRemoved(mapGroup.get(grupoId));
                 }
 
                 @Override
@@ -148,17 +149,13 @@ public class BackgroundBootService extends Service {
                                 @Override
                                 public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
                                     Mensaje mensaje = snapshot.getValue(Mensaje.class);
-                                    Log.i("MENSAJE", mensaje.getDato());
                                     if(!mensaje.getIdEnvio().equals(auth.getCurrentUser().getUid())){
-                                        Log.i("MENSAJE1", mensaje.getDato());
                                         myRefChat = database.getReference(FB_USERS_PATH + mensaje.getIdEnvio());
                                         myRefChat.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                                Log.i("MENSAJE2", mensaje.getDato());
                                                 if(task.isSuccessful()) {
                                                     if(mensaje.getTipo().equals("TEXT")){
-                                                        Log.i("MENSAJE3", mensaje.getDato());
                                                         chatNotification(single.getKey(),task.getResult().child("nombre").getValue(String.class) + " " + task.getResult().child("apellido").getValue(String.class), mensaje.getDato());
                                                     }else{
                                                         chatNotification(single.getKey(),task.getResult().child("nombre").getValue(String.class) + " " + task.getResult().child("apellido").getValue(String.class), "Foto");
@@ -195,59 +192,71 @@ public class BackgroundBootService extends Service {
         }
 
         if(auth.getCurrentUser()!=null) {
-            myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid());
-            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+            myRef.addChildEventListener(new ChildEventListener() {
                 @Override
-                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        Usuario usuario = task.getResult().getValue(Usuario.class);
-                        for (DataSnapshot single : task.getResult().child(FB_GROUPS_PATH).getChildren()) {
-                            if (single.getValue(Boolean.class)) {
-                                myRef = database.getReference(FB_GROUPS_PATH + single.getKey());
-                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                        if (task.isSuccessful()) {
-                                            Grupo grupo = task.getResult().getValue(Grupo.class);
-                                            myRef = database.getReference(FB_USERS_PATH + grupo.getIdConductor());
-                                            myRef.addValueEventListener(new ValueEventListener() {
-                                                @Override
-                                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                                    Usuario conductor = snapshot.getValue(Usuario.class);
-                                                    myRef = database.getReference(FB_GROUPS_PATH + single.getKey()).child(FB_ROUTE_PATH);
-                                                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                                        @Override
-                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                                            if(task.isSuccessful()){
-                                                                for(DataSnapshot minisingle : task.getResult().getChildren()){
-                                                                    PuntoRuta puntoRuta = minisingle.getValue(PuntoRuta.class);
-                                                                    if(puntoRuta.getIdUsuario().equals(auth.getCurrentUser().getUid())){
-                                                                        if(distance(conductor.getLatitud(), conductor.getLongitud(), puntoRuta.getLatitud(), puntoRuta.getLongitud()) <= 1){
-                                                                            if(distance(conductor.getLatitud(), conductor.getLongitud(), puntoRuta.getLatitud(), puntoRuta.getLongitud()) <= 0.01){
-                                                                                driverArrived(conductor.getNombre());
-                                                                            }else{
-                                                                                driverNeared(conductor.getNombre());
-                                                                            }
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    if(snapshot.getValue(Boolean.class)){
+                        myRef = database.getReference(FB_GROUPS_PATH + snapshot.getKey());
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    Grupo grupo = task.getResult().getValue(Grupo.class);
+                                    myRef = database.getReference(FB_USERS_PATH + grupo.getIdConductor());
+                                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                            if(task.isSuccessful()){
+                                                Usuario conductor = task.getResult().getValue(Usuario.class);
+                                                myRef = database.getReference(FB_GROUPS_PATH + snapshot.getKey()).child(FB_ROUTE_PATH);
+                                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                        if(task.isSuccessful()){
+                                                            for(DataSnapshot single : task.getResult().getChildren()){
+                                                                PuntoRuta puntoRuta = single.getValue(PuntoRuta.class);
+                                                                if(puntoRuta.getIdUsuario().equals(auth.getCurrentUser().getUid())){
+                                                                    if(distance(puntoRuta.getLatitud(), puntoRuta.getLongitud(), conductor.getLatitud(), conductor.getLongitud()) <= 1){
+                                                                        if(distance(puntoRuta.getLatitud(), puntoRuta.getLongitud(), conductor.getLatitud(), conductor.getLongitud()) <= 0.02){
+                                                                            driverArrived(conductor.getNombre(), grupo);
+                                                                        }else{
+                                                                            driverNeared(conductor.getNombre(), grupo);
                                                                         }
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                    });
-                                                }
-
-                                                @Override
-                                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                                }
-                                            });
+                                                    }
+                                                });
+                                            }
                                         }
-
-                                    }
-                                });
+                                    });
+                                }
                             }
-                        }
+                        });
+
                     }
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
                 }
             });
         }
@@ -260,16 +269,22 @@ public class BackgroundBootService extends Service {
         sendNotification("Wheelsplus", "El grupo " + groupname +" se ha eliminado", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
     }
 
-    private void groupStarted(String groupname) {
-        sendNotification("Wheelsplus", "El grupo " + groupname +" ha iniciado", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
+    private void groupStarted(Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        intent.putExtra("myGroup", group);
+        sendNotification("Wheelsplus", "El grupo " + group.getNombreGrupo() +" ha iniciado", R.drawable.logo_wheels, intent);
     }
 
-    private void driverNeared(String conductor) {
-        sendNotification("Wheelsplus", "El conductor " + conductor + " esta cerca, ¡preparate!", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
+    private void driverNeared(String conductor, Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        intent.putExtra("myGroup", group);
+        sendNotification("Wheelsplus", "El conductor " + conductor + " esta cerca, ¡preparate!", R.drawable.logo_wheels, intent);
     }
 
-    private void driverArrived(String conductor) {
-        sendNotification("Wheelsplus", "El conductor " + conductor + " llego ¡subete!", R.drawable.logo_wheels, new Intent(this, PassengerTripActivity.class));
+    private void driverArrived(String conductor, Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        intent.putExtra("myGroup", group);
+        sendNotification("Wheelsplus", "El conductor " + conductor + " llego ¡subete!", R.drawable.logo_wheels, intent);
     }
 
     private void chatNotification(String idChat, String nameOther, String dataMessage) {
