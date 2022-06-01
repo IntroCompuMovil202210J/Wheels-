@@ -1,17 +1,13 @@
 package boot;
 
-import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -30,16 +26,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.Chat;
 import model.Grupo;
 import model.Mensaje;
-import model.Usuario;
 
 public class BackgroundBootService extends Service {
 
@@ -154,7 +147,7 @@ public class BackgroundBootService extends Service {
                                             @Override
                                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                                 if(task.isSuccessful()) {
-                                                    if (mensaje.getTipo().equals("TEXT")) {
+                                                    if(mensaje.getTipo().equals("TEXT")){
                                                         chatNotification(single.getKey(),task.getResult().child("nombre").getValue(String.class) + " " + task.getResult().child("apellido").getValue(String.class), mensaje.getDato());
                                                     }else{
                                                         chatNotification(single.getKey(),task.getResult().child("nombre").getValue(String.class) + " " + task.getResult().child("apellido").getValue(String.class), "Foto");
@@ -193,13 +186,6 @@ public class BackgroundBootService extends Service {
         return START_STICKY;
     }
 
-    /*
-    private void dataChanged(String username) {
-        sendNotification("Taller3FOV", username + " actualizó su estado a disponible", R.drawable.ic_baseline_local_fire_department_24);
-    }
-
-    */
-
     private void groupRemoved(String groupname) {
         sendNotification("Wheelsplus", "El grupo " + groupname +" se ha eliminado", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
     }
@@ -233,7 +219,7 @@ public class BackgroundBootService extends Service {
         mBuilder.setContentText(message);
         mBuilder.setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
         mBuilder.setAutoCancel(true);
 

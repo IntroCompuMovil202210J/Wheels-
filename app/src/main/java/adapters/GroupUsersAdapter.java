@@ -29,7 +29,6 @@ import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import model.Chat;
-import model.Grupo;
 import model.Usuario;
 import services.DownloadImageTask;
 
@@ -49,7 +48,6 @@ public class GroupUsersAdapter extends ArrayAdapter<Usuario> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        FirebaseAuth auth = FirebaseAuth.getInstance();
         if(v == null){
             v = LayoutInflater.from(getContext()).inflate(R.layout.group_user_row, parent, false);
         }

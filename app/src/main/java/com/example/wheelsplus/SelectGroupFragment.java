@@ -72,13 +72,14 @@ public class SelectGroupFragment extends Fragment {
      */
     FirebaseAuth auth;
     FirebaseDatabase database;
-    DatabaseReference myRef, myRefAux;
+    DatabaseReference myRef;
 
     /**
      * Utils
      */
     public static final String FB_GROUPS_PATH = "groups/";
     public static final String FB_USERS_PATH = "users/";
+    public static final String FB_ROUTE_PATH = "ruta/";
     ArrayList<Grupo> grupos = new ArrayList<>();
     SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
 
@@ -172,28 +173,16 @@ public class SelectGroupFragment extends Fragment {
                                                     myRef.setValue(gr.getCupo() - 1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                         @Override
                                                         public void onComplete(@NonNull Task<Void> task) {
-
-                                                            myRef = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta");
-                                                            PuntoRuta puntoRuta = new PuntoRuta(auth.getCurrentUser().getUid(), grupoEscogido.getLatOrigin(), grupoEscogido.getLonOrigin());
-
-                                                            String key = myRef.push().getKey();
-                                                            myRefAux = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta/" + key);
-                                                            myRefAux.setValue(puntoRuta);
-
-                                                            myRefAux = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo() + "/ruta/cuposOcupados");
-                                                            myRefAux.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                            myRef = database.getReference(FB_GROUPS_PATH + grupoEscogido.getIdGrupo()).child(FB_ROUTE_PATH);
+                                                            myRef.push().setValue(new PuntoRuta(auth.getCurrentUser().getUid(), grupoEscogido.getLatOrigin(), grupoEscogido.getLonOrigin())).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                 @Override
-                                                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                                                    if (task.isSuccessful()){
-                                                                        Long auxNum = (Long) task.getResult().getValue();
-                                                                        myRefAux.setValue(auxNum + 1);
+                                                                public void onComplete(@NonNull Task<Void> task) {
+                                                                    if(task.isSuccessful()){
+                                                                        Toast.makeText(getActivity(), "Grupo añadido correctamente", Toast.LENGTH_LONG).show();
+                                                                        replaceFragment(new GroupFragment());
                                                                     }
                                                                 }
-
                                                             });
-
-                                                            Toast.makeText(getActivity(), "Grupo añadido correctamente", Toast.LENGTH_LONG).show();
-                                                            replaceFragment(new GroupFragment());
                                                         }
                                                     });
                                                 }

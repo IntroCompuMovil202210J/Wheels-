@@ -255,7 +255,7 @@ public class GroupDetailFragment extends Fragment {
                                     startActivity(intent);
                                 } else {
                                     new MaterialAlertDialogBuilder(view.getContext())
-                                            .setTitle("¿Desea iniciar un chat con el conductor + " + displayGroup.getNombreConductor() + "?")
+                                            .setTitle("¿Desea iniciar un chat con el conductor" + displayGroup.getNombreConductor() + "?")
                                             .setNegativeButton("Volver", null)
                                             .setPositiveButton("Crear chat", new DialogInterface.OnClickListener() {
                                                 @Override
@@ -282,7 +282,6 @@ public class GroupDetailFragment extends Fragment {
                                                                                     Toast.makeText(view.getContext(), "Chat creado correctamente", Toast.LENGTH_SHORT).show();
                                                                                     Intent intent = new Intent(getActivity(), ChatActivity.class);
                                                                                     intent.putExtra("chatKey", key);
-                                                                                    intent.putExtra("otherUser", grupo.getIdConductor());
                                                                                     startActivity(intent);
                                                                                 }
                                                                             });

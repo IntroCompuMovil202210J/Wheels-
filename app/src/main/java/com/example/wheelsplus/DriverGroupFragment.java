@@ -274,7 +274,6 @@ public class DriverGroupFragment extends Fragment {
                                                 editGroupFeeDriver.setText("");
                                                 editGroupNameDriver.setText("");
                                                 editGroupOriginDriver.setText("");
-
                                                 myRef = database.getReference(FB_GROUPS_PATH + key + "/ruta/cuposOcupados");
                                                 myRef.setValue(0);
                                             }
@@ -367,7 +366,7 @@ public class DriverGroupFragment extends Fragment {
                                         Vehiculo vehiculo = single.getValue(Vehiculo.class);
                                         for(Grupo grupo : grupos){
                                             if(grupo.getIdVehiculo().equals(single.getKey()))
-                                                displayGroups.add(new DisplayGroupDriver(grupo.getNombreGrupo(), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())),geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), sdf.format(grupo.getFechaAcuerdo()), String.valueOf(grupo.getTarifa()), vehiculo.getPlaca(), vehiculo.getMarca(), grupo.getId_Grupo(), vehiculo.getModelo()));
+                                                displayGroups.add(new DisplayGroupDriver(grupo.getNombreGrupo(), geoCoderBuscar(new LatLng(grupo.getLatitudAcuerdo(), grupo.getLongitudAcuerdo())), geoCoderBuscar(new LatLng(grupo.getLatitudDestino(), grupo.getLongitudDestino())), sdf.format(grupo.getFechaAcuerdo()), String.valueOf(grupo.getTarifa()), vehiculo.getPlaca(), vehiculo.getMarca(), grupo.getId_Grupo(), vehiculo.getModelo()));
                                         }
                                     }
                                     if(getActivity() != null) {

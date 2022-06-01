@@ -26,6 +26,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import adapters.ChatsAdapter;
 import display.DisplayChat;
@@ -67,6 +69,8 @@ public class DisplayChatsFragment extends Fragment {
     String lastMessage;
     long timeLastMessage;
     SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+    Queue<String> messages = new LinkedList<>();
+    Queue<String> times = new LinkedList<>();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -190,6 +194,8 @@ public class DisplayChatsFragment extends Fragment {
                                                                     lastMessage = "Foto";
                                                                 }
                                                                 timeLastMessage = minisingle.getValue(Mensaje.class).getFecha();
+                                                                messages.offer(lastMessage);
+                                                                times.offer(sdf.format(new Date(timeLastMessage)));
                                                             }
                                                             aux++;
                                                         }
@@ -199,7 +205,7 @@ public class DisplayChatsFragment extends Fragment {
                                                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                                                 if(task.isSuccessful()){
                                                                     Usuario other = task.getResult().getValue(Usuario.class);
-                                                                    displayChats.add(new DisplayChat(chat.getIdChat(), other.getUrlFoto(), other.getNombre() + " " + other.getApellido(), task.getResult().getKey(), lastMessage, sdf.format(new Date(timeLastMessage))));
+                                                                    displayChats.add(new DisplayChat(chat.getIdChat(), other.getUrlFoto(), other.getNombre() + " " + other.getApellido(), task.getResult().getKey(), messages.poll(), times.poll()));
                                                                     if(getActivity() != null){
                                                                         ChatsAdapter chatsAdapter = new ChatsAdapter(getActivity(), displayChats);
                                                                         listChats.setAdapter(chatsAdapter);

@@ -33,23 +33,35 @@ import display.DisplayGroupDriver;
 
 public class DriverMapDetailFragment extends Fragment {
 
+    /**
+     * View
+     */
     View root;
 
+    /**
+     * Map/Location
+     */
     MapView map;
     IMapController mapController;
-
     RoadManager roadManager;
     Polyline roadOverlay;
-
-    FirebaseAuth auth;
-    FirebaseDatabase database;
-    DatabaseReference myRef, myRefRutaB;
-
-    DisplayGroupDriver displayGroup;
-
     ArrayList<GeoPoint> points = new ArrayList<>();
     ArrayList<GeoPoint> pointsAux = new ArrayList<>();
-    Double latitudA, longitudA;
+    double latitudA, longitudA;
+
+    /**
+     * Firebase
+     */
+    FirebaseAuth auth;
+    FirebaseDatabase database;
+    DatabaseReference myRef;
+
+    /**
+     * Utils
+     */
+    public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_ROUTE_PATH = "ruta/";
+    DisplayGroupDriver displayGroup;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -98,6 +110,10 @@ public class DriverMapDetailFragment extends Fragment {
         roadManager = new OSRMRoadManager(getActivity(), "ANDROID");
 
         initMap();
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
         getCoordenadasFB();
 
         return root;
@@ -122,8 +138,7 @@ public class DriverMapDetailFragment extends Fragment {
     }
 
     private void getCoordenadasFB(){
-
-        myRef = database.getReference("groups/" + displayGroup.getIdGrupo());
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
         myRef.child("latitudAcuerdo").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -166,32 +181,30 @@ public class DriverMapDetailFragment extends Fragment {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        myRef = database.getReference("groups/"+ displayGroup.getIdGrupo() + "/ruta");
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task){
                 if (task.isSuccessful()){
-                    for (DataSnapshot s: task.getResult().getChildren()) {
-                        if (!s.getKey().equals("cuposOcupados")){
-                            myRefRutaB = database.getReference("groups/" + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/latitud");
-                            myRefRutaB.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                    if (task.isSuccessful()) latitudA = (Double) task.getResult().getValue();
+                    for(DataSnapshot s: task.getResult().getChildren()){
+                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/latitud");
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if (task.isSuccessful()) latitudA = (Double) task.getResult().getValue();
+                            }
+                        });
+                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/longitud");
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task){
+                                if(task.isSuccessful()){
+                                    longitudA = (Double) task.getResult().getValue();
+                                    points.add(new GeoPoint(latitudA, longitudA));
+                                    sortGeoPoint(points);
                                 }
-                            });
-
-                            myRefRutaB = database.getReference("groups/" + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/longitud");
-                            myRefRutaB.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task){
-                                    if (task.isSuccessful())
-                                        longitudA = (Double) task.getResult().getValue();
-                                        points.add(new GeoPoint(latitudA, longitudA));
-                                        sortGeoPoint(points);
-                                }
-                            });
-                        }
+                            }
+                        });
                     }
                 }
             }
@@ -202,13 +215,13 @@ public class DriverMapDetailFragment extends Fragment {
 
         final Long[] tamano = {Long.valueOf(pointss.size())};
 
-        myRef = database.getReference("groups/" + displayGroup.getIdGrupo() +"/ruta/cuposOcupados");
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()){
-                    if((Long) task.getResult().getValue() + 2 == tamano[0]){
-
+                    long count = task.getResult().getChildrenCount();
+                    if(count + 2 == tamano[0]){
                         GeoPoint geoAux, geoTemp = null;
                         Integer tam = pointss.size();
                         Double distancia = Double.valueOf(10000), distanciaTemp;
@@ -218,8 +231,8 @@ public class DriverMapDetailFragment extends Fragment {
                         pointss.remove(1);
                         pointss.remove(0);
 
-                        while (pointsAux.size() != tam){
-                            for (int j = 0; j<pointss.size(); j++){
+                        while(pointsAux.size() != tam){
+                            for(int j = 0; j<pointss.size(); j++){
                                 distanciaTemp = distance(pointsAux.get(0).getLatitude(), pointsAux.get(0).getLongitude(), pointss.get(j).getLatitude(), pointss.get(j).getLongitude());
                                 if (distanciaTemp < distancia){
                                     distancia = distanciaTemp;
@@ -232,12 +245,7 @@ public class DriverMapDetailFragment extends Fragment {
                         }
 
                         pointsAux.add(geoAux);
-                        int SDK_INT = android.os.Build.VERSION.SDK_INT;
-                        if (SDK_INT > 8) {
-                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                            StrictMode.setThreadPolicy(policy);
-                            drawRoute(pointsAux);
-                        }
+                        drawRoute(pointsAux);
                     }
                 }
             }

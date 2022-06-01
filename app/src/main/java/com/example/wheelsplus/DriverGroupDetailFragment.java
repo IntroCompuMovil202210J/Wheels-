@@ -64,7 +64,6 @@ public class DriverGroupDetailFragment extends Fragment {
     public static final String FB_DRIVERS_PATH = "drivers/";
     public static final String FB_GROUPS_PATH = "groups/";
     DisplayGroupDriver displayGroup;
-    DriverMapDetailFragment driverMapDetailFragment = new DriverMapDetailFragment();
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,6 +109,7 @@ public class DriverGroupDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         root = inflater.inflate(R.layout.fragment_driver_group_detail, container, false);
 
         tvDetailDriverGroupName = root.findViewById(R.id.tvDetailDriverGroupName);
@@ -140,7 +140,6 @@ public class DriverGroupDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Log.i("pruebita", tvDetailDriverGroupName.getText().toString());
         tvDetailDriverGroupName.setText(displayGroup.getNombre());
         tvDetailDriverOrigin.setText("Origen: " + displayGroup.getOrigen());
         tvDetailDriverDestination.setText("Destino: " + displayGroup.getDestino());
@@ -159,6 +158,7 @@ public class DriverGroupDetailFragment extends Fragment {
         buttonDriverMapDetail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                DriverMapDetailFragment driverMapDetailFragment = new DriverMapDetailFragment();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("displayDriverGroupInfo", displayGroup);
                 driverMapDetailFragment.setArguments(bundle);
@@ -230,7 +230,6 @@ public class DriverGroupDetailFragment extends Fragment {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + displayGroup.getIdGrupo());
-                                Log.i("JIJIJA", displayGroup.getNombre());
                                 myRef.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {

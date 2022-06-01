@@ -127,16 +127,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         boolean r = true;
 
-        if (!(nombre.length() > 4 && nombre.length() < 11)){
-            editNameRegister.setError("Ingrese un nombre valido");
-            r = false;
-        }
-
-        if(!(apellido.length() > 4 && nombre.length() < 11)){
-            editLastnameRegister.setError("Ingrese un apellido valido");
-            r = false;
-        }
-
         if (numero.length() != 10){
             editPhoneRegister.setError("Ingrese un numero telefonico valido");
             r = false;

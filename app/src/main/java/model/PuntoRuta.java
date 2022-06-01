@@ -6,6 +6,9 @@ public class PuntoRuta {
     Double latitud;
     Double longitud;
 
+    public PuntoRuta() {
+    }
+
     public PuntoRuta(String idUsuario, Double latitud, Double longitud) {
         this.idUsuario = idUsuario;
         this.latitud = latitud;

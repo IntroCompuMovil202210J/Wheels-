@@ -1,41 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/azul_cool"
     tools:context=".DriverMapDetailFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight=".1"
+        android:fontFamily="@font/roboto_black"
+        android:text="Ruta actual del grupo"
+        android:textSize="28sp"
+        app:layout_constraintBottom_toTopOf="@+id/profilePic"
+        app:layout_constraintEnd_toStartOf="@+id/buttonModify"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.062" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <org.osmdroid.views.MapView
+        android:id="@+id/driverHomeMapDetail"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <TextView
-            android:id="@+id/textView8"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="Ruta Parcial"
-            android:textSize="20dp"
-            android:gravity="center"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <org.osmdroid.views.MapView
-            android:id="@+id/driverHomeMapDetail"
-            android:layout_width="match_parent"
-            android:layout_height="550dp"
-            android:layout_gravity="bottom"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="0dp"
+        android:layout_marginBottom="60dp"
+        android:layout_weight="1.2"
+        android:layout_gravity="bottom" />
 
 
-
-</FrameLayout>
+</LinearLayout>

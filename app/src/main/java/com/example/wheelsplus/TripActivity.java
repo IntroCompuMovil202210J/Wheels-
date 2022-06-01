@@ -1,30 +1,25 @@
 package com.example.wheelsplus;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
+import android.view.Window;
+import android.widget.ListView;
+
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.IntentSenderRequest;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.StrictMode;
-import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -48,13 +43,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
-import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
@@ -63,17 +58,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import adapters.PassengersAdapter;
 import display.DisplayGroupDriver;
+import model.PuntoRuta;
+import model.Usuario;
 
-@RequiresApi(api = Build.VERSION_CODES.N)
 public class TripActivity extends AppCompatActivity {
+
+    ListView listTripPassengers;
 
     private MapView map;
     private IMapController mapController;
     private Marker marker, marker1, marker2;
 
     public static final String FB_USERS_PATH = "users/";
-    public static final String FB_USERS_ONLINE = "online/";
+    public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_ROUTE_PATH = "ruta/";
 
     private FusedLocationProviderClient mFusedLocationClient;
     private LocationRequest locationRequest;
@@ -86,13 +86,14 @@ public class TripActivity extends AppCompatActivity {
 
     private FirebaseAuth auth;
     private FirebaseDatabase database;
-    private DatabaseReference myRef, myRefRutaB;
+    private DatabaseReference myRef;
+    ValueEventListener vel;
 
     private DisplayGroupDriver displayGroup;
 
     private ArrayList<GeoPoint> points = new ArrayList<>();
     private ArrayList<GeoPoint> pointsAux = new ArrayList<>();
-    private Double latitude = 4.76943, longitude = -74.04317, latitudA, longitudA;
+    private double latitude = 4.76943, longitude = -74.04317, latitudA, longitudA;
     private GeoPoint startPoint;
 
 
@@ -118,9 +119,13 @@ public class TripActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_trip);
 
         displayGroup = getIntent().getParcelableExtra("displayDriverGroupInfo");
+
+        listTripPassengers = findViewById(R.id.listTripPassengers);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -138,12 +143,18 @@ public class TripActivity extends AppCompatActivity {
         requestPermissionLocation.launch(Manifest.permission.ACCESS_FINE_LOCATION);
 
         initMap();
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        loadPassengers();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         checkLocationSettings();
+        loadPassengers();
     }
 
     @Override
@@ -154,7 +165,6 @@ public class TripActivity extends AppCompatActivity {
         LatLng bogota = new LatLng(4.6269938175930525, -74.06389749953162);
         mapController.setCenter(new GeoPoint(bogota.latitude, bogota.longitude));
         mapController.setZoom(16.0);
-
         startLocationUpdates();
     }
 
@@ -163,6 +173,39 @@ public class TripActivity extends AppCompatActivity {
         super.onPause();
         map.onPause();
         stopLocationUpdates();
+        if(myRef != null){
+            myRef.removeEventListener(vel);
+        }
+    }
+
+    private void loadPassengers(){
+        ArrayList<Usuario> usuarios = new ArrayList<>();
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
+        vel = myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                listTripPassengers.setAdapter(null);
+                for(DataSnapshot single : snapshot.getChildren()){
+                    PuntoRuta puntoRuta = single.getValue(PuntoRuta.class);
+                    myRef = database.getReference(FB_USERS_PATH + puntoRuta.getIdUsuario());
+                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                usuarios.add(task.getResult().getValue(Usuario.class));
+                                PassengersAdapter passengersAdapter = new PassengersAdapter(TripActivity.this, usuarios);
+                                listTripPassengers.setAdapter(passengersAdapter);
+                            }
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void initMap(){
@@ -272,38 +315,6 @@ public class TripActivity extends AppCompatActivity {
         });
     }
 
-  /*  private void geocoderUbi(String direccion){
-        if(!direccion.isEmpty()){
-            try {
-                List<Address> addresses = mGeocoder.getFromLocationName(direccion, 2);
-                if(addresses != null && !addresses.isEmpty()){
-                    Address addressResult = addresses.get(0);
-
-                    if(map != null){
-                        if (map.getOverlays().contains(marker2)) map.getOverlays().remove(marker2);
-                        GeoPoint location = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
-                        Marker marker = new Marker(map);
-                        addMarker(new GeoPoint(location.getLatitude(), location.getLongitude()), 1, marker);
-                        MapController mapController = (MapController) map.getController();
-                        Location locA = new Location("");
-                        locA.setLatitude(location.getLatitude());
-                        locA.setLongitude(location.getLongitude());
-                        if(calcularMovimiento(locA) > 200000) mapController.setZoom(10.0);
-                        else if(calcularMovimiento(locA) > 5000) mapController.setZoom(15.0);
-                        else mapController.setZoom(17.0);
-                        mapController.setCenter(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                        drawRoute(new GeoPoint(location.getLatitude(), location.getLongitude()));
-                        distancia(new LatLng(location.getLatitude(), location.getLongitude()));
-                    }
-
-                } else Toast.makeText(this, "Direccion no encontrada", Toast.LENGTH_LONG).show();
-
-            } catch (IOException e){
-                e.printStackTrace();
-            }
-        } else Toast.makeText(this, "Direccion vacia", Toast.LENGTH_LONG).show();
-    }*/
-
     private String geoCoderBuscar(LatLng latLng){
         try {
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 2);
@@ -315,29 +326,13 @@ public class TripActivity extends AppCompatActivity {
         return "";
     }
 
-   /* private void addMarker(GeoPoint geoPoint, int pos, Marker marker){
-        marker.setPosition(geoPoint);
-        marker.setIcon(getResources().getDrawable(R.drawable.marcador_de_posicion, this.getTheme()));
-        marker.setTitle(geoCoderBuscar(new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude())));
-        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-
-        if (pos == 0) {
-            marker1 = marker;
-            map.getOverlays().add(marker1);
-        }
-        else if(pos == 1){
-            marker2 = marker;
-            map.getOverlays().add(marker2);
-        }
-    }*/
-
     private void getCoordenadasFB(GeoPoint origen){
 
         latitudA = origen.getLatitude();
         longitudA = origen.getLongitude();
         points.add(new GeoPoint(latitudA, longitudA));
 
-        myRef = database.getReference("groups/" + displayGroup.getIdGrupo());
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
         myRef.child("latitudDestino").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -359,32 +354,30 @@ public class TripActivity extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {}
         });
 
-        myRef = database.getReference("groups/"+ displayGroup.getIdGrupo() + "/ruta");
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task){
                 if (task.isSuccessful()){
-                    for (DataSnapshot s: task.getResult().getChildren()) {
-                        if (!s.getKey().equals("cuposOcupados")){
-                            myRefRutaB = database.getReference("groups/" + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/latitud");
-                            myRefRutaB.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                    if (task.isSuccessful()) latitudA = (Double) task.getResult().getValue();
-                                }
-                            });
+                    for (DataSnapshot s : task.getResult().getChildren()) {
+                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/latitud");
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if (task.isSuccessful()) latitudA = (Double) task.getResult().getValue();
+                            }
+                        });
 
-                            myRefRutaB = database.getReference("groups/" + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/longitud");
-                            myRefRutaB.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                @Override
-                                public void onComplete(@NonNull Task<DataSnapshot> task){
-                                    if (task.isSuccessful())
-                                        longitudA = (Double) task.getResult().getValue();
-                                    points.add(new GeoPoint(latitudA, longitudA));
-                                    sortGeoPoint(points);
-                                }
-                            });
-                        }
+                        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo() + "/ruta/" + s.getKey() + "/longitud");
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task){
+                                if (task.isSuccessful())
+                                    longitudA = (Double) task.getResult().getValue();
+                                points.add(new GeoPoint(latitudA, longitudA));
+                                sortGeoPoint(points);
+                            }
+                        });
                     }
                 }
             }
@@ -395,13 +388,13 @@ public class TripActivity extends AppCompatActivity {
 
         final Long[] tamano = {Long.valueOf(pointss.size())};
 
-        myRef = database.getReference("groups/" + displayGroup.getIdGrupo() +"/ruta/cuposOcupados");
+        myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo()).child(FB_ROUTE_PATH);
         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()){
-                    if((Long) task.getResult().getValue() + 2 == tamano[0]){
-
+                    long count = task.getResult().getChildrenCount();
+                    if(count + 2 == tamano[0]){
                         GeoPoint geoAux, geoTemp = null;
                         Integer tam = pointss.size();
                         Double distancia = Double.valueOf(10000), distanciaTemp;
@@ -411,8 +404,8 @@ public class TripActivity extends AppCompatActivity {
                         pointss.remove(1);
                         pointss.remove(0);
 
-                        while (pointsAux.size() != tam){
-                            for (int j = 0; j<pointss.size(); j++){
+                        while(pointsAux.size() != tam){
+                            for(int j = 0; j<pointss.size(); j++){
                                 distanciaTemp = distance(pointsAux.get(0).getLatitude(), pointsAux.get(0).getLongitude(), pointss.get(j).getLatitude(), pointss.get(j).getLongitude());
                                 if (distanciaTemp < distancia){
                                     distancia = distanciaTemp;
@@ -420,18 +413,12 @@ public class TripActivity extends AppCompatActivity {
                                 }
                             }
                             pointss.remove(geoTemp);
-
                             pointsAux.add(geoTemp);
                             distancia = Double.valueOf(10000);
                         }
 
                         pointsAux.add(geoAux);
-                        int SDK_INT = android.os.Build.VERSION.SDK_INT;
-                        if (SDK_INT > 8) {
-                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                            StrictMode.setThreadPolicy(policy);
-                            drawRoute(pointsAux);
-                        }
+                        drawRoute(pointsAux);
                     }
                 }
             }

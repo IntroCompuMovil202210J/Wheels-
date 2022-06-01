@@ -1,5 +1,6 @@
 package com.example.wheelsplus;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -220,6 +221,12 @@ public class ChatActivity extends AppCompatActivity {
         if(myRef != null){
             myRef.removeEventListener(vel);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this, NavActivity.class));
     }
 
     private void readMessages(){
