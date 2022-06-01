@@ -10,8 +10,8 @@
         android:id="@+id/profilePicChat"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/sample_profile"
-        app:civ_border_color="#80DAD7D7"
+        android:src="@drawable/picture_sample_profile"
+        app:civ_border_color="#80878787"
         app:civ_border_width="1dp" />
 
     <LinearLayout
@@ -50,6 +50,7 @@
             android:ellipsize="end"
             android:fontFamily="@font/roboto_light"
             android:maxLines="2"
+            android:layout_marginTop="5dp"
             android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque mattis, mi sit amet eleifend faucibus, sem lacus convallis velit, a convallis augue ante quis nisi. Donec ac urna vitae turpis imperdiet mollis sagittis vel lorem. Integer sit amet ullamcorper ante. Vivamus vitae rhoncus orci. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin elementum libero sem, id lobortis diam faucibus in. Sed non lectus eu ex vehicula efficitur eu id urna. Mauris vel lacus eu risus sodales aliquet finibus ac augue. Quisque aliquet odio non rutrum semper. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque in tempor est. Nulla convallis aliquet aliquam." />
 
     </LinearLayout>

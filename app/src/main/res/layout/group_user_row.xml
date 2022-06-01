@@ -10,7 +10,7 @@
         android:id="@+id/profilePicUsers"
         android:layout_width="64dp"
         android:layout_height="64dp"
-        android:src="@drawable/sample_profile"
+        android:src="@drawable/picture_sample_profile"
         app:civ_border_color="#80DAD7D7"
         app:civ_border_width="1dp" />
 
@@ -22,6 +22,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:layout_marginStart="15dp"
+        android:textSize="17dp"
         android:layout_weight="1"
         android:text="Username"
         android:fontFamily="@font/roboto_medium"/>
@@ -33,7 +34,7 @@
         android:background="@null"
         android:layout_weight=".5"
         android:layout_gravity="center"
-        app:srcCompat="@drawable/ic_click_new_chat"
+        app:srcCompat="@drawable/vector_click_new_chat"
         tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
 </LinearLayout>

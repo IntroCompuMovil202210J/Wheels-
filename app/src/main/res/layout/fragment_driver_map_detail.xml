@@ -6,29 +6,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/azul_cool"
+    android:paddingTop="3dp"
     tools:context=".DriverMapDetailFragment">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_weight=".1"
-        android:fontFamily="@font/roboto_black"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
         android:text="Ruta actual del grupo"
-        android:textSize="28sp"
-        app:layout_constraintBottom_toTopOf="@+id/profilePic"
-        app:layout_constraintEnd_toStartOf="@+id/buttonModify"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.062" />
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:gravity="center_vertical"
+        android:layout_marginLeft="5dp"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="La ruta mostrada puede estar sujeta a cambios dependiendo los integrantes del grupo"
+        android:gravity="center"
+        android:layout_margin="1dp"
+        />
+
+
 
     <org.osmdroid.views.MapView
         android:id="@+id/driverHomeMapDetail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="55dp"
         android:layout_weight="1.2"
         android:layout_gravity="bottom" />
 

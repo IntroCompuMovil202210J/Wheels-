@@ -5,16 +5,21 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/azul_cool"
-    android:padding="20dp"
+    android:paddingTop="5dp"
+    android:paddingLeft="15dp"
+    android:padding="15dp"
+    android:paddingBottom="15dp"
+
     tools:context=".DriverGroupFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout3"
         android:layout_width="match_parent"
-        android:layout_height="440dp"
-        android:background="@drawable/group_border_rounded"
-        android:padding="15dp"
+        android:layout_height="450dp"
+        android:background="@drawable/shape_group_border_rounded"
+        android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.517"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -23,7 +28,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="25dp"
             android:hint="Nombre de grupo"
             android:textColorHint="#989898"
             app:boxBackgroundColor="@color/white"
@@ -34,7 +39,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/ic_search"
-            app:startIconDrawable="@drawable/ic_baseline_keyboard_arrow_right_24">
+            app:startIconDrawable="@drawable/vector_baseline_keyboard_arrow_right_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editGroupNameDriver"
@@ -51,7 +56,7 @@
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/ic_baseline_search_24"
+            android:src="@drawable/vector_baseline_search_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -59,7 +64,7 @@
             android:id="@+id/labelCrearGrupo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="2dp"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/roboto_light"
             android:text="Crear Grupo"
@@ -83,7 +88,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2"
-            app:startIconDrawable="@drawable/ic_outline_maps_home_work_24">
+            app:startIconDrawable="@drawable/vector_outline_maps_home_work_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editGroupDestinationDriver"
@@ -111,7 +116,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
-            app:startIconDrawable="@drawable/ic_outline_trip_origin_24">
+            app:startIconDrawable="@drawable/vector_outline_trip_origin_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editGroupOriginDriver"
@@ -185,7 +190,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout4"
-            app:startIconDrawable="@drawable/ic_outline_monetization_on_24">
+            app:startIconDrawable="@drawable/vector_outline_monetization_on_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editGroupFeeDriver"
@@ -197,28 +202,41 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageButton
-            android:id="@+id/buttonChooseVehicle"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginEnd="5dp"
+            android:text="Seleccionar Vehiculo"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toStartOf="@+id/buttonChooseVehicle"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/buttonChooseVehicle"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="10dp"
+            android:backgroundTint="#DEB4FD"
             android:minHeight="48dp"
-            android:src="@drawable/ic_baseline_directions_car_24"
+            android:src="@drawable/vector_baseline_directions_car_24"
+            app:layout_constraintBottom_toTopOf="@+id/textInputLayout2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <TextView
             android:id="@+id/tvPlacaVehiculo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:text=""
+            android:layout_marginEnd="10dp"
             android:fontFamily="@font/roboto_light"
-            app:layout_constraintBottom_toBottomOf="@+id/buttonChooseVehicle"
-            app:layout_constraintEnd_toStartOf="@+id/buttonChooseVehicle"
-            app:layout_constraintTop_toTopOf="@+id/buttonChooseVehicle" />
+            android:text=""
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonChooseVehicle" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -227,8 +245,8 @@
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="448dp"
-        android:src="@drawable/nv_group"
+        android:layout_marginTop="478dp"
+        android:src="@drawable/vector_nv_group"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -237,7 +255,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:fontFamily="@font/roboto_light"
         android:text="Mis grupos"
         android:textSize="18sp"

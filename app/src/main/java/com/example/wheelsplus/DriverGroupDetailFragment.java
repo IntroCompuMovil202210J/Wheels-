@@ -140,7 +140,7 @@ public class DriverGroupDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tvDetailDriverGroupName.setText(displayGroup.getNombre());
+        tvDetailDriverGroupName.setText("Nombre del grupo: "+ displayGroup.getNombre());
         tvDetailDriverOrigin.setText("Origen: " + displayGroup.getOrigen());
         tvDetailDriverDestination.setText("Destino: " + displayGroup.getDestino());
         tvDetailDriverDate.setText("Fecha: " + displayGroup.getFecha());

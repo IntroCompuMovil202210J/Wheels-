@@ -154,7 +154,7 @@ public class GroupDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        tvDetailGroupName.setText(displayGroup.getNombreGrupo());
+        tvDetailGroupName.setText("Nombre del grupo: " + displayGroup.getNombreGrupo());
         tvDetailOrigin.setText("Origen: " + displayGroup.getOrigen());
         tvDetailDestination.setText("Destino: " + displayGroup.getDestino());
         tvDetailDate.setText("Fecha: " + displayGroup.getFecha());

@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="550dp"
         android:padding="16dp"
-        android:background="@drawable/group_border_rounded"
+        android:background="@drawable/shape_group_border_rounded"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.454"
@@ -46,7 +46,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayout"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
@@ -70,7 +70,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/textInputLayoutPas"
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
@@ -109,7 +109,7 @@
             android:id="@+id/buttonSignIn"
             android:layout_width="300dp"
             android:layout_height="70dp"
-            android:layout_marginTop="120dp"
+            android:layout_marginTop="100dp"
             android:layout_weight="0.5"
             android:backgroundTint="#0D324D"
             android:text="Iniciar sesión"

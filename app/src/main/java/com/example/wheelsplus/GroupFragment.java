@@ -242,31 +242,20 @@ public class GroupFragment extends Fragment {
 
                 if(flag){
 
-
                     ArrayList<Grupo> grupos = new ArrayList<>();
-
                     latLngDestino = searchLatLngAddress(editGroupDestination.getText().toString());
-
                     long timestamp = calendar.getTimeInMillis();
-
                     String groupName = editGroupName.getText().toString();
-
-
                     myRef = database.getReference(FB_GROUPS_PATH);
 
-
                     if(!TextUtils.isEmpty(editGroupName.getText()) && TextUtils.isEmpty(editGroupDestination.getText())){
-
                         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                 if(task.isSuccessful()){
-
                                     for(DataSnapshot single : task.getResult().getChildren()){
                                         Grupo grupo = single.getValue(Grupo.class);
-
                                         if(candidatoGrupoXDistancia(grupo.getLatitudAcuerdo(), grupo.getLatitudDestino(), grupo.getLongitudAcuerdo(), grupo.getLongitudDestino(), new LatLng(latOrigin, lngOrigin))){
-
                                             long tiempo = grupo.getFechaAcuerdo();
                                             Calendar c = Calendar.getInstance();
                                             c.setTime(new Date(tiempo));
@@ -414,11 +403,9 @@ public class GroupFragment extends Fragment {
         });
     }
 
-
     private boolean candidatoGrupoXDistancia (Double latitudA, Double latitudB, Double longitudA, Double longitudB, LatLng origenUsuario){
 
         GeoPoint A, B, C;
-        Double disAux;
 
         B = calcularPuntoMedio(latitudA, latitudB, longitudA, longitudB);
         A = calcularPuntoMedio(latitudA, B.getLatitude(), longitudA, B.getLongitude());

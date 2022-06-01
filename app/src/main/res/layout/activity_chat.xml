@@ -10,7 +10,9 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        android:background="@color/azul_cool"
+        android:background="@drawable/shape_rounded_buttom"
+        android:backgroundTint="@color/azul_cool"
+
         android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -18,11 +20,11 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/profilePicOtherUser"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="32dp"
-            android:src="@drawable/sample_profile"
+            android:src="@drawable/picture_sample_profile"
             app:civ_border_color="#80DAD7D7"
             app:civ_border_width="1dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -35,6 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:textStyle="bold"
             android:text="OtherUser"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -81,7 +84,7 @@
             android:layout_gravity="center"
             android:layout_weight=".1"
             android:background="@null"
-            app:srcCompat="@drawable/fab_camera"
+            app:srcCompat="@drawable/vector_fab_camera"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
         <ImageButton
@@ -91,7 +94,7 @@
             android:layout_gravity="center"
             android:layout_weight=".1"
             android:background="@null"
-            app:srcCompat="@drawable/fab_gallery"
+            app:srcCompat="@drawable/vector_fab_gallery"
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
         <ImageButton
@@ -101,7 +104,7 @@
             android:layout_gravity="center"
             android:layout_weight=".1"
             android:background="@null"
-            app:srcCompat="@drawable/ic_baseline_send_24"
+            app:srcCompat="@drawable/vector_baseline_send_24"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
     </LinearLayout>

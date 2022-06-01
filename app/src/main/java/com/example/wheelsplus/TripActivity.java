@@ -253,7 +253,7 @@ public class TripActivity extends AppCompatActivity {
                                 map.getOverlays().remove(marker);
                             }
 
-                            marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.ic_baseline_directions_car_24);
+                            marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_baseline_directions_car_24);
                             map.getOverlays().add(marker);
                             points.clear();
                             pointsAux.clear();

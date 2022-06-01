@@ -53,7 +53,6 @@ import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.osmdroid.api.IMapController;
@@ -239,7 +238,7 @@ public class DriverInitLocationFragment extends Fragment {
                                 Address addressResult = addresses.get(0);
                                 destinationPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
                                 map.getOverlays().remove(destination);
-                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_destination);
                                 map.getOverlays().add(destination);
                                 editPolilyne(startPoint, destinationPoint);
                             } else {
@@ -292,10 +291,10 @@ public class DriverInitLocationFragment extends Fragment {
             map.getZoomController().activate();
             mapController = map.getController();
             if(invert){
-                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_dark_origin);
             }else {
-                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
-            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
+            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_destination);
             map.getOverlays().add(origin);
             map.getOverlays().add(destination);
             mapController.setZoom(15.0);
@@ -390,9 +389,9 @@ public class DriverInitLocationFragment extends Fragment {
                                 map.getOverlays().remove(origin);
                             }
                             if(invert){
-                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_dark_origin);
                             }else {
-                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
                             }                            map.getOverlays().add(origin);
                             editPolilyne(startPoint, destinationPoint);
                         }
@@ -444,7 +443,7 @@ public class DriverInitLocationFragment extends Fragment {
                             if(origin != null){
                                 map.getOverlays().remove(origin);
                             }
-                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_dark_origin);
                             map.getOverlays().add(origin);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
@@ -454,7 +453,7 @@ public class DriverInitLocationFragment extends Fragment {
                             if(origin != null){
                                 map.getOverlays().remove(origin);
                             }
-                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
                             map.getOverlays().add(origin);
                         }
                     }

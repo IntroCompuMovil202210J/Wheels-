@@ -243,9 +243,9 @@ public class InitLocationFragment extends Fragment {
                                 startPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
                                 map.getOverlays().remove(origin);
                                 if(invert){
-                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
                                 }else {
-                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                                    origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
                                 }                                map.getOverlays().add(origin);
                                 editPolilyne(startPoint, destinationPoint);
                                 actual = false;
@@ -276,7 +276,7 @@ public class InitLocationFragment extends Fragment {
                                 Address addressResult = addresses.get(0);
                                 destinationPoint = new GeoPoint(addressResult.getLatitude(), addressResult.getLongitude());
                                 map.getOverlays().remove(destination);
-                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                                destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_destination);
                                 map.getOverlays().add(destination);
                                 editPolilyne(startPoint, destinationPoint);
                             } else {
@@ -337,10 +337,10 @@ public class InitLocationFragment extends Fragment {
             map.getZoomController().activate();
             mapController = map.getController();
             if(invert){
-                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
             }else {
-                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_destination);
+                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
+            }            destination = createMarker(destinationPoint, geocoder.getFromLocation(destinationPoint.getLatitude(), destinationPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_destination);
             map.getOverlays().add(origin);
             map.getOverlays().add(destination);
             mapController.setZoom(15.0);
@@ -435,9 +435,9 @@ public class InitLocationFragment extends Fragment {
                                 map.getOverlays().remove(origin);
                             }
                             if(invert){
-                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
                             }else {
-                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                                origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
                             }                            map.getOverlays().add(origin);
                             editPolilyne(startPoint, destinationPoint);
                         }
@@ -489,7 +489,7 @@ public class InitLocationFragment extends Fragment {
                             if(origin != null){
                                 map.getOverlays().remove(origin);
                             }
-                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
                             map.getOverlays().add(origin);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
@@ -499,7 +499,7 @@ public class InitLocationFragment extends Fragment {
                             if(origin != null){
                                 map.getOverlays().remove(origin);
                             }
-                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            origin = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
                             map.getOverlays().add(origin);
                         }
                     }

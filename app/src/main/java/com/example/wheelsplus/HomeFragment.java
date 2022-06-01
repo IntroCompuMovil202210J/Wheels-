@@ -1,7 +1,6 @@
 package com.example.wheelsplus;
 
 import static android.app.Activity.RESULT_OK;
-
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
@@ -24,7 +23,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,7 +34,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.common.api.ResolvableApiException;
@@ -56,7 +53,6 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import org.osmdroid.api.IMapController;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -64,10 +60,8 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.TilesOverlay;
-
 import java.io.IOException;
 import java.util.List;
-
 import de.hdodenhof.circleimageview.CircleImageView;
 import services.DownloadImageTask;
 
@@ -87,16 +81,15 @@ public class HomeFragment extends Fragment {
      * Map/Location
      */
     FusedLocationProviderClient mFusedLocationClient;
-    boolean settingsOK = false;
     LocationRequest locationRequest;
     LocationCallback locationCallback;
-    double latitude = 0, longitude = 0;
-    GeoPoint startPoint = null;
-    Geocoder geocoder;
+
     MapView map;
     Marker other = null;
     IMapController mapController;
-    public static final double EARTH_RADIUS = 6371;
+
+    GeoPoint startPoint = null;
+    Geocoder geocoder;
 
     /**
      * Light sensor
@@ -122,15 +115,18 @@ public class HomeFragment extends Fragment {
     /**
      * Utils
      */
+    double latitude = 0, longitude = 0;
+    boolean settingsOK = false;
+    public static final double EARTH_RADIUS = 6371;
+
     public static final String FB_USERS_PATH = "users/";
     boolean invert = false;
 
     ActivityResultLauncher<String> requestPermissionLocation = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
         @Override
         public void onActivityResult(Boolean result) {
-            if(result){
+            if(result)
                 startLocationUpdates();
-            }
         }
     });
 
@@ -140,9 +136,10 @@ public class HomeFragment extends Fragment {
             if(result.getResultCode() == RESULT_OK){
                 settingsOK = true;
                 startLocationUpdates();
-            }else{
-                Log.i("LocationTest", "GPS is OFF");
             }
+            else
+                Log.i("LocationTest", "GPS is OFF");
+
         }
     });
 
@@ -242,15 +239,16 @@ public class HomeFragment extends Fragment {
                                 InitLocationFragment initLocationFragment = new InitLocationFragment();
                                 initLocationFragment.setArguments(bundle);
                                 replaceFragment(initLocationFragment);
-                            } else {
-                                if_viaje.setError("Dirección no encontrada");
                             }
+                            else
+                                if_viaje.setError("Dirección no encontrada");
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    } else {
-                        Toast.makeText(getActivity(), "La dirección esta vacía", Toast.LENGTH_SHORT).show();
                     }
+                    else
+                        Toast.makeText(getActivity(), "La dirección esta vacía", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -331,9 +329,8 @@ public class HomeFragment extends Fragment {
 
     public void startLocationUpdates(){
         if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
-            if(settingsOK){
+            if(settingsOK)
                 mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-            }
         }
     }
 
@@ -358,7 +355,7 @@ public class HomeFragment extends Fragment {
                     if (lastLocation != null) {
                         Log.i("Callback", "Latitude: " + lastLocation.getLatitude() + " Longitude: " + lastLocation.getLongitude());
                         if(distance(latitude, longitude, lastLocation.getLatitude(), lastLocation.getLongitude()) > 0.03){
-                            mapController.setZoom(15.0);
+                            mapController.setZoom(17.0);
                             mapController.setCenter(new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude()));
                             latitude = lastLocation.getLatitude();
                             longitude = lastLocation.getLongitude();
@@ -370,14 +367,15 @@ public class HomeFragment extends Fragment {
                         longitude = lastLocation.getLongitude();
                         startPoint = new GeoPoint(lastLocation.getLatitude(), lastLocation.getLongitude());
                         tvI_ubicacionP.setText(geoCoderBuscar(new LatLng(latitude, longitude)));
-                        if(other != null){
+                        if(other != null)
                             map.getOverlays().remove(other);
-                        }
-                        if(invert){
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
-                        }else {
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
-                        }
+
+                        if(invert)
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
+
+                        else
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
+
                         map.getOverlays().add(other);
                     }
 
@@ -401,6 +399,7 @@ public class HomeFragment extends Fragment {
                 startLocationUpdates();
             }
         });
+
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
@@ -439,7 +438,7 @@ public class HomeFragment extends Fragment {
                             if (other != null) {
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_dark_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_dark_origin);
                             map.getOverlays().add(other);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
@@ -448,15 +447,13 @@ public class HomeFragment extends Fragment {
                             if(other != null){
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mk_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
                             map.getOverlays().add(other);
                         }
-
                     }
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-
             }
 
             @Override

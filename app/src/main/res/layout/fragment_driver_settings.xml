@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="0dp"
             android:fontFamily="@font/roboto_black"
             android:text="Configuración"
             android:textSize="28sp"
@@ -51,7 +51,7 @@
             android:layout_height="80dp"
             android:layout_marginStart="8dp"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/sample_profile"
+            android:src="@drawable/picture_sample_profile"
             app:civ_border_color="#80DAD7D7"
             app:civ_border_width="1dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -74,7 +74,7 @@
             android:layout_marginTop="50dp"
             android:layout_marginEnd="32dp"
             android:backgroundTint="@color/azul_cool"
-            android:src="@drawable/ic_outline_border_color_24"
+            android:src="@drawable/vector_outline_border_color_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -130,7 +130,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="20dp"
-                android:src="@drawable/ic_outline_map_24" />
+                android:src="@drawable/vector_outline_map_24" />
 
             <TextView
                 android:layout_width="0dp"
@@ -145,7 +145,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
+                android:src="@drawable/vector_baseline_keyboard_arrow_right_24" />
         </LinearLayout>
 
         <LinearLayout
@@ -161,7 +161,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="20dp"
-                android:src="@drawable/ic_outline_payment_24" />
+                android:src="@drawable/vector_outline_payment_24" />
 
             <TextView
                 android:layout_width="0dp"
@@ -176,7 +176,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
+                android:src="@drawable/vector_baseline_keyboard_arrow_right_24" />
         </LinearLayout>
 
         <LinearLayout
@@ -192,7 +192,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="20dp"
-                android:src="@drawable/ic_sharp_settings_applications_24" />
+                android:src="@drawable/vector_sharp_settings_applications_24" />
 
             <TextView
                 android:layout_width="0dp"
@@ -207,7 +207,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
+                android:src="@drawable/vector_baseline_keyboard_arrow_right_24" />
         </LinearLayout>
 
         <LinearLayout
@@ -223,7 +223,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="20dp"
-                android:src="@drawable/ic_baseline_directions_car_24" />
+                android:src="@drawable/vector_baseline_directions_car_24" />
 
             <TextView
                 android:layout_width="0dp"
@@ -238,7 +238,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
+                android:src="@drawable/vector_baseline_keyboard_arrow_right_24" />
         </LinearLayout>
 
         <LinearLayout
@@ -254,7 +254,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:padding="20dp"
-                android:src="@drawable/ic_baseline_social_distance_24" />
+                android:src="@drawable/vector_baseline_social_distance_24" />
 
             <TextView
                 android:layout_width="0dp"
@@ -269,7 +269,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:src="@drawable/ic_baseline_keyboard_arrow_right_24" />
+                android:src="@drawable/vector_baseline_keyboard_arrow_right_24" />
         </LinearLayout>
     </LinearLayout>
 

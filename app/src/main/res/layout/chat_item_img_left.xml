@@ -10,7 +10,7 @@
         android:id="@+id/tvMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_left"
+        android:background="@drawable/shape_background_left"
         android:fontFamily="@font/roboto_regular"
         android:padding="8dp"
         android:text="TextView"
@@ -21,6 +21,6 @@
         android:id="@+id/ivMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_left"
+        android:background="@drawable/shape_background_left"
         tools:srcCompat="@tools:sample/avatars" />
 </RelativeLayout>

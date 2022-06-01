@@ -12,7 +12,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="332dp"
-        android:background="@drawable/group_border_rounded"
+        android:background="@drawable/shape_group_border_rounded"
         android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -22,9 +22,9 @@
             android:id="@+id/ic_search"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="0dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_twotone_groups_24"
+            android:src="@drawable/vector_twotone_groups_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -33,7 +33,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="10dp"
             android:fontFamily="@font/roboto_light"
             android:text="Detalle Grupo"
             android:textSize="18sp"
@@ -92,33 +92,36 @@
 
         <ImageButton
             android:id="@+id/buttonModifyDriverGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="5dp"
             android:minHeight="48dp"
-            android:src="@drawable/ic_outline_border_color_24_black"
+            android:backgroundTint="#00E4E4F2"
+            android:src="@drawable/vector_outline_border_color_24_black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <ImageButton
             android:id="@+id/buttonRemoveDriverGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="15dp"
+            android:backgroundTint="#00E4E4F2"
             android:minHeight="48dp"
-            android:src="@drawable/ic_twotone_group_off_24"
+            android:src="@drawable/vector_twotone_group_off_24"
             app:layout_constraintEnd_toStartOf="@+id/buttonModifyDriverGroup"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
 
         <ImageButton
             android:id="@+id/buttonDriverMapDetail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="15dp"
+            android:backgroundTint="#00E4E4F2"
             android:minHeight="48dp"
-            android:src="@drawable/ic_outline_route_24"
+            android:src="@drawable/vector_baseline_alt_route_24"
             app:layout_constraintEnd_toStartOf="@+id/buttonRemoveDriverGroup"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
@@ -128,7 +131,7 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/ic_baseline_directions_car_24"
+            android:src="@drawable/vector_baseline_directions_car_24"
             app:layout_constraintStart_toStartOf="@+id/tvDetailDriverFee"
             app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverFee" />
 
@@ -161,7 +164,7 @@
             android:layout_marginEnd="8dp"
             android:background="@color/white"
             android:scaleType="fitStart"
-            android:src="@drawable/ic_baseline_play_arrow_24"
+            android:src="@drawable/vector_baseline_play_arrow_24"
             app:layout_constraintBottom_toBottomOf="@+id/imageView6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/imageView6"

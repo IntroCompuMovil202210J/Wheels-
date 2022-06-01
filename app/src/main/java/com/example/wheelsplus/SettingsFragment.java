@@ -216,5 +216,4 @@ public class SettingsFragment extends Fragment {
         fragmentTransaction.replace(R.id.nav_host_fragment, fragment);
         fragmentTransaction.commit();
     }
-
 }

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/endHomeGradient"
     tools:context=".InitLocationFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -29,7 +30,7 @@
             android:layout_marginBottom="20dp"
             android:backgroundTint="@color/white"
             android:clickable="true"
-            android:src="@drawable/ic_baseline_my_location_24"
+            android:src="@drawable/vector_baseline_my_location_24"
             app:backgroundTint="@color/azul_cool"
             tools:ignore="SpeakableTextPresentCheck" />
 
@@ -39,7 +40,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:background="@drawable/group_border_rounded"
+        android:backgroundTint="@color/azul_cool"
+        android:background="@drawable/shape_group_border_rounded"
         android:padding="10dp">
 
         <com.google.android.material.textfield.TextInputLayout
@@ -58,7 +60,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:startIconDrawable="@drawable/ic_outline_trip_origin_24">
+            app:startIconDrawable="@drawable/vector_outline_trip_origin_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editOrigin"
@@ -86,7 +88,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout3"
-            app:startIconDrawable="@drawable/ic_outline_gps_fixed_24">
+            app:startIconDrawable="@drawable/vector_outline_gps_fixed_24">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editDestination"
@@ -112,7 +114,7 @@
                 android:layout_height="55dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="0.5"
-                android:backgroundTint="@color/azul_cool"
+                android:backgroundTint="@color/endHomeGradient"
                 android:fontFamily="@font/roboto_medium"
                 android:text="Cancelar"
                 android:textColor="@color/black"
@@ -125,7 +127,7 @@
                 android:layout_height="55dp"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="0.5"
-                android:backgroundTint="@color/azul_cool"
+                android:backgroundTint="@color/endHomeGradient"
                 android:fontFamily="@font/roboto_medium"
                 android:text="Confirmar"
                 android:textColor="@color/black"

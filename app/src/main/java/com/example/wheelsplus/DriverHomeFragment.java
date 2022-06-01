@@ -373,9 +373,9 @@ public class DriverHomeFragment extends Fragment {
                             map.getOverlays().remove(other);
                         }
                         if(invert){
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_dark_origin);
                         }else {
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
                         }
                         map.getOverlays().add(other);
                     }
@@ -438,7 +438,7 @@ public class DriverHomeFragment extends Fragment {
                             if (other != null) {
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_dark_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_dark_origin);
                             map.getOverlays().add(other);
                         } else {
                             Log.i("MAPS", "LIGHT MAP " + event.values[0]);
@@ -447,7 +447,7 @@ public class DriverHomeFragment extends Fragment {
                             if(other != null){
                                 map.getOverlays().remove(other);
                             }
-                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.mkd_origin);
+                            other = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mkd_origin);
                             map.getOverlays().add(other);
                         }
 

@@ -4,15 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp"
+    android:padding="1dp"
     android:orientation="vertical"
+    android:background="@color/azul_cool"
     tools:context=".DisplayChatsFragment" >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:layout_weight=".1"
         android:fontFamily="@font/roboto_black"
         android:text="Chats"
@@ -28,5 +29,6 @@
         android:id="@+id/listChats"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.5"/>
+        android:layout_weight="1.5"
+        android:layout_marginTop="5dp"/>
 </LinearLayout>

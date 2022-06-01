@@ -12,7 +12,7 @@
         android:id="@+id/constraintLayout"
         android:layout_width="match_parent"
         android:layout_height="328dp"
-        android:background="@drawable/group_border_rounded"
+        android:background="@drawable/shape_group_border_rounded"
         android:padding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
             android:layout_height="32dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_twotone_groups_24"
+            android:src="@drawable/vector_twotone_groups_24"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -99,7 +99,7 @@
             android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
-            android:src="@drawable/sample_profile"
+            android:src="@drawable/picture_sample_profile"
             app:civ_border_color="#80DAD7D7"
             app:civ_border_width="1dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -118,11 +118,12 @@
 
         <ImageButton
             android:id="@+id/buttonRemoveGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_marginEnd="8dp"
+            android:backgroundTint="#00E4E4F2"
             android:minHeight="48dp"
-            android:src="@drawable/ic_baseline_exit_to_app_24"
+            android:src="@drawable/vector_baseline_exit_to_app_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
@@ -135,7 +136,7 @@
             android:background="@null"
             android:minWidth="48dp"
             android:minHeight="48dp"
-            android:src="@drawable/ic_click_new_chat"
+            android:src="@drawable/vector_click_new_chat"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:ignore="SpeakableTextPresentCheck" />
