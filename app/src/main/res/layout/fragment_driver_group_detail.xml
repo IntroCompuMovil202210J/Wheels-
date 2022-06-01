@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/azul_cool"
     android:padding="20dp"
-    tools:context=".GroupDetailFragment">
+    tools:context=".DriverGroupDetailFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"

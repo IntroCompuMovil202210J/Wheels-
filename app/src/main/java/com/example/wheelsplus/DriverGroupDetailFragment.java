@@ -1,6 +1,7 @@
 package com.example.wheelsplus;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -243,6 +244,10 @@ public class DriverGroupDetailFragment extends Fragment {
                                                             for(DataSnapshot minisingle : single.child(FB_GROUPS_PATH).getChildren()){
                                                                 if(minisingle.getKey().equals(displayGroup.getIdGrupo())){
                                                                     minisingle.getRef().setValue(true);
+
+                                                                    Intent intent = new Intent(getContext(), TripActivity.class);
+                                                                    intent.putExtra("displayDriverGroupInfo", displayGroup);
+                                                                    startActivity(intent);
                                                                 }
                                                             }
                                                         }
