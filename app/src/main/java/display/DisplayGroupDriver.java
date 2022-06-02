@@ -14,11 +14,12 @@ public class DisplayGroupDriver implements Parcelable {
     String marca;
     String idGrupo;
     String modelo;
+    String urlImagen;
 
     public DisplayGroupDriver() {
     }
 
-    public DisplayGroupDriver(String nombre, String origen, String destino, String fecha, String tarifa, String placa, String marca, String idGrupo, String modelo) {
+    public DisplayGroupDriver(String nombre, String origen, String destino, String fecha, String tarifa, String placa, String marca, String idGrupo, String modelo, String urlImagen) {
         this.nombre = nombre;
         this.origen = origen;
         this.destino = destino;
@@ -28,6 +29,7 @@ public class DisplayGroupDriver implements Parcelable {
         this.marca = marca;
         this.idGrupo = idGrupo;
         this.modelo = modelo;
+        this.urlImagen = urlImagen;
     }
 
     protected DisplayGroupDriver(Parcel in) {
@@ -40,6 +42,7 @@ public class DisplayGroupDriver implements Parcelable {
         marca = in.readString();
         idGrupo = in.readString();
         modelo = in.readString();
+        urlImagen = in.readString();
     }
 
     @Override
@@ -53,6 +56,7 @@ public class DisplayGroupDriver implements Parcelable {
         dest.writeString(marca);
         dest.writeString(idGrupo);
         dest.writeString(modelo);
+        dest.writeString(urlImagen);
     }
 
     @Override
@@ -71,6 +75,14 @@ public class DisplayGroupDriver implements Parcelable {
             return new DisplayGroupDriver[size];
         }
     };
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
+    }
 
     public String getNombre() {
         return nombre;

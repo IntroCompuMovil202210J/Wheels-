@@ -5,8 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.wheelsplus.R;
 
 import org.w3c.dom.Text;
@@ -18,9 +20,13 @@ import display.DisplayGroup;
 import model.Vehiculo;
 import services.DownloadImageTask;
 
+
 public class VehiclesAdapter extends ArrayAdapter<Vehiculo> {
+
+    Context contexto;
     public VehiclesAdapter(Context context, ArrayList<Vehiculo> groups) {
         super(context, 0, groups);
+        contexto = context;
     }
 
     @Override
@@ -34,6 +40,13 @@ public class VehiclesAdapter extends ArrayAdapter<Vehiculo> {
         TextView tvMarca = v.findViewById(R.id.tvMarca);
         TextView tvModelo = v.findViewById(R.id.tvModelo);
         TextView tvCapacidad = v.findViewById(R.id.tvCapacidad);
+        ImageView imagenCarro = v.findViewById(R.id.imageView5);
+
+
+        if (!vehiculo.getUrlImagen().equals("N/A"))
+            Glide.with(contexto).load(vehiculo.getUrlImagen()).into(imagenCarro);
+
+
         tvPlaca.setText("Placa: " + vehiculo.getPlaca());
         tvCapacidad.setText("Capacidad: " + String.valueOf(vehiculo.getCapacidad()));
         tvModelo.setText("Modelo: " + vehiculo.getModelo());

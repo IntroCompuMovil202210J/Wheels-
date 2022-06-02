@@ -153,6 +153,7 @@ public class SelectVehicleFragment extends Fragment {
                             }
                         }
                     }
+
                     if(getActivity() != null) {
                         VehiclesAdapter vehiclesAdapter = new VehiclesAdapter(getActivity(), vehiculos);
                         listVehicles.setAdapter(vehiclesAdapter);

@@ -11,6 +11,7 @@ public class Vehiculo implements Parcelable {
     String marca;
     String modelo;
     int anno;
+    String urlImagen;
 
     public Vehiculo() {
     }
@@ -24,6 +25,7 @@ public class Vehiculo implements Parcelable {
         this.anno = anno;
     }
 
+
     protected Vehiculo(Parcel in) {
         idVehiculo = in.readString();
         placa = in.readString();
@@ -31,6 +33,15 @@ public class Vehiculo implements Parcelable {
         marca = in.readString();
         modelo = in.readString();
         anno = in.readInt();
+        urlImagen = in.readString();
+    }
+
+    public String getUrlImagen() {
+        return urlImagen;
+    }
+
+    public void setUrlImagen(String urlImagen) {
+        this.urlImagen = urlImagen;
     }
 
     public static final Creator<Vehiculo> CREATOR = new Creator<Vehiculo>() {
@@ -106,5 +117,6 @@ public class Vehiculo implements Parcelable {
         parcel.writeString(marca);
         parcel.writeString(modelo);
         parcel.writeInt(anno);
+        parcel.writeString(urlImagen);
     }
 }

@@ -8,14 +8,17 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -46,6 +49,7 @@ public class DriverGroupDetailFragment extends Fragment {
      */
     TextView tvDetailDriverGroupName, tvDetailDriverOrigin, tvDetailDriverDestination, tvDetailDriverDate, tvDetailDriverFee, tvDetailDriverPlaca, tvDetailDriverMarca;
 
+    ImageView car;
     ImageButton buttonRemoveGroup, buttonModifyGroup, buttonDriverMapDetail, buttonStart;
 
     ListView listDriverGroupUsers;
@@ -124,6 +128,7 @@ public class DriverGroupDetailFragment extends Fragment {
         buttonStart = root.findViewById(R.id.buttonStart);
         listDriverGroupUsers = root.findViewById(R.id.listGroupDriverUsers);
         buttonDriverMapDetail = root.findViewById(R.id.buttonDriverMapDetail);
+        car = root.findViewById(R.id.imageViewCar);
 
         displayGroup = getArguments().getParcelable("displayDriverGroup");
 
@@ -147,6 +152,10 @@ public class DriverGroupDetailFragment extends Fragment {
         tvDetailDriverFee.setText("Tarifa: " + displayGroup.getTarifa());
         tvDetailDriverPlaca.setText(displayGroup.getPlaca());
         tvDetailDriverMarca.setText(displayGroup.getMarca() + " " + displayGroup.getModelo());
+
+        if (!displayGroup.getUrlImagen().equals("N/A"))
+            Glide.with(getContext()).load(displayGroup.getUrlImagen()).into(car);
+
 
         listDriverGroupUsers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

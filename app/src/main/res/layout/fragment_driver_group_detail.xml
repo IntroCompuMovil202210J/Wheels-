@@ -127,11 +127,11 @@
             tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
 
         <ImageView
-            android:id="@+id/imageView6"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:id="@+id/imageViewCar"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_marginTop="16dp"
-            android:src="@drawable/vector_baseline_directions_car_24"
+            android:src="@drawable/cardefault"
             app:layout_constraintStart_toStartOf="@+id/tvDetailDriverFee"
             app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverFee" />
 
@@ -144,7 +144,7 @@
             android:fontFamily="@font/roboto_light"
             android:text="Placa"
             android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@+id/imageView6"
+            app:layout_constraintStart_toEndOf="@+id/imageViewCar"
             app:layout_constraintTop_toBottomOf="@+id/tvDetailDriverFee" />
 
         <TextView
@@ -165,9 +165,9 @@
             android:background="@color/white"
             android:scaleType="fitStart"
             android:src="@drawable/vector_baseline_play_arrow_24"
-            app:layout_constraintBottom_toBottomOf="@+id/imageView6"
+            app:layout_constraintBottom_toBottomOf="@+id/imageViewCar"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/imageView6"
+            app:layout_constraintTop_toTopOf="@+id/imageViewCar"
             tools:ignore="SpeakableTextPresentCheck" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

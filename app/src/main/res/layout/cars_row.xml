@@ -10,15 +10,16 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="150dp"
-        android:layout_marginTop="10dp"
-        android:layout_height="wrap_content">
+        android:layout_marginTop="0dp"
+        android:layout_height="80dp">
 
         <ImageView
             android:id="@+id/imageView5"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/vector_baseline_directions_car_24" />
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/cardefault" />
     </LinearLayout>
 
     <LinearLayout
