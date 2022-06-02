@@ -13,7 +13,6 @@ public class Usuario {
     double longitud;
 
    /* ArrayList<Grupo> grupos = new ArrayList<>();
-    ArrayList<Viaje> viajes = new ArrayList<>();
     ArrayList<Chat> chats = new ArrayList<>();
     */
 

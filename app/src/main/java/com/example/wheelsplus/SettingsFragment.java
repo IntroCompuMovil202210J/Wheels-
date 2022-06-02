@@ -196,6 +196,13 @@ public class SettingsFragment extends Fragment {
             }
         });
 
+        trip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                replaceFragment(new DisplayTripsFragment());
+            }
+        });
+
         buttonModify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

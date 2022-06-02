@@ -10,7 +10,48 @@
     <org.osmdroid.views.MapView
         android:id="@+id/passengerTripMap"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight=".7">
     </org.osmdroid.views.MapView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight=".2"
+        android:orientation="vertical"
+        android:backgroundTint="@color/azul_cool"
+        android:background="@drawable/shape_group_border_rounded"
+        android:padding="15dp" >
+
+        <TextView
+            android:id="@+id/tvTimeGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_medium"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/tvDistanceGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:fontFamily="@font/roboto_medium"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonCancelGroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:backgroundTint="#0D324D"
+            android:text="Cancelar viaje"
+            android:theme="@style/textoFuenteBoton"
+            app:cornerRadius="10dp" />
+    </LinearLayout>
 
 </LinearLayout>

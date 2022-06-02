@@ -81,7 +81,7 @@ public class GroupFragment extends Fragment {
      */
     FirebaseAuth auth;
     FirebaseDatabase database;
-    DatabaseReference myRef, myRefAux;
+    DatabaseReference myRef;
     ValueEventListener vel;
 
     /**
@@ -89,7 +89,6 @@ public class GroupFragment extends Fragment {
      */
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
-    public static final String FB_DRIVERS_PATH = "drivers/";
     boolean time, date = false;
     double latitud = 0;
     double longitud = 0;
@@ -411,13 +410,13 @@ public class GroupFragment extends Fragment {
 
         Double dis = (distance(latitudA, longitudA, latitudB, longitudB));
 
-        if (distance(A.getLatitude(), A.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+        if (distance(A.getLatitude(), A.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2) + 1)
             return true;
 
-        else if(distance(B.getLatitude(), B.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+        else if(distance(B.getLatitude(), B.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2) + 1)
             return true;
 
-        else if(distance(C.getLatitude(), C.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2))
+        else if(distance(C.getLatitude(), C.getLongitude(), origenUsuario.lat, origenUsuario.lng) < (dis/2) + 1)
             return true;
 
         else

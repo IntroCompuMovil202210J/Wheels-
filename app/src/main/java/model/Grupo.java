@@ -17,14 +17,11 @@ public class Grupo implements Parcelable {
     double latitudDestino;
     double longitudDestino;
 
-
     double latUser, lonUser;
-
 
     long fechaAcuerdo;
     String idVehiculo;
     ArrayList<String> preferenciasRuta;
-
 
     public Grupo() {
     }
@@ -43,24 +40,8 @@ public class Grupo implements Parcelable {
         this.idVehiculo = idVehiculo;
     }
 
-    public Grupo(String id_Grupo, String nombreGrupo, String idConductor, double tarifa, int cupo, double latitudAcuerdo, double longitudAcuerdo, double latitudDestino, double longitudDestino, double latUser, double lonUser, long fechaAcuerdo, String idVehiculo, ArrayList<String> preferenciasRuta) {
-        this.id_Grupo = id_Grupo;
-        this.nombreGrupo = nombreGrupo;
-        this.idConductor = idConductor;
-        this.tarifa = tarifa;
-        this.cupo = cupo;
-        this.latitudAcuerdo = latitudAcuerdo;
-        this.longitudAcuerdo = longitudAcuerdo;
-        this.latitudDestino = latitudDestino;
-        this.longitudDestino = longitudDestino;
-        this.latUser = latUser;
-        this.lonUser = lonUser;
-        this.fechaAcuerdo = fechaAcuerdo;
-        this.idVehiculo = idVehiculo;
-        this.preferenciasRuta = preferenciasRuta;
-    }
-
     protected Grupo(Parcel in) {
+        id_Grupo = in.readString();
         nombreGrupo = in.readString();
         idConductor = in.readString();
         tarifa = in.readDouble();
@@ -69,6 +50,8 @@ public class Grupo implements Parcelable {
         longitudAcuerdo = in.readDouble();
         latitudDestino = in.readDouble();
         longitudDestino = in.readDouble();
+        latUser = in.readDouble();
+        lonUser = in.readDouble();
         fechaAcuerdo = in.readLong();
         idVehiculo = in.readString();
         preferenciasRuta = in.createStringArrayList();
@@ -182,26 +165,6 @@ public class Grupo implements Parcelable {
         this.id_Grupo = id_Grupo;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(nombreGrupo);
-        parcel.writeString(idConductor);
-        parcel.writeDouble(tarifa);
-        parcel.writeInt(cupo);
-        parcel.writeDouble(latitudAcuerdo);
-        parcel.writeDouble(longitudAcuerdo);
-        parcel.writeDouble(latitudDestino);
-        parcel.writeDouble(longitudDestino);
-        parcel.writeLong(fechaAcuerdo);
-        parcel.writeString(idVehiculo);
-        parcel.writeStringList(preferenciasRuta);
-    }
-
     public double getLatUser() {
         return latUser;
     }
@@ -216,5 +179,28 @@ public class Grupo implements Parcelable {
 
     public void setLonUser(double lonUser) {
         this.lonUser = lonUser;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(id_Grupo);
+        parcel.writeString(nombreGrupo);
+        parcel.writeString(idConductor);
+        parcel.writeDouble(tarifa);
+        parcel.writeInt(cupo);
+        parcel.writeDouble(latitudAcuerdo);
+        parcel.writeDouble(longitudAcuerdo);
+        parcel.writeDouble(latitudDestino);
+        parcel.writeDouble(longitudDestino);
+        parcel.writeDouble(latUser);
+        parcel.writeDouble(lonUser);
+        parcel.writeLong(fechaAcuerdo);
+        parcel.writeString(idVehiculo);
+        parcel.writeStringList(preferenciasRuta);
     }
 }

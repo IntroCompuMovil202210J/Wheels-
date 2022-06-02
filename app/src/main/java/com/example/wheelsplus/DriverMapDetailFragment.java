@@ -1,10 +1,16 @@
 package com.example.wheelsplus;
 
+import android.app.Activity;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import android.os.StrictMode;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +34,8 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.TilesOverlay;
+
 import java.util.ArrayList;
 import display.DisplayGroupDriver;
 
@@ -55,6 +63,13 @@ public class DriverMapDetailFragment extends Fragment {
     FirebaseAuth auth;
     FirebaseDatabase database;
     DatabaseReference myRef;
+
+    /**
+     * Light sensor
+     */
+    SensorManager sensorManager;
+    Sensor light;
+    SensorEventListener lightEvent;
 
     /**
      * Utils
@@ -114,6 +129,10 @@ public class DriverMapDetailFragment extends Fragment {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        sensorManager = (SensorManager) getActivity().getSystemService(Activity.SENSOR_SERVICE);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        lightEvent = createLightEventListener();
+
         getCoordenadasFB();
 
         return root;
@@ -127,6 +146,39 @@ public class DriverMapDetailFragment extends Fragment {
         LatLng bogota = new LatLng(4.6269938175930525, -74.06389749953162);
         mapController.setCenter(new GeoPoint(bogota.latitude, bogota.longitude));
         mapController.setZoom(16.0);
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(lightEvent);
+    }
+
+    private SensorEventListener createLightEventListener(){
+        return new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                try {
+                    if (map != null) {
+                        if (event.values[0] < 5000) {
+                            Log.i("MAPS", "DARK MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                        } else {
+                            Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                        }
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
     private void initMap(){

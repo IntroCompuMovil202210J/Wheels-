@@ -1,10 +1,15 @@
 package com.example.wheelsplus;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -57,6 +62,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,7 +81,7 @@ public class TripActivity extends AppCompatActivity {
 
     private MapView map;
     private IMapController mapController;
-    private Marker marker, other;
+    private Marker marker, other, dest;
 
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_DRIVERS_PATH = "drivers/";
@@ -97,6 +103,10 @@ public class TripActivity extends AppCompatActivity {
     ValueEventListener vel, sel;
 
     private DisplayGroupDriver displayGroup;
+
+    SensorManager sensorManager;
+    Sensor light;
+    SensorEventListener lightEvent;
 
     private ArrayList<GeoPoint> points = new ArrayList<>();
     private ArrayList<GeoPoint> pointsAux = new ArrayList<>();
@@ -156,12 +166,17 @@ public class TripActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        lightEvent = createLightEventListener();
+
         loadPassengers();
 
         buttonEndTrip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(distance(latitude, longitude, latitudDestino, longitudDestino) < 0.05){
+                    stopLocationUpdates();
                     myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
                     myRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -171,36 +186,38 @@ public class TripActivity extends AppCompatActivity {
                                 @Override
                                 public void onComplete(@NonNull Task<DataSnapshot> task) {
                                     if(task.isSuccessful()){
-                                        for(DataSnapshot single : task.getResult().child(FB_GROUPS_PATH).getChildren()){
-                                            if(single.getKey().equals(displayGroup.getIdGrupo())){
-                                                single.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                    @Override
-                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                        if(task.isSuccessful()){
-                                                            myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
-                                                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-                                                                @Override
-                                                                public void onComplete(@NonNull Task<DataSnapshot> task) {
-                                                                    if(task.isSuccessful()){
-                                                                        for(DataSnapshot superSingle : task.getResult().getChildren()){
-                                                                            if(superSingle.getKey().equals(displayGroup.getIdGrupo())){
-                                                                                superSingle.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                                                    @Override
-                                                                                    public void onComplete(@NonNull Task<Void> task) {
-                                                                                        if(task.isSuccessful()){
-                                                                                            Toast.makeText(TripActivity.this, "El viaje ha finalizado correctamente", Toast.LENGTH_SHORT).show();
-                                                                                            startActivity(new Intent(view.getContext(), DriverNavActivity.class));
+                                        for(DataSnapshot singleMax : task.getResult().getChildren()) {
+                                            for (DataSnapshot single : singleMax.child(FB_GROUPS_PATH).getChildren()) {
+                                                if (single.getKey().equals(displayGroup.getIdGrupo())) {
+                                                    single.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                        @Override
+                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                            if (task.isSuccessful()) {
+                                                                myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+                                                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                    @Override
+                                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                        if (task.isSuccessful()) {
+                                                                            for (DataSnapshot superSingle : task.getResult().getChildren()) {
+                                                                                if (superSingle.getKey().equals(displayGroup.getIdGrupo())) {
+                                                                                    superSingle.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<Void> task) {
+                                                                                            if (task.isSuccessful()) {
+                                                                                                Toast.makeText(TripActivity.this, "El viaje ha finalizado correctamente", Toast.LENGTH_SHORT).show();
+                                                                                                startActivity(new Intent(view.getContext(), DriverNavActivity.class));
+                                                                                            }
                                                                                         }
-                                                                                    }
-                                                                                });
+                                                                                    });
+                                                                                }
                                                                             }
                                                                         }
                                                                     }
-                                                                }
-                                                            });
+                                                                });
+                                                            }
                                                         }
-                                                    }
-                                                });
+                                                    });
+                                                }
                                             }
                                         }
                                     }
@@ -232,6 +249,7 @@ public class TripActivity extends AppCompatActivity {
         mapController.setCenter(new GeoPoint(bogota.latitude, bogota.longitude));
         mapController.setZoom(16.0);
         startLocationUpdates();
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -242,6 +260,33 @@ public class TripActivity extends AppCompatActivity {
         if(myRef != null){
             myRef.removeEventListener(vel);
         }
+        sensorManager.unregisterListener(lightEvent);
+    }
+
+    private SensorEventListener createLightEventListener(){
+        return new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                try {
+                    if (map != null) {
+                        if (event.values[0] < 5000) {
+                            Log.i("MAPS", "DARK MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                        } else {
+                            Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                        }
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
     private void loadPassengers(){
@@ -410,6 +455,11 @@ public class TripActivity extends AppCompatActivity {
                     Grupo grupo = task.getResult().getValue(Grupo.class);
                     latitudDestino = grupo.getLatitudDestino();
                     longitudDestino = grupo.getLongitudDestino();
+                    if(dest != null){
+                        map.getOverlays().remove(dest);
+                    }
+                    dest = createMarker(new GeoPoint(latitudDestino, longitudDestino), geoCoderBuscar(new LatLng(latitudDestino, longitudDestino)), null, R.drawable.vector_mk_destination);
+                    map.getOverlays().add(dest);
                     points.add(new GeoPoint(grupo.getLatitudDestino(), grupo.getLongitudDestino()));
                 }
             }

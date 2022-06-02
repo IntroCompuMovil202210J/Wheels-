@@ -10,16 +10,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -53,6 +62,7 @@ import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
+import org.osmdroid.views.overlay.TilesOverlay;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,10 +75,12 @@ import model.Usuario;
 public class PassengerTripActivity extends AppCompatActivity {
 
     MapView passengerTripMap;
+    Button buttonCancelGroup;
+    TextView tvTimeGroup, tvDistanceGroup;
 
     private MapView map;
     private IMapController mapController;
-    private Marker marker, other;
+    private Marker marker, other, dest;
     private RoadManager roadManager;
     private Polyline roadOverlay;
 
@@ -87,8 +99,14 @@ public class PassengerTripActivity extends AppCompatActivity {
     private DatabaseReference myRef;
     ValueEventListener sel, fel, tel;
 
+    SensorManager sensorManager;
+    Sensor light;
+    SensorEventListener lightEvent;
+
     Grupo myGroup = null;
+    public static Grupo intentGroup;
     String groupKey;
+    String tim, dis;
     private ArrayList<GeoPoint> points = new ArrayList<>();
     private ArrayList<GeoPoint> pointsAux = new ArrayList<>();
     boolean mainRoute = false, in = false;
@@ -126,6 +144,9 @@ public class PassengerTripActivity extends AppCompatActivity {
         Log.i("MyGroup", groupKey);
 
         passengerTripMap = findViewById(R.id.passengerTripMap);
+        buttonCancelGroup = findViewById(R.id.buttonCancelGroup);
+        tvTimeGroup = findViewById(R.id.tvTimeGroup);
+        tvDistanceGroup = findViewById(R.id.tvDistanceGroup);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -137,6 +158,9 @@ public class PassengerTripActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DataSnapshot> task) {
                 if(task.isSuccessful()){
                     myGroup = task.getResult().getValue(Grupo.class);
+                    if(myGroup != null){
+                        intentGroup = myGroup;
+                    }
                     checkDriverLocation();
                     checkTrip();
                 }
@@ -159,12 +183,62 @@ public class PassengerTripActivity extends AppCompatActivity {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
+        sensorManager = (SensorManager) getSystemService(Activity.SENSOR_SERVICE);
+        light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        lightEvent = createLightEventListener();
+
+        buttonCancelGroup.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + groupKey);
+                myRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        myRef = database.getReference(FB_GROUPS_PATH + groupKey).child(FB_ROUTE_PATH);
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    for(DataSnapshot single : task.getResult().getChildren()){
+                                        PuntoRuta puntoRuta = single.getValue(PuntoRuta.class);
+                                        if(puntoRuta.getIdUsuario().equals(auth.getCurrentUser().getUid())){
+                                            single.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    Toast.makeText(PassengerTripActivity.this, "Saliste del grupo " + myGroup.getNombreGrupo(), Toast.LENGTH_SHORT).show();
+                                                    startActivity(new Intent(PassengerTripActivity.this, NavActivity.class));
+                                                }
+                                            });
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         checkLocationSettings();
+        myRef = database.getReference(FB_GROUPS_PATH + groupKey);
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.isSuccessful()){
+                    myGroup = task.getResult().getValue(Grupo.class);
+                    if(myGroup != null){
+                        intentGroup = myGroup;
+                    }
+                    checkDriverLocation();
+                    checkTrip();
+                }
+            }
+        });
     }
 
     @Override
@@ -176,6 +250,7 @@ public class PassengerTripActivity extends AppCompatActivity {
         mapController.setCenter(new GeoPoint(bogota.latitude, bogota.longitude));
         mapController.setZoom(16.0);
         startLocationUpdates();
+        sensorManager.registerListener(lightEvent, light, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
@@ -186,7 +261,35 @@ public class PassengerTripActivity extends AppCompatActivity {
         if(myRef != null){
             myRef.removeEventListener(sel);
             myRef.removeEventListener(fel);
+            myRef.removeEventListener(tel);
         }
+        sensorManager.unregisterListener(lightEvent);
+    }
+
+    private SensorEventListener createLightEventListener(){
+        return new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                try {
+                    if (map != null) {
+                        if (event.values[0] < 5000) {
+                            Log.i("MAPS", "DARK MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(TilesOverlay.INVERT_COLORS);
+                        } else {
+                            Log.i("MAPS", "LIGHT MAP " + event.values[0]);
+                            map.getOverlayManager().getTilesOverlay().setColorFilter(null);
+                        }
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+
+            }
+        };
     }
 
     private void initMap(){
@@ -237,8 +340,10 @@ public class PassengerTripActivity extends AppCompatActivity {
                                 map.getOverlays().remove(marker);
                             }
 
-                            marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
-                            map.getOverlays().add(marker);
+                            if(!in) {
+                                marker = createMarker(startPoint, geocoder.getFromLocation(startPoint.getLatitude(), startPoint.getLongitude(), 1).get(0).getAddressLine(0), null, R.drawable.vector_mk_origin);
+                                map.getOverlays().add(marker);
+                            }
                             points.clear();
                             pointsAux.clear();
                             getCoordenadasFB(startPoint);
@@ -323,7 +428,7 @@ public class PassengerTripActivity extends AppCompatActivity {
                 }
                 other = createMarker(new GeoPoint(latitudConductor, longitudConductor), conductor.getNombre() + " " + conductor.getApellido(), geoCoderBuscar(new LatLng(latitudConductor, longitudConductor)), R.drawable.vector_mkd_origin);
                 map.getOverlays().add(other);
-                if(startPoint != null && in){
+                if(startPoint != null && !in){
                     drawRoute(startPoint, new GeoPoint(latitudConductor, longitudConductor), Color.RED);
                 }
             }
@@ -341,6 +446,11 @@ public class PassengerTripActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if(!snapshot.exists()){
+                    stopLocationUpdates();
+                    Intent intent = new Intent(PassengerTripActivity.this, SummaryActivity.class);
+                    intent.putExtra("group", intentGroup);
+                    intent.putExtra("timeTrip", tim);
+                    intent.putExtra("distanceTrip", dis);
                     startActivity(new Intent(PassengerTripActivity.this, SummaryActivity.class));
                 }
             }
@@ -366,6 +476,11 @@ public class PassengerTripActivity extends AppCompatActivity {
                     Grupo grupo = task.getResult().getValue(Grupo.class);
                     latitudDestino = grupo.getLatitudDestino();
                     longitudDestino = grupo.getLongitudDestino();
+                    if(dest != null){
+                        map.getOverlays().remove(dest);
+                    }
+                    dest = createMarker(new GeoPoint(latitudDestino, longitudDestino), geoCoderBuscar(new LatLng(latitudDestino, longitudDestino)), null, R.drawable.vector_mk_destination);
+                    map.getOverlays().add(dest);
                     points.add(new GeoPoint(grupo.getLatitudDestino(), grupo.getLongitudDestino()));
                 }
             }
@@ -388,6 +503,7 @@ public class PassengerTripActivity extends AppCompatActivity {
                     drawRoute(startPoint, new GeoPoint(latitudConductor, longitudConductor), Color.RED);
                 }else{
                     in = true;
+                    buttonCancelGroup.setClickable(false);
                     if(other != null){
                         map.getOverlays().remove(other);
                     }
@@ -488,6 +604,14 @@ public class PassengerTripActivity extends AppCompatActivity {
 
         if (!pointsR.isEmpty()){
             Road road = roadManager.getRoad(pointsR);
+            if(!in){
+                tim = String.valueOf(road.mLength);
+                dis = String.valueOf(road.mDuration/60);
+            }
+            Log.i("RUTA", "Route length: "+road.mLength+" klm");
+            tvDistanceGroup.setText(road.mLength + " kms");
+            Log.i("RUTA", "Duration: "+road.mDuration/60+" min");
+            tvTimeGroup.setText(road.mDuration/60 + " min");
             if(map!=null){
                 if(roadOverlay!=null)
                     map.getOverlays().remove(roadOverlay);
@@ -505,8 +629,14 @@ public class PassengerTripActivity extends AppCompatActivity {
         routePoints.add(start);
         routePoints.add(finish);
         Road road = roadManager.getRoad(routePoints);
+        if(!in){
+            tim = String.valueOf(road.mLength);
+            dis = String.valueOf(road.mDuration/60);
+        }
         Log.i("RUTA", "Route length: "+road.mLength+" klm");
+        tvDistanceGroup.setText(road.mLength + " kms");
         Log.i("RUTA", "Duration: "+road.mDuration/60+" min");
+        tvTimeGroup.setText(road.mDuration/60 + " min");
         if(map!=null){
             if(roadOverlay!=null){
                 map.getOverlays().remove(roadOverlay);
