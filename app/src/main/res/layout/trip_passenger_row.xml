@@ -28,6 +28,17 @@
         android:fontFamily="@font/roboto_medium"/>
 
     <ImageButton
+        android:id="@+id/buttonChatPassenger"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:minHeight="48dp"
+        android:layout_weight=".5"
+        android:layout_gravity="center"
+        app:srcCompat="@drawable/vector_click_new_chat"
+        tools:ignore="SpeakableTextPresentCheck,TouchTargetSizeCheck" />
+
+    <ImageButton
         android:id="@+id/buttonInUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

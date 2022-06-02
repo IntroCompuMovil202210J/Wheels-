@@ -7,19 +7,37 @@
     android:orientation="vertical"
     tools:context=".TripActivity">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/driverTripMapDetail"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight=".7">
 
-    </org.osmdroid.views.MapView>
+        <org.osmdroid.views.MapView
+            android:id="@+id/driverTripMapDetail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </org.osmdroid.views.MapView>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/buttonEndTrip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            app:backgroundTint="@color/azul_cool"
+            app:srcCompat="@drawable/vector_baseline_sports_score_24"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+    </FrameLayout>
 
     <ListView
-        android:background="@color/azul_cool"
         android:id="@+id/listTripPassengers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".3" />
+        android:layout_weight=".3"
+        android:background="@color/azul_cool" />
 
 </LinearLayout>

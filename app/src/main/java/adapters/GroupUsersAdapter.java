@@ -80,7 +80,7 @@ public class GroupUsersAdapter extends ArrayAdapter<Usuario> {
                                     getContext().startActivity(intent);
                                 } else {
                                     new MaterialAlertDialogBuilder(view.getContext())
-                                            .setTitle("¿Desea iniciar un chat con" + usuario.getNombre() + " " + usuario.getApellido() + "?")
+                                            .setTitle("¿Desea iniciar un chat con " + usuario.getNombre() + " " + usuario.getApellido() + "?")
                                             .setNegativeButton("Volver", null)
                                             .setPositiveButton("Crear chat", new DialogInterface.OnClickListener() {
                                                 @Override
@@ -101,7 +101,7 @@ public class GroupUsersAdapter extends ArrayAdapter<Usuario> {
                                                                         Toast.makeText(view.getContext(), "Chat creado correctamente", Toast.LENGTH_SHORT).show();
                                                                         Intent intent = new Intent(getContext(), ChatActivity.class);
                                                                         intent.putExtra("chatKey", key);
-                                                                        intent.putExtra("otherUser", usuario.getIdUsuario());
+                                                                        intent.putExtra("fromActivity", "groupDetail");
                                                                         getContext().startActivity(intent);
                                                                     }
                                                                 });

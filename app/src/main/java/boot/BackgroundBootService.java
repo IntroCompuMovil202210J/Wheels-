@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,8 +16,10 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 
 import com.example.wheelsplus.ChatActivity;
+import com.example.wheelsplus.HomeFragment;
 import com.example.wheelsplus.MainActivity;
 import com.example.wheelsplus.NavActivity;
+import com.example.wheelsplus.PassengerTripActivity;
 import com.example.wheelsplus.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -26,6 +29,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,14 +37,18 @@ import java.util.Map;
 
 import model.Grupo;
 import model.Mensaje;
+import model.PuntoRuta;
+import model.Usuario;
 
 public class BackgroundBootService extends Service {
 
     public static final String CHANNEL_ID = "WheelsPlus";
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
+    public static final String FB_DRIVERS_PATH = "drivers/";
     public static final String FB_CHATS_PATH = "chats/";
     public static final String FB_MESSAGES_PATH = "messages/";
+    public static final String FB_ROUTE_PATH = "ruta/";
 
 
     FirebaseAuth auth;
@@ -49,7 +57,7 @@ public class BackgroundBootService extends Service {
     ChildEventListener vel, velC;
 
     String uuid;
-    Map<String, String> mapGroup = new HashMap<>();
+    Map<String, Grupo> mapGroup = new HashMap<>();
     ArrayList<Mensaje> arrayMessage = new ArrayList<>();
 
     @Nullable
@@ -101,7 +109,7 @@ public class BackgroundBootService extends Service {
                         public void onComplete(@NonNull Task<DataSnapshot> task) {
                             if (task.isSuccessful()) {
                                 Grupo grupo = task.getResult().getValue(Grupo.class);
-                                mapGroup.put(grupo.getId_Grupo(), grupo.getNombreGrupo());
+                                mapGroup.put(grupo.getId_Grupo(), grupo);
                             }
                         }
                     });
@@ -116,8 +124,8 @@ public class BackgroundBootService extends Service {
                 @Override
                 public void onChildRemoved(@NonNull DataSnapshot snapshot) {
                     String grupoId = snapshot.getKey();
+                    groupRemoved(mapGroup.get(grupoId).getNombreGrupo());
                     mapGroup.remove(grupoId);
-                    groupRemoved(mapGroup.get(grupoId));
                 }
 
                 @Override
@@ -183,6 +191,77 @@ public class BackgroundBootService extends Service {
             });
         }
 
+        if(auth.getCurrentUser()!=null) {
+            myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+            myRef.addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                    if(snapshot.getValue(Boolean.class)){
+                        myRef = database.getReference(FB_GROUPS_PATH + snapshot.getKey());
+                        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                if(task.isSuccessful()){
+                                    Grupo grupo = task.getResult().getValue(Grupo.class);
+                                    myRef = database.getReference(FB_USERS_PATH + grupo.getIdConductor());
+                                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                            if(task.isSuccessful()){
+                                                Usuario conductor = task.getResult().getValue(Usuario.class);
+                                                myRef = database.getReference(FB_GROUPS_PATH + snapshot.getKey()).child(FB_ROUTE_PATH);
+                                                myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                        if(task.isSuccessful()){
+                                                            for(DataSnapshot single : task.getResult().getChildren()){
+                                                                PuntoRuta puntoRuta = single.getValue(PuntoRuta.class);
+                                                                if(puntoRuta.getIdUsuario().equals(auth.getCurrentUser().getUid())){
+                                                                    if(distance(puntoRuta.getLatitud(), puntoRuta.getLongitud(), conductor.getLatitud(), conductor.getLongitud()) <= 1){
+                                                                        if(distance(puntoRuta.getLatitud(), puntoRuta.getLongitud(), conductor.getLatitud(), conductor.getLongitud()) <= 0.02){
+                                                                            driverArrived(conductor.getNombre(), grupo);
+                                                                        }else{
+                                                                            driverNeared(conductor.getNombre(), grupo);
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                    }
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
+
+
         return START_STICKY;
     }
 
@@ -190,8 +269,28 @@ public class BackgroundBootService extends Service {
         sendNotification("Wheelsplus", "El grupo " + groupname +" se ha eliminado", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
     }
 
-    private void groupStarted(String groupname) {
-        sendNotification("Wheelsplus", "El grupo " + groupname +" ha iniciado", R.drawable.logo_wheels, new Intent(this, NavActivity.class));
+    private void groupStarted(Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        sendNotification("Wheelsplus", "El grupo " + group.getNombreGrupo() +" ha iniciado", R.drawable.logo_wheels, intent);
+    }
+
+    private void driverNeared(String conductor, Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        sendNotification("Wheelsplus", "El conductor " + conductor + " esta cerca, ¡preparate!", R.drawable.logo_wheels, intent);
+    }
+
+    private void driverArrived(String conductor, Grupo group) {
+        Intent intent = new Intent(this, PassengerTripActivity.class);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        sendNotification("Wheelsplus", "El conductor " + conductor + " llego ¡subete!", R.drawable.logo_wheels, intent);
     }
 
     private void chatNotification(String idChat, String nameOther, String dataMessage) {
@@ -231,5 +330,15 @@ public class BackgroundBootService extends Service {
         notificationManager.notify(7, buildComplexNotification(title, message, icon, intent));
     }
 
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        double latDistance = Math.toRadians(lat1 - lat2);
+        double lngDistance = Math.toRadians(long1 - long2);
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lngDistance / 2) * Math.sin(lngDistance / 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double result = HomeFragment.EARTH_RADIUS * c;
+        return Math.round(result*100.0)/100.0;
+    }
 
 }

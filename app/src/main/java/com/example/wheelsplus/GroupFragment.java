@@ -96,7 +96,7 @@ public class GroupFragment extends Fragment {
     double latOrigin, lngOrigin;
     LatLng latLngDestino;
     Calendar calendar = Calendar.getInstance();
-    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -184,7 +184,7 @@ public class GroupFragment extends Fragment {
         buttonTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
                 TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -339,9 +339,7 @@ public class GroupFragment extends Fragment {
                         else
                             editGroupDestination.setError("Dirección no encontrada, intente de nuevo");
 
-                    }
-
-                    else{
+                    }else{
                         myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                             @Override
                             public void onComplete(@NonNull Task<DataSnapshot> task) {

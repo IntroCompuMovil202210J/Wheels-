@@ -35,6 +35,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import display.DisplayGroup;
 import model.Chat;
 import model.Grupo;
+import model.PuntoRuta;
 import model.Usuario;
 import services.DownloadImageTask;
 
@@ -70,6 +71,7 @@ public class GroupDetailFragment extends Fragment {
     public static final String FB_USERS_PATH = "users/";
     public static final String FB_GROUPS_PATH = "groups/";
     public static final String FB_CHATS_PATH = "chats/";
+    public static final String FB_ROUTE_PATH = "ruta/";
     DisplayGroup displayGroup;
     String idDriver;
 
@@ -201,6 +203,19 @@ public class GroupDetailFragment extends Fragment {
                                                                             public void onComplete(@NonNull Task<DataSnapshot> task) {
                                                                                 if(task.isSuccessful()){
                                                                                     Grupo gr = task.getResult().getValue(Grupo.class);
+                                                                                    myRef = database.getReference(FB_GROUPS_PATH + grupo.getId_Grupo()).child(FB_ROUTE_PATH);
+                                                                                    myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                                        @Override
+                                                                                        public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                                            if(task.isSuccessful()){
+                                                                                                for(DataSnapshot single : task.getResult().getChildren()){
+                                                                                                    if(single.getValue(PuntoRuta.class).getIdUsuario().equals(auth.getCurrentUser().getUid())){
+                                                                                                        single.getRef().removeValue();
+                                                                                                    }
+                                                                                                }
+                                                                                            }
+                                                                                        }
+                                                                                    });
                                                                                     myRef = database.getReference(FB_GROUPS_PATH + grupo.getId_Grupo()).child("cupo");
                                                                                     myRef.setValue(gr.getCupo() + 1).addOnCompleteListener(new OnCompleteListener<Void>() {
                                                                                         @Override

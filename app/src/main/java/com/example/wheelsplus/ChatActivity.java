@@ -60,7 +60,7 @@ public class ChatActivity extends AppCompatActivity {
     public static final String FB_CHATS_PATH = "chats/";
     public static final String FB_MESSAGES_PATH = "messages/";
     public static final String FB_CHAT_CONTENT = "chatContent/";
-    String chatKey;
+    String chatKey, fromActivity;
     Usuario otherUser;
     MessagesAdapter messagesAdapter = new MessagesAdapter(this, new ArrayList<>());
     ArrayList<Mensaje> mensajes = new ArrayList<>();
@@ -129,6 +129,11 @@ public class ChatActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         chatKey = getIntent().getStringExtra("chatKey");
+        if(getIntent().getStringExtra("fromActivity") != null){
+            fromActivity = getIntent().getStringExtra("fromActivity");
+        }else{
+            fromActivity = "tripDetail";
+        }
 
         tvOtherUserName = findViewById(R.id.tvOtherChatUsername);
         recyclerView = findViewById(R.id.recyclerView);
@@ -225,8 +230,11 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        startActivity(new Intent(this, NavActivity.class));
+        if(!fromActivity.equals("tripDetail")){
+            startActivity(new Intent(this, NavActivity.class));
+        }else{
+            super.onBackPressed();
+        }
     }
 
     private void readMessages(){

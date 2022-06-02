@@ -85,7 +85,7 @@ public class DriverGroupFragment extends Fragment {
     boolean time, date = false;
     Calendar calendar = Calendar.getInstance();
     Vehiculo vehiculo = null;
-    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+    SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -177,7 +177,7 @@ public class DriverGroupFragment extends Fragment {
         buttonTimeDriver.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm a");
                 TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(), new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker timePicker, int hour, int minute) {
@@ -274,8 +274,6 @@ public class DriverGroupFragment extends Fragment {
                                                 editGroupFeeDriver.setText("");
                                                 editGroupNameDriver.setText("");
                                                 editGroupOriginDriver.setText("");
-                                                myRef = database.getReference(FB_GROUPS_PATH + key + "/ruta/cuposOcupados");
-                                                myRef.setValue(0);
                                             }
                                         }
                                     });

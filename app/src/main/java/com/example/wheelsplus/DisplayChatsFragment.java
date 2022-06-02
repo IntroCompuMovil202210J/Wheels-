@@ -134,6 +134,7 @@ public class DisplayChatsFragment extends Fragment {
                 DisplayChat displayChat = (DisplayChat) adapterView.getItemAtPosition(i);
                 Intent intent = new Intent(getActivity(), ChatActivity.class);
                 intent.putExtra("chatKey", displayChat.getIdChat());
+                intent.putExtra("fromActivity", "displayChats");
                 startActivity(intent);
             }
         });
