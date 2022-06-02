@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -18,6 +19,7 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.Window;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.CommonStatusCodes;
@@ -83,12 +85,13 @@ public class PassengerTripActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private FirebaseDatabase database;
     private DatabaseReference myRef;
-    ValueEventListener sel, fel;
+    ValueEventListener sel, fel, tel;
 
     Grupo myGroup = null;
+    String groupKey;
     private ArrayList<GeoPoint> points = new ArrayList<>();
     private ArrayList<GeoPoint> pointsAux = new ArrayList<>();
-    boolean mainRoute = false;
+    boolean mainRoute = false, in = false;
     private double latitude = 4.76943, longitude = -74.04317, latitudA, longitudA, latitudDestino, longitudDestino, latitudConductor, longitudConductor;
     private GeoPoint startPoint;
 
@@ -114,9 +117,13 @@ public class PassengerTripActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getSupportActionBar().hide();
         setContentView(R.layout.activity_passenger_trip);
 
-        myGroup = getIntent().getParcelableExtra("myGroup");
+        groupKey = getIntent().getStringExtra("myGroup");
+
+        Log.i("MyGroup", groupKey);
 
         passengerTripMap = findViewById(R.id.passengerTripMap);
 
@@ -124,7 +131,17 @@ public class PassengerTripActivity extends AppCompatActivity {
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
 
-        checkDriverLocation();
+        myRef = database.getReference(FB_GROUPS_PATH + groupKey);
+        myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DataSnapshot> task) {
+                if(task.isSuccessful()){
+                    myGroup = task.getResult().getValue(Grupo.class);
+                    checkDriverLocation();
+                    checkTrip();
+                }
+            }
+        });
 
         geocoder = new Geocoder(this);
 
@@ -173,7 +190,7 @@ public class PassengerTripActivity extends AppCompatActivity {
     }
 
     private void initMap(){
-        map = findViewById(R.id.driverTripMapDetail);
+        map = findViewById(R.id.passengerTripMap);
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.getZoomController().activate();
@@ -306,6 +323,26 @@ public class PassengerTripActivity extends AppCompatActivity {
                 }
                 other = createMarker(new GeoPoint(latitudConductor, longitudConductor), conductor.getNombre() + " " + conductor.getApellido(), geoCoderBuscar(new LatLng(latitudConductor, longitudConductor)), R.drawable.vector_mkd_origin);
                 map.getOverlays().add(other);
+                if(startPoint != null && in){
+                    drawRoute(startPoint, new GeoPoint(latitudConductor, longitudConductor), Color.RED);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+    }
+
+    private void checkTrip(){
+        myRef = database.getReference(FB_USERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH + myGroup.getId_Grupo());
+        tel = myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(!snapshot.exists()){
+                    startActivity(new Intent(PassengerTripActivity.this, SummaryActivity.class));
+                }
             }
 
             @Override
@@ -334,7 +371,7 @@ public class PassengerTripActivity extends AppCompatActivity {
             }
         });
 
-        myRef = database.getReference(FB_USERS_PATH + myGroup.getId_Grupo()).child(FB_ROUTE_PATH);
+        myRef = database.getReference(FB_GROUPS_PATH + myGroup.getId_Grupo()).child(FB_ROUTE_PATH);
         sel = myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -350,6 +387,10 @@ public class PassengerTripActivity extends AppCompatActivity {
                 if(val){
                     drawRoute(startPoint, new GeoPoint(latitudConductor, longitudConductor), Color.RED);
                 }else{
+                    in = true;
+                    if(other != null){
+                        map.getOverlays().remove(other);
+                    }
                     myRef = database.getReference(FB_GROUPS_PATH + myGroup.getId_Grupo()).child(FB_ROUTE_PATH);
                     myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
                         @Override

@@ -271,19 +271,25 @@ public class BackgroundBootService extends Service {
 
     private void groupStarted(Grupo group) {
         Intent intent = new Intent(this, PassengerTripActivity.class);
-        intent.putExtra("myGroup", group);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         sendNotification("Wheelsplus", "El grupo " + group.getNombreGrupo() +" ha iniciado", R.drawable.logo_wheels, intent);
     }
 
     private void driverNeared(String conductor, Grupo group) {
         Intent intent = new Intent(this, PassengerTripActivity.class);
-        intent.putExtra("myGroup", group);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         sendNotification("Wheelsplus", "El conductor " + conductor + " esta cerca, ¡preparate!", R.drawable.logo_wheels, intent);
     }
 
     private void driverArrived(String conductor, Grupo group) {
         Intent intent = new Intent(this, PassengerTripActivity.class);
-        intent.putExtra("myGroup", group);
+        Log.i("GroupIntent", group.getId_Grupo());
+        intent.putExtra("myGroup", group.getId_Grupo());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         sendNotification("Wheelsplus", "El conductor " + conductor + " llego ¡subete!", R.drawable.logo_wheels, intent);
     }
 

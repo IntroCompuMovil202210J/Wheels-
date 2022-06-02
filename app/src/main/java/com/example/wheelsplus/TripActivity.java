@@ -1,6 +1,7 @@
 package com.example.wheelsplus;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -9,8 +10,10 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
+import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -37,6 +40,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -67,12 +71,14 @@ import model.Usuario;
 public class TripActivity extends AppCompatActivity {
 
     ListView listTripPassengers;
+    FloatingActionButton buttonEndTrip;
 
     private MapView map;
     private IMapController mapController;
     private Marker marker, other;
 
     public static final String FB_USERS_PATH = "users/";
+    public static final String FB_DRIVERS_PATH = "drivers/";
     public static final String FB_GROUPS_PATH = "groups/";
     public static final String FB_ROUTE_PATH = "ruta/";
 
@@ -128,6 +134,7 @@ public class TripActivity extends AppCompatActivity {
         displayGroup = getIntent().getParcelableExtra("displayDriverGroupInfo");
 
         listTripPassengers = findViewById(R.id.listTripPassengers);
+        buttonEndTrip = findViewById(R.id.buttonEndTrip);
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
@@ -150,6 +157,63 @@ public class TripActivity extends AppCompatActivity {
         StrictMode.setThreadPolicy(policy);
 
         loadPassengers();
+
+        buttonEndTrip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(distance(latitude, longitude, latitudDestino, longitudDestino) < 0.05){
+                    myRef = database.getReference(FB_GROUPS_PATH + displayGroup.getIdGrupo());
+                    myRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            myRef = database.getReference(FB_USERS_PATH);
+                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                    if(task.isSuccessful()){
+                                        for(DataSnapshot single : task.getResult().child(FB_GROUPS_PATH).getChildren()){
+                                            if(single.getKey().equals(displayGroup.getIdGrupo())){
+                                                single.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                    @Override
+                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                        if(task.isSuccessful()){
+                                                            myRef = database.getReference(FB_DRIVERS_PATH + auth.getCurrentUser().getUid()).child(FB_GROUPS_PATH);
+                                                            myRef.get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<DataSnapshot> task) {
+                                                                    if(task.isSuccessful()){
+                                                                        for(DataSnapshot superSingle : task.getResult().getChildren()){
+                                                                            if(superSingle.getKey().equals(displayGroup.getIdGrupo())){
+                                                                                superSingle.getRef().removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                                                    @Override
+                                                                                    public void onComplete(@NonNull Task<Void> task) {
+                                                                                        if(task.isSuccessful()){
+                                                                                            Toast.makeText(TripActivity.this, "El viaje ha finalizado correctamente", Toast.LENGTH_SHORT).show();
+                                                                                            startActivity(new Intent(view.getContext(), DriverNavActivity.class));
+                                                                                        }
+                                                                                    }
+                                                                                });
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }else{
+                    Toast.makeText(TripActivity.this, "Todavía no estás cerca para terminar el viaje", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     @Override
